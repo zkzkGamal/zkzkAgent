@@ -1,13 +1,12 @@
 from tools_module import (
     runDeployScript,
-    openVsCode,
-    openBrowser,
-    network_tools,
 )
 
 from tools_module.dangerous_tools import emptyTrash, emptyTmp , removeFile
 from tools_module.files_tools import findFile, readFile , openFile , findFolder
 from tools_module.processes_tools import findProcess , killProcess
+from tools_module.network_tools import checkInternet, enableWifi
+from tools_module.applications_tools import openVsCode , openBrowser
 
 __all__ = [
     findFile.find_file,
@@ -27,6 +26,6 @@ __all__ = [
     killProcess.kill_process,
     findProcess.find_process,
 
-    network_tools.check_internet,
-    network_tools.enable_wifi,
+    checkInternet.check_internet,
+    enableWifi.enable_wifi,
 ]
