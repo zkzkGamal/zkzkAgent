@@ -1,5 +1,6 @@
 from tools_module import (
     runDeployScript,
+    runCommand,
 )
 
 from tools_module.dangerous_tools import emptyTrash, emptyTmp , removeFile
@@ -29,4 +30,6 @@ __all__ = [
     checkInternet.check_internet,
     enableWifi.enable_wifi,
     networkSearch.duckduckgo_search,
+
+    runCommand.run_command,
 ]
