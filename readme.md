@@ -70,6 +70,8 @@
 
 - **Find Process** (`find_process`): Locate running processes by name using `pgrep`
 - **Kill Process** (`kill_process`): Terminate background processes with SIGTERM
+
+#### Deployment Tools (1 tool)
 - **Deploy Script** (`run_deploy_script`): Run deployment scripts with AI-assisted option selection
 
 ---
