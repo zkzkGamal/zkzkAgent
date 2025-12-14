@@ -2,6 +2,7 @@ import logging, os
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from agent import app
 from modules.voice_module import VoiceModule
+from langchain_core.prompts import load_prompt
 
 # -------------------------
 # Configure logging
@@ -13,7 +14,8 @@ logger = logging.getLogger(__name__)
 
 voice_module = VoiceModule()
 
-
+prompt = load_prompt("prompt.yaml")
+prompt = prompt.format(home=os.path.expanduser("~"))
 # -------------------------
 # Main Execution
 # -------------------------
@@ -23,19 +25,7 @@ def main():
     # Initial State
     messages = [
         SystemMessage(
-            content=f"""
-                You are a local AI assistant. When the user requests an action:
-                    1. If the user requests a deployment, read the deploy script, choose the numeric option automatically, and run it with real-time logs.
-                    2. You can call tools like open_vscode, empty_trash, and clear_tmp when requested.
-                    3. Always stream outputs and update state messages.
-                    4. For dangerous operations (emptying trash, clearing /tmp), always ask the user to confirm before executing.
-                You are running on Ubuntu Linux.
-                    The current user's home directory is:
-                    {os.path.expanduser("~")}
-
-                    Do NOT guess paths like /home/ubuntu.
-                    Always use this home directory.
-            """
+            content=prompt
         )
     ]
 

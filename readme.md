@@ -8,12 +8,30 @@ A modular, local AI assistant built with **LangGraph** and **LangChain**, powere
 - **Modular Architecture**: Clean separation of concerns (Agent, Tools, State).
 - **Tool Use**:
   - `read_file`: Read file contents.
-  - `run_deploy_script`: Automated deployment with AI decision making.
+  - `run_deploy_script`: Automated deployment with background execution and logging.
+  - `kill_process`: Terminate running background processes.
+  - `check_internet` & `enable_wifi`: Ensure network connectivity.
+  - `open_browser`: Open URLs in the default browser.
   - `open_vscode`: Open Visual Studio Code.
   - `empty_trash`: Empty system trash (requires confirmation).
   - `clear_tmp`: Clear temporary files (requires confirmation).
 - **Safety First**: Dangerous tools require explicit user confirmation before execution.
 - **Interactive Loop**: Continuous chat interface with the agent.
+
+## Workflow
+
+```mermaid
+graph TD
+    User[User Input] --> Agent
+    Agent -->|Decide| Decision{Action?}
+    Decision -->|Call Tool| Safety{Dangerous?}
+    Safety -->|Yes| Confirm[Ask Confirmation]
+    Confirm -->|Approved| Tool[Execute Tool]
+    Confirm -->|Denied| Agent
+    Safety -->|No| Tool
+    Tool -->|Output| Agent
+    Decision -->|Response| User
+```
 
 ## Prerequisites
 
