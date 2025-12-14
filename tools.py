@@ -1,13 +1,14 @@
 from tools_module import (
     runDeployScript,
     openVsCode,
-    killProcess,
     openBrowser,
     network_tools,
-    findProcess
 )
+
 from tools_module.dangerous_tools import emptyTrash, emptyTmp , removeFile
 from tools_module.files_tools import findFile, readFile , openFile , findFolder
+from tools_module.processes_tools import findProcess , killProcess
+
 __all__ = [
     findFile.find_file,
     readFile.read_file,
