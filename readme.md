@@ -72,53 +72,179 @@
 
 ## 🏗️ Architecture
 
-The agent operates on a cyclic graph architecture using **LangGraph** with state management and conditional routing.
+The agent operates on a **cyclic graph architecture** using **LangGraph** with stateful execution, conditional routing, and human-in-the-loop safety mechanisms.
+
+### High-Level Agent Flow
+
+```mermaid
+graph TB
+    Start([User Input]) --> Entry[Entry Point: Agent Node]
+
+    Entry --> CheckPending{Pending<br/>Confirmation?}
+
+    %% Confirmation Flow
+    CheckPending -->|Yes| ParseResponse{User Response}
+    ParseResponse -->|yes/y| ExecuteDangerous[Execute Dangerous Tool]
+    ParseResponse -->|no/other| CancelAction[Cancel Action]
+    ExecuteDangerous --> UpdateState1[Update State]
+    CancelAction --> UpdateState1
+    UpdateState1 --> End1([Return to User])
+
+    %% Normal Flow
+    CheckPending -->|No| InvokeLLM[Invoke LLM with Tools]
+    InvokeLLM --> CheckToolCalls{Tool Calls<br/>Present?}
+
+    %% No Tool Calls
+    CheckToolCalls -->|No| End2([Return Response to User])
+
+    %% Tool Calls Present
+    CheckToolCalls -->|Yes| CheckDangerous{Is Dangerous<br/>Tool?}
+
+    %% Dangerous Tool Path
+    CheckDangerous -->|Yes: empty_trash<br/>clear_tmp<br/>remove_file| SetPending[Set Pending Confirmation]
+    SetPending --> AskConfirm[Ask User for Confirmation]
+    AskConfirm --> End3([Wait for User Response])
+
+    %% Safe Tool Path
+    CheckDangerous -->|No| ToolNode[Tool Execution Node]
+    ToolNode --> ExecuteTools[Execute Tool Functions]
+    ExecuteTools --> ToolResult[Collect Tool Results]
+    ToolResult --> BackToAgent[Return to Agent Node]
+    BackToAgent --> Entry
+
+    style CheckPending fill:#ff9999
+    style CheckDangerous fill:#ff9999
+    style SetPending fill:#ffcccc
+    style ExecuteDangerous fill:#ff6666
+    style ToolNode fill:#99ccff
+    style InvokeLLM fill:#99ff99
+```
+
+### Detailed State Management
+
+```mermaid
+graph LR
+    subgraph "AgentState Structure"
+        State[AgentState]
+        State --> Messages[messages: List]
+        State --> Pending[pending_confirmation: Dict]
+        State --> Processes[running_processes: Dict]
+    end
+
+    subgraph "Messages"
+        Messages --> System[SystemMessage]
+        Messages --> Human[HumanMessage]
+        Messages --> AI[AIMessage]
+        Messages --> Tool[ToolMessage]
+    end
+
+    subgraph "Pending Confirmation"
+        Pending --> ToolName[tool_name: str]
+        Pending --> UserMsg[user_message: str]
+    end
+
+    subgraph "Running Processes"
+        Processes --> ProcName[process_name: str]
+        Processes --> PID[pid: int]
+    end
+
+    style State fill:#e1f5ff
+    style Messages fill:#fff9c4
+    style Pending fill:#ffccbc
+    style Processes fill:#c8e6c9
+```
+
+### Tool Execution Flow
 
 ```mermaid
 graph TD
-    User([User Input]) --> Agent
-    Agent[Agent Node] -->|Decide| Decision{Action Required?}
+    ToolCall[Tool Call Received] --> RouteType{Tool Type}
 
-    Decision -->|Yes| CheckSafety{Is Dangerous?}
-    Decision -->|No| Respond([Reply to User])
+    %% File Operations
+    RouteType -->|File Ops| FileFlow[File Operations Flow]
+    FileFlow --> FindFile[find_file: Search with wildcards]
+    FileFlow --> FindFolder[find_folder: Locate directories]
+    FileFlow --> ReadFile[read_file: Display contents]
+    FileFlow --> OpenFile[open_file: xdg-open]
 
-    CheckSafety -->|Yes| Confirm[Request Confirmation]
-    CheckSafety -->|No| Execute[Execute Tool]
+    %% Network Operations
+    RouteType -->|Network| NetworkFlow[Network Operations Flow]
+    NetworkFlow --> CheckInternet[check_internet: Ping 8.8.8.8]
+    NetworkFlow --> EnableWiFi[enable_wifi: nmcli radio wifi on]
 
-    Confirm -->|Approved| Execute
-    Confirm -->|Denied| Agent
+    %% Development Tools
+    RouteType -->|Development| DevFlow[Development Tools Flow]
+    DevFlow --> OpenVSCode[open_vscode: Launch IDE]
+    DevFlow --> OpenBrowser[open_browser: xdg-open URL]
 
-    Execute -->|Result| Agent
+    %% Process Management
+    RouteType -->|Process| ProcFlow[Process Management Flow]
+    ProcFlow --> RunDeploy[run_deploy_script: Background execution]
+    ProcFlow --> KillProc[kill_process: SIGTERM]
 
-    subgraph "File Tools"
-        FindFile[Find File]
-        FindFolder[Find Folder]
-        ReadFile[Read File]
-        OpenFile[Open File]
+    %% Dangerous Operations
+    RouteType -->|Dangerous| DangerFlow[Dangerous Operations Flow]
+    DangerFlow --> Confirm{User<br/>Confirmed?}
+    Confirm -->|Yes| EmptyTrash[empty_trash: rm -rf ~/.local/share/Trash/*]
+    Confirm -->|Yes| ClearTmp[clear_tmp: rm -rf ~/tmp/*]
+    Confirm -->|Yes| RemoveFile[remove_file: rm -rf path]
+    Confirm -->|No| Cancel[Cancel Operation]
+
+    %% Results
+    FindFile --> Result[Return Result to Agent]
+    FindFolder --> Result
+    ReadFile --> Result
+    OpenFile --> Result
+    CheckInternet --> Result
+    EnableWiFi --> Result
+    OpenVSCode --> Result
+    OpenBrowser --> Result
+    RunDeploy --> Result
+    KillProc --> Result
+    EmptyTrash --> Result
+    ClearTmp --> Result
+    RemoveFile --> Result
+    Cancel --> Result
+
+    style DangerFlow fill:#ff9999
+    style Confirm fill:#ffcccc
+    style EmptyTrash fill:#ff6666
+    style ClearTmp fill:#ff6666
+    style RemoveFile fill:#ff6666
+    style NetworkFlow fill:#99ccff
+    style FileFlow fill:#c8e6c9
+    style DevFlow fill:#fff9c4
+    style ProcFlow fill:#e1bee7
+```
+
+### LangGraph Node Structure
+
+```mermaid
+graph LR
+    subgraph "Graph Nodes"
+        AgentNode[Agent Node<br/>call_model]
+        ToolsNode[Tools Node<br/>ToolNode]
     end
 
-    subgraph "Dangerous Tools"
-        EmptyTrash[Empty Trash]
-        ClearTmp[Clear Temp]
-        RemoveFile[Remove File]
+    subgraph "Conditional Routing"
+        Router[should_continue]
+        Router --> CheckPending{pending_confirmation?}
+        Router --> CheckToolCalls{tool_calls?}
     end
 
-    subgraph "System Tools"
-        Deploy[Deploy Script]
-        KillProc[Kill Process]
-        OpenVS[Open VSCode]
-        OpenBrowser[Open Browser]
-    end
+    Start([START]) --> AgentNode
+    AgentNode --> Router
 
-    subgraph "Network Tools"
-        CheckNet[Check Internet]
-        EnableWiFi[Enable Wi-Fi]
-    end
+    CheckPending -->|Yes| End1([END])
+    CheckPending -->|No| CheckToolCalls
+    CheckToolCalls -->|Yes| ToolsNode
+    CheckToolCalls -->|No| End2([END])
 
-    Execute -.-> File Tools
-    Execute -.-> Dangerous Tools
-    Execute -.-> System Tools
-    Execute -.-> Network Tools
+    ToolsNode --> AgentNode
+
+    style AgentNode fill:#99ff99
+    style ToolsNode fill:#99ccff
+    style Router fill:#fff9c4
 ```
 
 ---
