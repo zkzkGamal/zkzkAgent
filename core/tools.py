@@ -5,7 +5,7 @@ from tools_module import (
 from tools_module.dangerous_tools import emptyTrash, emptyTmp , removeFile
 from tools_module.files_tools import findFile, readFile , openFile , findFolder
 from tools_module.processes_tools import findProcess , killProcess
-from tools_module.network_tools import checkInternet, enableWifi
+from tools_module.network_tools import checkInternet, enableWifi , networkSearch
 from tools_module.applications_tools import openVsCode , openBrowser
 
 __all__ = [
@@ -28,4 +28,5 @@ __all__ = [
 
     checkInternet.check_internet,
     enableWifi.enable_wifi,
+    networkSearch.duckduckgo_search,
 ]

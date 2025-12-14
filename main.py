@@ -66,11 +66,11 @@ def main():
 
             last_msg = current_state["messages"][-1]
             if isinstance(last_msg, AIMessage):
-                # logger.info(f"\n[AI]: {last_msg.content}\n")
-                speak(last_msg.content)
+                logger.info(f"\n[AI]: {last_msg.content}\n")
+                # speak(last_msg.content)
             elif isinstance(last_msg, HumanMessage):
-                # logger.info(f"\n[SYSTEM]: {last_msg.content}\n")
-                speak(last_msg.content)
+                logger.info(f"\n[SYSTEM]: {last_msg.content}\n")
+                # speak(last_msg.content)
 
         except KeyboardInterrupt:
             logger.info("\nExiting...")

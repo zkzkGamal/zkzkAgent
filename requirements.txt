@@ -12,3 +12,4 @@ noisereduce
 scipy
 TTS
 pyttsx3
+ddgs

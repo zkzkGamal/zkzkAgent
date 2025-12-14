@@ -3,7 +3,7 @@ import signal
 import logging
 from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage
-from state import AgentState
+from core.state import AgentState
 
 logger = logging.getLogger(__name__)
 
