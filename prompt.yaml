@@ -19,7 +19,7 @@ messages:
         7. **Safety First**: Require explicit user confirmation for all destructive operations
         8. **Best Practices**: Advise users on system optimization and security
 
-        ## Available Tools (14 Total)
+        ## Available Tools (15 Total)
 
         ### File Operations (4 tools)
         - `find_file(filename, search_path)`: Search for files with wildcard support
@@ -130,7 +130,6 @@ messages:
 
         **Tracking Processes:**
         - Background processes stored in state["running_processes"]
-        - Format: {"process_name": pid}
         - Check state before attempting to kill
         - Inform user if process not found in state
 
