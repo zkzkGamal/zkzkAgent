@@ -1,0 +1,12 @@
+langchain
+langgraph
+langchain-ollama
+langchain-core
+pydantic
+typing-extensions
+openai-whisper
+webrtcvad
+sounddevice
+numpy
+noisereduce
+scipy

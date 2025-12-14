@@ -1,83 +1,150 @@
-# Local AI Assistant
+# 🤖 zkzkAgent: Local AI System Manager
 
-A modular, local AI assistant built with **LangGraph** and **LangChain**, powered by **Ollama**. This agent can perform file operations, run deployment scripts, and execute system commands with a built-in safety mechanism for dangerous operations.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)
+![LangChain](https://img.shields.io/badge/LangChain-0.1-green?style=for-the-badge&logo=chainlink)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)
 
-## Features
+**zkzkAgent** is a powerful, privacy-focused local AI assistant designed to act as your intelligent system manager. Built on **LangGraph** and **Ollama**, it automates complex workflows, manages system processes, and handles network tasks—all while keeping your data on your machine.
 
-- **Local LLM Support**: Uses Ollama (default model: `qwen3-vl:4b-instruct-q4_K_M`) for privacy and offline capability.
-- **Modular Architecture**: Clean separation of concerns (Agent, Tools, State).
-- **Tool Use**:
-  - `read_file`: Read file contents.
-  - `run_deploy_script`: Automated deployment with background execution and logging.
-  - `kill_process`: Terminate running background processes.
-  - `check_internet` & `enable_wifi`: Ensure network connectivity.
-  - `open_browser`: Open URLs in the default browser.
-  - `open_vscode`: Open Visual Studio Code.
-  - `empty_trash`: Empty system trash (requires confirmation).
-  - `clear_tmp`: Clear temporary files (requires confirmation).
-- **Safety First**: Dangerous tools require explicit user confirmation before execution.
-- **Interactive Loop**: Continuous chat interface with the agent.
+---
 
-## Workflow
+## ✨ Key Features
+
+### 🧠 Intelligent Automation
+
+- **Background Deployment**: Run long-running deployment scripts in the background. The agent monitors the process, logs output to files, and notifies you upon completion.
+- **Process Management**: Track and kill background processes directly through chat commands.
+
+### 🌐 Network Awareness
+
+- **Auto-Connectivity Check**: Automatically verifies internet access before executing network-dependent tasks.
+- **Self-Healing Wi-Fi**: Detects disconnections and attempts to enable Wi-Fi automatically to restore service.
+
+### 🛡️ Safety & Security
+
+- **Human-in-the-Loop**: Destructive operations (like emptying trash or clearing temp files) require explicit user confirmation.
+- **Local Execution**: Powered by local LLMs (default: `qwen3-vl`) via Ollama, ensuring your data never leaves your device.
+
+### 🛠️ Modular Tooling
+
+- **File Operations**: Read, find, and manage files.
+- **Browser Automation**: Open URLs in your default web browser.
+- **IDE Integration**: Open Visual Studio Code directly from the chat.
+- **System Maintenance**: Clean up system trash and temporary files.
+
+---
+
+## 🏗️ Architecture
+
+The agent operates on a cyclic graph architecture using **LangGraph**.
 
 ```mermaid
 graph TD
-    User[User Input] --> Agent
-    Agent -->|Decide| Decision{Action?}
-    Decision -->|Call Tool| Safety{Dangerous?}
-    Safety -->|Yes| Confirm[Ask Confirmation]
-    Confirm -->|Approved| Tool[Execute Tool]
+    User([User Input]) --> Agent
+    Agent[Agent Node] -->|Decide| Decision{Action Required?}
+
+    Decision -->|Yes| CheckSafety{Is Dangerous?}
+    Decision -->|No| Respond([Reply to User])
+
+    CheckSafety -->|Yes| Confirm[Request Confirmation]
+    CheckSafety -->|No| Execute[Execute Tool]
+
+    Confirm -->|Approved| Execute
     Confirm -->|Denied| Agent
-    Safety -->|No| Tool
-    Tool -->|Output| Agent
-    Decision -->|Response| User
+
+    Execute -->|Result| Agent
+
+    subgraph "Toolbox"
+        Deploy[Deploy Script]
+        Network[Network Tools]
+        File[File Ops]
+        System[System Ops]
+    end
+
+    Execute -.-> Toolbox
 ```
 
-## Prerequisites
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
 
 - **Python 3.10+**
-- **Ollama**: Installed and running.
-  - Pull the model: `ollama pull qwen3-vl:4b-instruct-q4_K_M` (or update `agent.py` to use your preferred model).
+- **Ollama**: Installed and running locally.
+  - Pull the default model: `ollama pull qwen3-vl:4b-instruct-q4_K_M`
+  - _Note: You can change the model in `models/LLM.py`._
 
-## Installation
+### Installation
 
-1.  Clone the repository:
+1.  **Clone the Repository**
 
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/zkzkGamal/zkzkAgent.git
     cd zkzkAgent
     ```
 
-2.  Install dependencies:
+2.  **Install Dependencies**
     ```bash
-    pip install langchain langgraph langchain-ollama pydantic typing-extensions
+    pip install -r requirements.txt
     ```
 
-## Usage
+### Configuration
 
-Run the agent:
+- **System Prompt**: Customize the agent's personality and rules in `prompt.yaml`.
+- **Model Settings**: Adjust model parameters in `models/LLM.py`.
+
+---
+
+## 💻 Usage
+
+Start the agent:
 
 ```bash
 python3 main.py
 ```
 
-### Example Interaction
+### Example Commands
+
+| Category       | Command                    | Description                                     |
+| :------------- | :------------------------- | :---------------------------------------------- |
+| **Deployment** | _"Run the deploy script"_  | Starts deployment in background.                |
+| **Process**    | _"Kill the deploy script"_ | Terminates the background process.              |
+| **Network**    | _"Open youtube.com"_       | Checks net, enables Wi-Fi if needed, opens URL. |
+| **System**     | _"Empty the trash"_        | Asks for confirmation, then cleans trash.       |
+| **General**    | _"Read file main.py"_      | Reads and displays file content.                |
+
+---
+
+## 📂 Project Structure
 
 ```text
-AI Assistant Ready. Type 'exit' or 'quit' to stop.
-Enter your request: read file main.py
-
-[AI]: The file content is ...
+zkzkAgent/
+├── agent.py              # Core LangGraph agent logic & graph definition
+├── main.py               # Entry point & CLI loop
+├── state.py              # AgentState definition (TypedDict)
+├── tools.py              # Tool exports & registration
+├── prompt.yaml           # System prompt configuration
+├── requirements.txt      # Python dependencies
+├── models/               # LLM configuration
+│   └── LLM.py
+├── modules/              # Auxiliary modules
+│   └── voice_module.py   # Experimental voice input support
+└── tools_module/         # Individual tool implementations
+    ├── dangerous_tools/  # Tools requiring confirmation (trash, tmp)
+    ├── killProcess.py    # Process management
+    ├── network_tools.py  # Connectivity & Wi-Fi
+    ├── openBrowser.py    # Web navigation
+    └── runDeployScript.py# Background deployment
 ```
 
-## Project Structure
+---
 
-- **`main.py`**: Entry point. Handles the user input loop and initializes the agent.
-- **`agent.py`**: Defines the LangGraph agent, including the decision logic and confirmation safeguards.
-- **`tools.py`**: Contains the definitions for all tools available to the agent.
-- **`state.py`**: Defines the `AgentState` using `TypedDict` for type safety.
+## 🤝 Contributing
 
-## Customization
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- **Change Model**: Edit `agent.py` and `tools.py` (if applicable) to change the `model` parameter in `ChatOllama`.
-- **Add Tools**: Define new tools in `tools.py` and add them to the `tools` list in `agent.py`.
+## 📄 License
+
+This project is licensed under the MIT License.
