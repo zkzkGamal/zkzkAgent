@@ -41,32 +41,36 @@
 - **Noise Reduction**: Built-in audio preprocessing for better recognition
 - **Hands-Free Operation**: Control your system with voice commands
 
-### 🛠️ Comprehensive Tooling
+### 🛠️ Comprehensive Tooling (15 Tools)
 
-#### File Operations
+#### File Operations (4 tools)
 
-- **Find File**: Search for files with automatic wildcard matching
-- **Find Folder**: Locate directories across your system
-- **Read File**: Display file contents
-- **Open File**: Open files with default applications using `xdg-open`
-- **Remove File**: Safely delete files with confirmation
+- **Find File** (`find_file`): Search for files with automatic wildcard matching
+- **Find Folder** (`find_folder`): Locate directories across your system
+- **Read File** (`read_file`): Display file contents
+- **Open File** (`open_file`): Open files with default applications using `xdg-open`
 
-#### System Maintenance
+#### Dangerous Tools (3 tools - Require Confirmation)
 
-- **Empty Trash**: Clear system trash (`~/.local/share/Trash`)
-- **Clear Temp**: Remove temporary files from `/tmp`
-- **Process Management**: Kill background processes by name
+- **Empty Trash** (`empty_trash`): Clear system trash (`~/.local/share/Trash/*`)
+- **Clear Temp** (`clear_tmp`): Remove temporary files from `~/tmp/*`
+- **Remove File** (`remove_file`): Safely delete files/folders permanently
 
-#### Development Tools
+#### Application Tools (2 tools)
 
-- **VSCode Integration**: Open files and folders in Visual Studio Code
-- **Browser Automation**: Open URLs in default browser
-- **Script Execution**: Run deployment scripts with AI-assisted option selection
+- **VSCode Integration** (`open_vscode`): Open files and folders in Visual Studio Code
+- **Browser Automation** (`open_browser`): Open URLs in default browser
 
-#### Network Tools
+#### Network Tools (2 tools)
 
-- **Internet Check**: Verify connectivity by pinging `8.8.8.8`
-- **Wi-Fi Management**: Enable Wi-Fi using NetworkManager (`nmcli`)
+- **Internet Check** (`check_internet`): Verify connectivity by pinging `8.8.8.8`
+- **Wi-Fi Management** (`enable_wifi`): Enable Wi-Fi using NetworkManager (`nmcli`)
+
+#### Process Tools (3 tools)
+
+- **Find Process** (`find_process`): Locate running processes by name using `pgrep`
+- **Kill Process** (`kill_process`): Terminate background processes with SIGTERM
+- **Deploy Script** (`run_deploy_script`): Run deployment scripts with AI-assisted option selection
 
 ---
 
