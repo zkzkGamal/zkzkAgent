@@ -1,13 +1,12 @@
 import logging
 from typing import Literal
-
-from langchain_ollama import ChatOllama
+from models.LLM import llm
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 
 from state import AgentState
-from tools import read_file, run_deploy_script, open_vscode, empty_trash, clear_tmp
+from tools import __all__ as tool_functions
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +14,7 @@ logger = logging.getLogger(__name__)
 # Initialize Model and Tools
 # -------------------------
 logger.info("[MODEL INIT] Initializing ChatOllama")
-llm = ChatOllama(model="qwen3-vl:4b-instruct-q4_K_M", temperature=0)
-tools = [read_file, run_deploy_script, open_vscode, empty_trash, clear_tmp]
-llm_with_tools = llm.bind_tools(tools)
+llm_with_tools = llm.bind_tools(tool_functions)
 logger.info("[MODEL INIT] Model initialized and tools bound")
 
 DANGEROUS_TOOLS = ["empty_trash", "clear_tmp"]
@@ -51,30 +48,9 @@ def call_model(state: AgentState):
             )
 
             if confirm in ("yes", "y"):
-                # User confirmed. We need to execute the tool.
-                # Since we are in 'call_model', we can't easily jump to 'tools' node with the *previous* tool call
-                # because the previous tool call was in the AIMessage *before* the confirmation request.
-                # Actually, the confirmation request was a HumanMessage added by the agent?
-                # No, in the original code, the agent added a HumanMessage asking for confirmation.
-                # Here, we should probably have returned an AIMessage asking for confirmation, or just a HumanMessage.
-
-                # Let's look at how we set up the confirmation request below.
-                # If we confirmed, we clear the pending state.
-                # But we still need to execute the tool.
-                # We can manually execute it here or try to trick the graph.
-                # Manual execution is safest to replicate original behavior.
-
-                # Find the tool instance
-                matched_tool = next((t for t in tools if t.name == tool_name), None)
+                matched_tool = next((t for t in tool_functions if t.name == tool_name), None)
                 if matched_tool:
-                    # We need the args. Where did we save them?
-                    # The original code didn't save args in pending_confirmation!
-                    # It just re-executed handle_tool_call({"name": tool_name, "args": {}}, state)
-                    # Wait, the original code passed empty args {} for the dangerous tools?
-                    # "state = handle_tool_call({"name": tool_name, "args": {}}, state)"
-                    # Yes, empty_trash and clear_tmp take no args.
-                    # So it was fine.
-
+                    logger.info(f"[AGENT] User confirmed. Executing tool: {tool_name}")
                     try:
                         output = matched_tool.invoke(
                             {}
@@ -104,27 +80,7 @@ def call_model(state: AgentState):
     if response.tool_calls:
         for tc in response.tool_calls:
             if tc["name"] in DANGEROUS_TOOLS:
-                # Found a dangerous tool.
-                # We should NOT return the tool call in the AIMessage in a way that triggers the 'tools' node immediately
-                # OR we should intercept it.
-
-                # If we return the response as is, the 'tools' node (if we use one) will execute it.
-                # We need to intercept.
-
-                # Let's modify the response to NOT have tool calls, or handle it manually.
-                # Or we can return a special state.
-
                 logger.info(f"[AGENT] Dangerous tool detected: {tc['name']}")
-
-                # We append the AIMessage but STRIP the tool calls so the graph doesn't automatically go to tools?
-                # Or we just don't return it yet?
-
-                # Let's append a request for confirmation.
-                # We need to save which tool was requested.
-
-                # We can append the original response, but we need to prevent the 'tools' node from running it.
-                # We can do this by having a conditional edge that checks for dangerous tools.
-
                 return {
                     "messages": [
                         response,
@@ -149,13 +105,9 @@ def should_continue(state: AgentState) -> Literal["tools", "__end__", "call_mode
     last_message = messages[-1]
     pending_confirmation = state.get("pending_confirmation", {})
 
-    # If we are waiting for confirmation, we should stop and wait for user input.
-    # But 'call_model' already added the confirmation request message.
-    # So we should return END to wait for user input.
     if pending_confirmation and pending_confirmation.get("tool_name"):
         return END
 
-    # If the last message has tool calls, go to tools.
     if isinstance(last_message, AIMessage) and last_message.tool_calls:
         return "tools"
 
@@ -168,7 +120,7 @@ def should_continue(state: AgentState) -> Literal["tools", "__end__", "call_mode
 graph = StateGraph(AgentState)
 
 graph.add_node("agent", call_model)
-graph.add_node("tools", ToolNode(tools))
+graph.add_node("tools", ToolNode(tools=tool_functions))
 
 graph.set_entry_point("agent")
 
