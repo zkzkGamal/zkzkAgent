@@ -4,6 +4,7 @@ from tools_module import (
     killProcess,
     openBrowser,
     network_tools,
+    findProcess
 )
 from tools_module.dangerous_tools import emptyTrash, emptyTmp , removeFile
 from tools_module.files_tools import findFile, readFile , openFile , findFolder
@@ -23,6 +24,7 @@ __all__ = [
     emptyTmp.clear_tmp,
     
     killProcess.kill_process,
+    findProcess.find_process,
 
     network_tools.check_internet,
     network_tools.enable_wifi,
