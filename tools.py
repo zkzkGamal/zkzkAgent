@@ -5,20 +5,21 @@ from tools_module import (
     openBrowser,
     network_tools,
 )
-from tools_module.dangerous_tools import emptyTrash, emptyTmp
-from tools_module.files_tools import findFile, readFile , openFile
+from tools_module.dangerous_tools import emptyTrash, emptyTmp , removeFile
+from tools_module.files_tools import findFile, readFile , openFile , findFolder
 __all__ = [
-    findFile.findfile,
+    findFile.find_file,
     readFile.read_file,
     openFile.open_file,
-
+    findFolder.find_folder,
+    
     runDeployScript.run_deploy_script,
 
     openVsCode.open_vscode,
     openBrowser.open_browser,
 
     emptyTrash.empty_trash,
-    emptyTrash.remove_file,
+    removeFile.remove_file,
     emptyTmp.clear_tmp,
     
     killProcess.kill_process,

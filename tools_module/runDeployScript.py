@@ -3,7 +3,7 @@ from langchain_core.tools import tool
 from langchain_core.messages import HumanMessage, SystemMessage
 from state import AgentState
 from models.LLM import llm
-from .readFile import read_file
+from .files_tools.readFile import read_file
 
 logger = logging.getLogger(__name__)
 

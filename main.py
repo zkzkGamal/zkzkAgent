@@ -1,21 +1,34 @@
-import logging, os
+import logging, os , sys
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from agent import app
 from modules.voice_module import VoiceModule
 from langchain_core.prompts import load_prompt
+from models.tts import speak
 
 # -------------------------
 # Configure logging
 # -------------------------
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
-)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+
+handler.setFormatter(formatter)
+if not logger.handlers:
+    logger.addHandler(handler)
+
 logger = logging.getLogger(__name__)
 
 voice_module = VoiceModule()
 
+
 prompt = load_prompt("prompt.yaml")
 prompt = prompt.format(home=os.path.expanduser("~"))
+
+
 # -------------------------
 # Main Execution
 # -------------------------
@@ -23,11 +36,7 @@ def main():
     logger.info("[MAIN] Starting AI assistant")
 
     # Initial State
-    messages = [
-        SystemMessage(
-            content=prompt
-        )
-    ]
+    messages = [SystemMessage(content=prompt)]
 
     current_state = {
         "messages": messages,
@@ -57,9 +66,11 @@ def main():
 
             last_msg = current_state["messages"][-1]
             if isinstance(last_msg, AIMessage):
-                logger.info(f"\n[AI]: {last_msg.content}\n")
+                # logger.info(f"\n[AI]: {last_msg.content}\n")
+                speak(last_msg.content)
             elif isinstance(last_msg, HumanMessage):
-                logger.info(f"\n[SYSTEM]: {last_msg.content}\n")
+                # logger.info(f"\n[SYSTEM]: {last_msg.content}\n")
+                speak(last_msg.content)
 
         except KeyboardInterrupt:
             logger.info("\nExiting...")

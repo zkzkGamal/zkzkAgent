@@ -1,10 +1,11 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
-import sys , whisper , time , webrtcvad , logging
+import sys , time , webrtcvad , logging
 import sounddevice as sd
 import numpy as np
 import noisereduce as nr
+from models.voice import whisper_model
 
 
 from scipy.io.wavfile import write
@@ -14,10 +15,6 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
 logger = logging.getLogger(__name__)
-
-logger.info("Loading Whisper...")
-whisper_model = whisper.load_model("small").cpu()
-logger.info("Whisper loaded.\n")
 
 vad = webrtcvad.Vad()
 vad.set_mode(3)

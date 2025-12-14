@@ -7,12 +7,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 @tool
-def findfile(filename: str, search_path: str = "~/") -> str:
+def find_file(filename: str, search_path: str = "~/") -> str:
     """Search for a file in the given directory and its subdirectories."""
     search_path = os.path.expanduser(search_path)
 
     logger.info(
-        f"[TOOL] findfile called with filename={filename}, search_path={search_path}"
+        f"[TOOL] find_file called with filename={filename}, search_path={search_path}"
     )
 
     try:
@@ -25,16 +25,16 @@ def findfile(filename: str, search_path: str = "~/") -> str:
 
         output = result.stdout.strip()
         if output:
-            logger.info(f"[TOOL] findfile found:\n{output}")
+            logger.info(f"[TOOL] find_file found:\n{output}")
             return output
 
         return f"No files found matching {filename} in {search_path}"
 
     except subprocess.CalledProcessError as e:
-        logger.error(f"[TOOL] findfile error: {e.stderr}")
+        logger.error(f"[TOOL] find_file error: {e.stderr}")
         return f"Error searching for file {filename}: {e.stderr}"
 
     
 if __name__ == "__main__":
     # Example usage
-    result = findfile.invoke({"filename": "faroos*", "search_path": "~/Downloads"})
+    result = find_file.invoke({"filename": "faroos*", "search_path": "~/Downloads"})

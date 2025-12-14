@@ -17,7 +17,7 @@ logger.info("[MODEL INIT] Initializing ChatOllama")
 llm_with_tools = llm.bind_tools(tool_functions)
 logger.info("[MODEL INIT] Model initialized and tools bound")
 
-DANGEROUS_TOOLS = ["empty_trash", "clear_tmp"]
+DANGEROUS_TOOLS = ["empty_trash", "clear_tmp","remove_file"]
 
 # -------------------------
 # Node Definitions

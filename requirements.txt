@@ -10,3 +10,5 @@ sounddevice
 numpy
 noisereduce
 scipy
+TTS
+pyttsx3
