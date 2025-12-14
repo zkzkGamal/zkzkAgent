@@ -1,9 +1,10 @@
-import subprocess , logging
+import subprocess, logging
 from langchain_core.tools import tool
 from langchain_core.messages import HumanMessage, SystemMessage
 from state import AgentState
 from models.LLM import llm
 from .readFile import read_file
+
 logger = logging.getLogger(__name__)
 
 
@@ -48,36 +49,44 @@ def run_deploy_script(state: AgentState) -> AgentState:
         Deploy script content:
         {script_content}
     """
-    
+
     state["messages"].append(HumanMessage(content=ai_prompt))
     response = llm.invoke(state["messages"])
-    
+
     numeric_choice = response.content.strip()
     logger.info(f"[TOOL] AI chose option: {numeric_choice}")
-    
+
     state["messages"].append(SystemMessage(content=f"[AI CHOICE] {numeric_choice}"))
 
     try:
+        log_file = open("../deploy/deploy.log", "w")
         process = subprocess.Popen(
             ["./deploy_v2.sh", numeric_choice],
             cwd="../deploy",
-            stdout=subprocess.PIPE,
+            stdout=log_file,
             stderr=subprocess.STDOUT,
             text=True,
         )
 
-        for line in iter(process.stdout.readline, ""):
-            if line:
-                line = line.strip()
-                print(line)
-                state["messages"].append(SystemMessage(content=f"[DEPLOY LOG] {line}"))
+        # Store PID in state
+        if "running_processes" not in state:
+            state["running_processes"] = {}
 
-        process.wait()
+        state["running_processes"]["deploy_script"] = process.pid
+
+        logger.info(
+            f"[TOOL] Deploy script started in background with PID: {process.pid}"
+        )
+        state["messages"].append(
+            SystemMessage(
+                content=f"[DEPLOY STARTED] Script running in background. PID: {process.pid}. Logs are being written to deploy.log."
+            )
+        )
+
     except Exception as e:
         logger.error(f"[TOOL] run_deploy_script error: {e}")
         state["messages"].append(
-            SystemMessage(content=f"[ERROR] Deploy script failed: {e}")
+            SystemMessage(content=f"[ERROR] Deploy script failed to start: {e}")
         )
 
     return state
-

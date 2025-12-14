@@ -1,9 +1,5 @@
-from tools_module import (
-    findFile , readFile , runDeployScript , openVsCode
-)
-from tools_module.dangerous_tools import (
-    emptyTrash , emptyTmp
-)
+from tools_module import findFile, readFile, runDeployScript, openVsCode, killProcess
+from tools_module.dangerous_tools import emptyTrash, emptyTmp
 
 __all__ = [
     findFile.findfile,
@@ -13,4 +9,5 @@ __all__ = [
     emptyTrash.empty_trash,
     emptyTrash.remove_file,
     emptyTmp.clear_tmp,
+    killProcess.kill_process,
 ]

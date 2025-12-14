@@ -7,3 +7,4 @@ from langgraph.graph.message import add_messages
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
     pending_confirmation: Optional[Dict[str, Optional[str]]]
+    running_processes: Optional[Dict[str, int]]

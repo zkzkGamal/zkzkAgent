@@ -1,4 +1,4 @@
-import logging , os
+import logging, os
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from agent import app
 from modules.voice_module import VoiceModule
@@ -12,6 +12,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 voice_module = VoiceModule()
+
 
 # -------------------------
 # Main Execution
@@ -41,6 +42,7 @@ def main():
     current_state = {
         "messages": messages,
         "pending_confirmation": {"tool_name": None, "user_message": None},
+        "running_processes": {},
     }
 
     logger.info("AI Assistant Ready. Type 'exit' or 'quit' to stop.")
@@ -53,7 +55,7 @@ def main():
             #     logger.info("No valid input detected. Please try again.")
             #     continue
             # logger.info(f"[USER]: {user_input}")
-            if user_input.lower() in ["exit", "quit" , ""]:
+            if user_input.lower() in ["exit", "quit", ""]:
                 break
 
             # Append user message
