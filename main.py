@@ -1,6 +1,6 @@
 import logging, os , sys
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from agent import app
+from core.agent import app
 from modules.voice_module import VoiceModule
 from langchain_core.prompts import load_prompt
 from models.tts import speak

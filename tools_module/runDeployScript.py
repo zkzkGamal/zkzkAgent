@@ -1,7 +1,7 @@
 import subprocess, logging
 from langchain_core.tools import tool
 from langchain_core.messages import HumanMessage, SystemMessage
-from state import AgentState
+from core.state import AgentState
 from models.LLM import llm
 from .files_tools.readFile import read_file
 
