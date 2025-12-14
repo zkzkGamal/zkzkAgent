@@ -176,15 +176,16 @@ graph TD
     NetworkFlow --> CheckInternet[check_internet: Ping 8.8.8.8]
     NetworkFlow --> EnableWiFi[enable_wifi: nmcli radio wifi on]
 
-    %% Development Tools
-    RouteType -->|Development| DevFlow[Development Tools Flow]
-    DevFlow --> OpenVSCode[open_vscode: Launch IDE]
-    DevFlow --> OpenBrowser[open_browser: xdg-open URL]
+    %% Application Tools
+    RouteType -->|Applications| AppFlow[Application Tools Flow]
+    AppFlow --> OpenVSCode[open_vscode: Launch IDE]
+    AppFlow --> OpenBrowser[open_browser: xdg-open URL]
 
     %% Process Management
     RouteType -->|Process| ProcFlow[Process Management Flow]
-    ProcFlow --> RunDeploy[run_deploy_script: Background execution]
+    ProcFlow --> FindProc[find_process: pgrep process_name]
     ProcFlow --> KillProc[kill_process: SIGTERM]
+    ProcFlow --> RunDeploy[run_deploy_script: Background execution]
 
     %% Dangerous Operations
     RouteType -->|Dangerous| DangerFlow[Dangerous Operations Flow]
@@ -203,8 +204,9 @@ graph TD
     EnableWiFi --> Result
     OpenVSCode --> Result
     OpenBrowser --> Result
-    RunDeploy --> Result
+    FindProc --> Result
     KillProc --> Result
+    RunDeploy --> Result
     EmptyTrash --> Result
     ClearTmp --> Result
     RemoveFile --> Result
@@ -217,7 +219,7 @@ graph TD
     style RemoveFile fill:#ff6666
     style NetworkFlow fill:#99ccff
     style FileFlow fill:#c8e6c9
-    style DevFlow fill:#fff9c4
+    style AppFlow fill:#fff9c4
     style ProcFlow fill:#e1bee7
 ```
 
@@ -487,11 +489,21 @@ AI: [Terminates process 12345]
 ### Process Management
 
 ```
+User: Find all Python processes
+AI: [Uses find_process tool with 'python']
+AI: Found the following Python processes:
+    - PID: 92550
+    - PID: 92560
+    - PID: 96142
+
+User: List all running processes
+AI: [Uses find_process to locate processes]
+
 User: Kill the deploy script
 AI: [Finds and terminates the background deployment process]
 
-User: Stop the running process
-AI: [Terminates the specified process]
+User: Stop process 12345
+AI: [Terminates the specified process using kill_process]
 ```
 
 ### Combined Workflows
@@ -510,12 +522,15 @@ AI: [Checks connectivity → Enables Wi-Fi if needed → Opens URL]
 
 ```text
 zkzkAgent/
-├── agent.py                    # Core LangGraph agent logic & graph definition
 ├── main.py                     # Entry point & CLI loop with logging
-├── state.py                    # AgentState TypedDict definition
-├── tools.py                    # Tool exports & registration
 ├── prompt.yaml                 # System prompt configuration
 ├── requirements.txt            # Python dependencies
+│
+├── core/                       # Core agent components
+│   ├── __init__.py
+│   ├── agent.py                # LangGraph agent logic & graph definition
+│   ├── state.py                # AgentState TypedDict definition
+│   └── tools.py                # Tool exports & registration
 │
 ├── models/                     # AI Model configurations
 │   ├── LLM.py                  # Ollama LLM setup (qwen3-vl)
@@ -525,26 +540,34 @@ zkzkAgent/
 ├── modules/                    # Auxiliary modules
 │   └── voice_module.py         # Voice input processing with VAD
 │
-└── tools_module/               # Tool implementations
+└── tools_module/               # Tool implementations (15 tools)
     ├── __init__.py
     │
-    ├── files_tools/            # File operation tools
+    ├── files_tools/            # File operation tools (4 tools)
     │   ├── findFile.py         # Search for files with wildcards
     │   ├── findFolder.py       # Search for directories
     │   ├── readFile.py         # Read file contents
     │   └── openFile.py         # Open files with xdg-open
     │
-    ├── dangerous_tools/        # Tools requiring confirmation
+    ├── dangerous_tools/        # Tools requiring confirmation (3 tools)
     │   ├── __init__.py
-    │   ├── emptyTrash.py       # Empty ~/.local/share/Trash
-    │   ├── emptyTmp.py         # Clear /tmp directory
-    │   └── removeFile.py       # Delete files safely
+    │   ├── emptyTrash.py       # Empty ~/.local/share/Trash/*
+    │   ├── emptyTmp.py         # Clear ~/tmp/*
+    │   └── removeFile.py       # Delete files/folders safely
     │
-    ├── killProcess.py          # Process management
-    ├── network_tools.py        # Internet check & Wi-Fi management
-    ├── openBrowser.py          # Open URLs in default browser
-    ├── openVsCode.py           # Launch VSCode
-    └── runDeployScript.py      # Background script execution
+    ├── applications_tools/     # Application launchers (2 tools)
+    │   ├── openVsCode.py       # Launch Visual Studio Code
+    │   └── openBrowser.py      # Open URLs in default browser
+    │
+    ├── network_tools/          # Network management (2 tools)
+    │   ├── checkInternet.py    # Verify connectivity (ping 8.8.8.8)
+    │   └── enableWifi.py       # Enable Wi-Fi using nmcli
+    │
+    ├── processes_tools/        # Process management (3 tools)
+    │   ├── findProcess.py      # Find processes by name (pgrep)
+    │   └── killProcess.py      # Terminate processes (SIGTERM)
+    │
+    └── runDeployScript.py      # Background deployment script execution
 ```
 
 ---
