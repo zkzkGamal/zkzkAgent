@@ -4,6 +4,8 @@
 ![LangChain](https://img.shields.io/badge/LangChain-Latest-green?style=for-the-badge&logo=chainlink)
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange?style=for-the-badge)
 ![Linux](https://img.shields.io/badge/Linux-Only-yellow?style=for-the-badge&logo=linux)
+![Tools](https://img.shields.io/badge/Tools-18-brightgreen?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)
 
 > ⚠️ **Linux Only**: This project is specifically designed for Linux systems (Ubuntu/Debian-based distributions). It uses Linux-specific commands and tools like `nmcli`, `xdg-open`, and system paths.
@@ -41,7 +43,7 @@
 - **Noise Reduction**: Built-in audio preprocessing for better recognition
 - **Hands-Free Operation**: Control your system with voice commands
 
-### 🛠️ Comprehensive Tooling (15 Tools)
+### 🛠️ Comprehensive Tooling (18 Tools)
 
 #### File Operations (4 tools)
 
@@ -61,18 +63,25 @@
 - **VSCode Integration** (`open_vscode`): Open files and folders in Visual Studio Code
 - **Browser Automation** (`open_browser`): Open URLs in default browser
 
-#### Network Tools (2 tools)
+#### Network Tools (3 tools)
 
 - **Internet Check** (`check_internet`): Verify connectivity by pinging `8.8.8.8`
 - **Wi-Fi Management** (`enable_wifi`): Enable Wi-Fi using NetworkManager (`nmcli`)
+- **Web Search** (`duckduckgo_search`): Search the web using DuckDuckGo API
 
-#### Process Tools (3 tools)
+#### Process Management Tools (2 tools)
 
 - **Find Process** (`find_process`): Locate running processes by name using `pgrep`
 - **Kill Process** (`kill_process`): Terminate background processes with SIGTERM
 
-#### Deployment Tools (1 tool)
+#### Deployment Tools (2 tools)
+
 - **Deploy Script** (`run_deploy_script`): Run deployment scripts with AI-assisted option selection
+- **Stop Frontend** (`stop_frontend`): Terminate remote frontend process via SSH
+
+#### System Tools (2 tools)
+
+- **Run Command** (`run_command`): Execute shell commands and return output (date, whoami, ls, etc.)
 
 ---
 
@@ -177,6 +186,7 @@ graph TD
     RouteType -->|Network| NetworkFlow[Network Operations Flow]
     NetworkFlow --> CheckInternet[check_internet: Ping 8.8.8.8]
     NetworkFlow --> EnableWiFi[enable_wifi: nmcli radio wifi on]
+    NetworkFlow --> WebSearch[duckduckgo_search: Query DuckDuckGo API]
 
     %% Application Tools
     RouteType -->|Applications| AppFlow[Application Tools Flow]
@@ -187,7 +197,15 @@ graph TD
     RouteType -->|Process| ProcFlow[Process Management Flow]
     ProcFlow --> FindProc[find_process: pgrep process_name]
     ProcFlow --> KillProc[kill_process: SIGTERM]
-    ProcFlow --> RunDeploy[run_deploy_script: Background execution]
+
+    %% Deployment Tools
+    RouteType -->|Deployment| DeployFlow[Deployment Tools Flow]
+    DeployFlow --> RunDeploy[run_deploy_script: Background execution]
+    DeployFlow --> StopFrontend[stop_frontend: Kill remote frontend]
+
+    %% System Tools
+    RouteType -->|System| SysFlow[System Commands Flow]
+    SysFlow --> RunCommand[run_command: Execute shell command]
 
     %% Dangerous Operations
     RouteType -->|Dangerous| DangerFlow[Dangerous Operations Flow]
@@ -204,11 +222,14 @@ graph TD
     OpenFile --> Result
     CheckInternet --> Result
     EnableWiFi --> Result
+    WebSearch --> Result
     OpenVSCode --> Result
     OpenBrowser --> Result
     FindProc --> Result
     KillProc --> Result
     RunDeploy --> Result
+    StopFrontend --> Result
+    RunCommand --> Result
     EmptyTrash --> Result
     ClearTmp --> Result
     RemoveFile --> Result
@@ -223,6 +244,8 @@ graph TD
     style FileFlow fill:#c8e6c9
     style AppFlow fill:#fff9c4
     style ProcFlow fill:#e1bee7
+    style DeployFlow fill:#b2dfdb
+    style SysFlow fill:#ffccbc
 ```
 
 ### LangGraph Node Structure
@@ -253,6 +276,38 @@ graph LR
     style AgentNode fill:#99ff99
     style ToolsNode fill:#99ccff
     style Router fill:#fff9c4
+```
+
+### Internet Connectivity Workflow
+
+```mermaid
+graph TD
+    Start[Tool Requires Network?] --> CheckType{Tool Type}
+
+    CheckType -->|duckduckgo_search| DirectSearch[Execute Search Directly]
+    DirectSearch --> SearchResult[Return Results or Error]
+
+    CheckType -->|open_browser| CheckNet[check_internet]
+    CheckType -->|run_deploy_script| CheckNet
+
+    CheckNet --> IsConnected{Connected?}
+    IsConnected -->|Yes| ExecuteTool[Execute Tool]
+    IsConnected -->|No| EnableWiFi[enable_wifi]
+
+    EnableWiFi --> Wait[Wait 2-3 seconds]
+    Wait --> Retry[check_internet again]
+    Retry --> RetryCheck{Connected?}
+
+    RetryCheck -->|Yes| ExecuteTool
+    RetryCheck -->|No| Error[Report Connection Error]
+
+    ExecuteTool --> Success[Return Result]
+
+    style DirectSearch fill:#99ff99
+    style CheckNet fill:#99ccff
+    style EnableWiFi fill:#ffcc99
+    style Error fill:#ff9999
+    style Success fill:#99ff99
 ```
 
 ---
@@ -518,6 +573,46 @@ User: Check internet and open the project documentation
 AI: [Checks connectivity → Enables Wi-Fi if needed → Opens URL]
 ```
 
+### Web Search
+
+```
+User: Search for Python best practices
+AI: [Uses duckduckgo_search tool → Returns top 5 results with titles, descriptions, and URLs]
+
+User: Find information about LangGraph framework
+AI: [Searches web and presents results with clickable links]
+
+User: Look up the latest news about AI agents
+AI: [Executes duckduckgo_search("AI agents news", 5) → Displays formatted results]
+```
+
+### System Commands
+
+```
+User: What's the current date?
+AI: [Uses run_command("date") → Returns current date and time]
+
+User: Show me the current user
+AI: [Uses run_command("whoami") → Returns username]
+
+User: Check disk space
+AI: [Uses run_command("df -h") → Returns disk usage information]
+
+User: Show system information
+AI: [Uses run_command("uname -a") → Returns kernel and system details]
+```
+
+### Frontend Management
+
+```
+User: Stop the frontend
+AI: [Uses stop_frontend() → Terminates remote frontend process]
+AI: Frontend stopped successfully. PID 12345 killed on remote server.
+
+User: Kill the frontend deployment
+AI: [Checks running_processes state → Uses stop_frontend() → Reports success]
+```
+
 ---
 
 ## 📂 Project Structure
@@ -542,7 +637,7 @@ zkzkAgent/
 ├── modules/                    # Auxiliary modules
 │   └── voice_module.py         # Voice input processing with VAD
 │
-└── tools_module/               # Tool implementations (15 tools)
+└── tools_module/               # Tool implementations (18 tools)
     ├── __init__.py
     │
     ├── files_tools/            # File operation tools (4 tools)
@@ -561,15 +656,17 @@ zkzkAgent/
     │   ├── openVsCode.py       # Launch Visual Studio Code
     │   └── openBrowser.py      # Open URLs in default browser
     │
-    ├── network_tools/          # Network management (2 tools)
+    ├── network_tools/          # Network management (3 tools)
     │   ├── checkInternet.py    # Verify connectivity (ping 8.8.8.8)
-    │   └── enableWifi.py       # Enable Wi-Fi using nmcli
+    │   ├── enableWifi.py       # Enable Wi-Fi using nmcli
+    │   └── networkSearch.py    # DuckDuckGo web search
     │
-    ├── processes_tools/        # Process management (3 tools)
+    ├── processes_tools/        # Process management (2 tools)
     │   ├── findProcess.py      # Find processes by name (pgrep)
     │   └── killProcess.py      # Terminate processes (SIGTERM)
     │
-    └── runDeployScript.py      # Background deployment script execution
+    ├── runDeployScript.py      # Deployment tools (2 tools: run_deploy_script, stop_frontend)
+    └── runCommand.py           # System command execution (1 tool: run_command)
 ```
 
 ---
