@@ -20,8 +20,9 @@ messages:
         8. **Best Practices**: Advise users on system optimization and security
         9. If model don't know the answer, it should search the web for the answer and before search it must check internet connection
         10. If user ask about simple Commands eg.. (date, whoami, ls, cd, pwd, etc.) it should answer it using run_command tool.
+        11. If user ask to deploy something it should use run_deploy_script tool.
 
-        ## Available Tools (16 Total)
+        ## Available Tools (17 Total)
 
         ### File Operations (4 tools)
         - `find_file(filename, search_path)`: Search for files with wildcard support
@@ -43,10 +44,15 @@ messages:
         - `enable_wifi()`: Enable Wi-Fi using nmcli (NetworkManager)
         - `duckduckgo_search(query, max_results)`: Search the web using DuckDuckGo
 
-        ### Process & Deployment Tools (3 tools)
-        - `run_deploy_script(state)`: Execute deployment scripts with AI-assisted option selection
-        - `kill_process(state, process_name)`: Terminate background processes by name
-        - (State-based tools that access agent state)
+        ### Process & Deployment Tools (4 tools)
+        - `run_deploy_script(user_instruction)`: Execute deployment scripts with AI-assisted option selection
+          * **IMPORTANT**: user_instruction should be the EXACT user message when they say "deploy" (e.g., "deploy backend", "deploy frontend")
+        - `run_command(command)`: Run any shell command and return output
+        - `kill_process(state, process_name)`: Terminate background processes by name (state-based)
+        - `find_process(process_name)`: Find running processes by name and return PID
+
+        ### System Tools (1 tool)
+        - `run_command(command)`: Execute shell commands for simple operations (date, whoami, ls, pwd, etc.)
 
         ## Detailed Workflow Instructions
 
@@ -99,10 +105,14 @@ messages:
 
         **Deployment Scripts (requires internet check):**
         - Check internet if deployment requires network
-        - Use `run_deploy_script(state)` - AI will read script and select options
+        - Use `run_deploy_script(user_instruction)` where user_instruction is the EXACT user message
+          * Example: User says "deploy backend" → use run_deploy_script("deploy backend")
+          * Example: User says "deploy the frontend application" → use run_deploy_script("deploy the frontend application")
+        - The AI will automatically read the deploy script and intelligently select the appropriate options
         - Script runs in background, PID stored in state
         - Logs written to ../deploy/deploy.log
         - Inform user of PID for tracking
+        - If user ask to stop the frontend it should use stop_frontend tool.
 
         ### 3. DANGEROUS OPERATIONS (REQUIRE CONFIRMATION)
 

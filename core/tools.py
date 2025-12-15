@@ -16,6 +16,7 @@ __all__ = [
     findFolder.find_folder,
     
     runDeployScript.run_deploy_script,
+    runDeployScript.stop_frontend,
 
     openVsCode.open_vscode,
     openBrowser.open_browser,

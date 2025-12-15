@@ -1,7 +1,6 @@
 import os
 import subprocess
 from langchain_core.tools import tool
-from models.tts import speak
 
 @tool
 def open_file(file_path: str) -> str:
@@ -16,8 +15,6 @@ def open_file(file_path: str) -> str:
 
     try:
         subprocess.Popen(["xdg-open", file_path])
-        speak(f"file opened successfully")
         return f"[SUCCESS] Opened file: {file_path}"
     except Exception as e:
-        speak(f"Failed to open file {e}")
         return f"[ERROR] Failed to open file {file_path}: {e}"

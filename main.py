@@ -1,9 +1,9 @@
 import logging, os , sys
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from core.agent import app
-from modules.voice_module import VoiceModule
+# from modules.voice_module import VoiceModule
 from langchain_core.prompts import load_prompt
-from models.tts import speak
+# from models.tts import speak
 
 # -------------------------
 # Configure logging
@@ -22,7 +22,7 @@ if not logger.handlers:
 
 logger = logging.getLogger(__name__)
 
-voice_module = VoiceModule()
+# voice_module = VoiceModule()
 
 
 prompt = load_prompt("prompt.yaml")
