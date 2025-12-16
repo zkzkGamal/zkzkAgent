@@ -13,11 +13,20 @@ logger = logging.getLogger(__name__)
 # -------------------------
 # Initialize Model and Tools
 # -------------------------
-logger.info("[MODEL INIT] Initializing ChatOllama")
-llm_with_tools = llm.bind_tools(tool_functions)
-logger.info("[MODEL INIT] Model initialized and tools bound")
+# We lazy-load the chain to avoid import-time side effects
+_model_chain = None
 
-DANGEROUS_TOOLS = ["empty_trash", "clear_tmp","remove_file"]
+
+def get_model_chain():
+    global _model_chain
+    if _model_chain is None:
+        logger.info("[MODEL INIT] Lazily binding tools to ChatOllama")
+        _model_chain = llm.bind_tools(tool_functions)
+        logger.info("[MODEL INIT] Model initialized and tools bound")
+    return _model_chain
+
+
+DANGEROUS_TOOLS = ["empty_trash", "clear_tmp", "remove_file"]
 
 # -------------------------
 # Node Definitions
@@ -48,7 +57,9 @@ def call_model(state: AgentState):
             )
 
             if confirm in ("yes", "y"):
-                matched_tool = next((t for t in tool_functions if t.name == tool_name), None)
+                matched_tool = next(
+                    (t for t in tool_functions if t.name == tool_name), None
+                )
                 if matched_tool:
                     logger.info(f"[AGENT] User confirmed. Executing tool: {tool_name}")
                     try:
@@ -73,7 +84,9 @@ def call_model(state: AgentState):
                 }
 
     # 2. Normal AI Invocation
-    response = llm_with_tools.invoke(messages)
+    # Lazy load the model chain if not ready
+    chain = get_model_chain()
+    response = chain.invoke(messages)
     logger.info(f"[MODEL RESPONSE] {response.content}")
 
     # Check for dangerous tools in the response
