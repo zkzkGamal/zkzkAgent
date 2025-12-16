@@ -1,8 +1,10 @@
-import logging, os , sys
+import logging, os, sys
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from core.agent import app
+
 # from modules.voice_module import VoiceModule
 from langchain_core.prompts import load_prompt
+
 # from models.tts import speak
 
 # -------------------------
@@ -34,6 +36,19 @@ prompt = prompt.format(home=os.path.expanduser("~"))
 # -------------------------
 def main():
     logger.info("[MAIN] Starting AI assistant")
+
+    # Warm-up the model
+    logger.info(
+        "Initializing and loading local AI model (this may take a few seconds)..."
+    )
+    try:
+        from models.LLM import llm
+
+        llm.invoke("Hi")
+        logger.info("Local AI Model Loaded Successfully.")
+    except Exception as e:
+        logger.error(f"Failed to load local model: {e}")
+        logger.warning("Continuing, but first response may be slow or fail.")
 
     # Initial State
     messages = [SystemMessage(content=prompt)]

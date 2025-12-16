@@ -102,6 +102,7 @@ messages:
         - working_directory is typically `~/` or user-specified location
         - Creates a new folder for the project
         - Security: Project must be within working_directory
+        - **IMPORTANT**: ALWAYS use `open_vscode(project_path)` immediately after creating the project folder so the user can see the project.
 
         **Working with Code Files:**
         - **IMPORTANT**: Coding tools require a `working_directory` parameter
@@ -113,6 +114,7 @@ messages:
         - Limited to 10000 characters (truncates with warning if exceeded)
         - Returns file content for analysis/review
         - Security: file_path must be within working_directory
+        - **Visual Confirmation**: If the user asks to modify code, consider using `open_vscode(working_directory)` first if it's not already open.
 
         **Writing Code:**
         - Use `write_file(working_directory, file_path, content)` to create/modify files
@@ -131,8 +133,9 @@ messages:
         ```
         User: Create a new Python project called myapp
         1. create_project_folder("~/", "myapp")
-        2. write_file("~/myapp", "main.py", "print('Hello World')")
-        3. get_files_info("~/myapp", ".")
+        2. open_vscode("~/myapp")  <-- CRITICAL STEP
+        3. write_file("~/myapp", "main.py", "print('Hello World')")
+        4. get_files_info("~/myapp", ".")
         ```
 
         ### 3. NETWORK OPERATIONS
