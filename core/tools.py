@@ -10,7 +10,7 @@ from tools_module.files_tools import (
     openFile,
     findFolder,
     getFileContent,
-    getFilesInfo,
+    getFileInfo,
     writeFile,
     createProjectFolder,
 )
