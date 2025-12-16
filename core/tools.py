@@ -24,7 +24,7 @@ __all__ = [
     openFile.open_file,
     findFolder.find_folder,
     getFileContent.get_file_content,
-    getFilesInfo.get_files_info,
+    getFileInfo.get_files_info,
     writeFile.write_file,
     createProjectFolder.create_project_folder,
     runDeployScript.run_deploy_script,
