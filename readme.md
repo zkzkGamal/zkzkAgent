@@ -4,7 +4,7 @@
 ![LangChain](https://img.shields.io/badge/LangChain-Latest-green?style=for-the-badge&logo=chainlink)
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange?style=for-the-badge)
 ![Linux](https://img.shields.io/badge/Linux-Only-yellow?style=for-the-badge&logo=linux)
-![Tools](https://img.shields.io/badge/Tools-18-brightgreen?style=for-the-badge)
+![Tools](https://img.shields.io/badge/Tools-22-brightgreen?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)
 
@@ -43,14 +43,23 @@
 - **Noise Reduction**: Built-in audio preprocessing for better recognition
 - **Hands-Free Operation**: Control your system with voice commands
 
-### 🛠️ Comprehensive Tooling (18 Tools)
+### 🛠️ Comprehensive Tooling (22 Tools)
 
-#### File Operations (4 tools)
+#### File Operations (8 tools)
+
+**General File Tools (4 tools)**
 
 - **Find File** (`find_file`): Search for files with automatic wildcard matching
 - **Find Folder** (`find_folder`): Locate directories across your system
 - **Read File** (`read_file`): Display file contents
 - **Open File** (`open_file`): Open files with default applications using `xdg-open`
+
+**Coding & Project Tools (4 tools - New)**
+
+- **Get File Content** (`get_file_content`): Read code files within a project limit 10000 chars
+- **Write File** (`write_file`): Write code to files within a project limit 10000 chars
+- **Get Files Info** (`get_files_info`): List files and directories with metadata
+- **Create Project** (`create_project_folder`): Create new project directories safely
 
 #### Dangerous Tools (3 tools - Require Confirmation)
 
@@ -182,6 +191,13 @@ graph TD
     FileFlow --> ReadFile[read_file: Display contents]
     FileFlow --> OpenFile[open_file: xdg-open]
 
+    %% Coding Operations
+    RouteType -->|Coding| CodeFlow[Coding Operations Flow]
+    CodeFlow --> CreateProj[create_project_folder: Init Project]
+    CodeFlow --> WriteMs[write_file: Write Code]
+    CodeFlow --> ReadCode[get_file_content: Read Code]
+    CodeFlow --> ListFiles[get_files_info: List Project Files]
+
     %% Network Operations
     RouteType -->|Network| NetworkFlow[Network Operations Flow]
     NetworkFlow --> CheckInternet[check_internet: Ping 8.8.8.8]
@@ -220,6 +236,10 @@ graph TD
     FindFolder --> Result
     ReadFile --> Result
     OpenFile --> Result
+    CreateProj --> Result
+    WriteMs --> Result
+    ReadCode --> Result
+    ListFiles --> Result
     CheckInternet --> Result
     EnableWiFi --> Result
     WebSearch --> Result
@@ -242,6 +262,7 @@ graph TD
     style RemoveFile fill:#ff6666
     style NetworkFlow fill:#99ccff
     style FileFlow fill:#c8e6c9
+    style CodeFlow fill:#a5d6a7
     style AppFlow fill:#fff9c4
     style ProcFlow fill:#e1bee7
     style DeployFlow fill:#b2dfdb
@@ -473,6 +494,32 @@ User: Open setup.py in VSCode
 AI: [Uses open_vscode tool to open in VSCode]
 ```
 
+### Coding & Project Management
+
+#### creating New Projects
+
+```
+User: Create a new Python project called 'ai-bot'
+AI: [Uses create_project_folder("~/", "ai-bot") → Creates new directory]
+```
+
+#### Writing and Reading Code
+
+```
+User: Create main.py in myapp with a hello world script
+AI: [Uses write_file("~/myapp", "main.py", "print('Hello')") → Writes content]
+
+User: Read the content of src/utils.py
+AI: [Uses get_file_content("~/myapp", "src/utils.py") → Returns code content]
+```
+
+#### Explroing Project Structure
+
+```
+User: what files are in the current project?
+AI: [Uses get_files_info("~/myapp", ".") → Lists files with metadata]
+```
+
 ### System Maintenance
 
 #### Cleaning System
@@ -637,14 +684,18 @@ zkzkAgent/
 ├── modules/                    # Auxiliary modules
 │   └── voice_module.py         # Voice input processing with VAD
 │
-└── tools_module/               # Tool implementations (18 tools)
+└── tools_module/               # Tool implementations (22 tools)
     ├── __init__.py
     │
-    ├── files_tools/            # File operation tools (4 tools)
+    ├── files_tools/            # File operation tools (8 tools)
     │   ├── findFile.py         # Search for files with wildcards
     │   ├── findFolder.py       # Search for directories
     │   ├── readFile.py         # Read file contents
-    │   └── openFile.py         # Open files with xdg-open
+    │   ├── openFile.py         # Open files with xdg-open
+    │   ├── getFileContent.py   # Read code files (coding tool)
+    │   ├── writeFile.py        # Write code files (coding tool)
+    │   ├── getFileInfo.py      # List file metadata (coding tool)
+    │   └── createProjectFolder.py # Create project directories
     │
     ├── dangerous_tools/        # Tools requiring confirmation (3 tools)
     │   ├── __init__.py
