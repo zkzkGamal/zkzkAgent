@@ -6,8 +6,10 @@ llm = ChatOllama(
     timeout=30,
     model_kwargs={
         "base_url": "http://localhost:11434",
-        "num_thread": 4,  # Reduce CPU core usage
-        "num_gpu": 1,  # If you have GPU, keep this low
-        "top_k": 10,  # small = faster
+        "num_thread": 6,  # max threads for CPU
+        "num_gpu": 1,     # keep GPU usage
+        "top_k": 20,      # slightly higher for quality
+        "num_ctx": 1024,  
+        "use_mmap": True, # reduces RAM load
     },
 )

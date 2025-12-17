@@ -1,5 +1,5 @@
 from langchain_core.tools import tool
-import os
+import os , subprocess
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -24,7 +24,9 @@ def create_project_folder(working_directory: str, project_name: str) -> str:
         return f'Error: Project folder "{project_name}" already exists at {abs_project_path}'
 
     try:
-        os.makedirs(abs_project_path, exist_ok=False)
+        res = subprocess.run(f"mkdir -p {abs_project_path}", shell=True, check=True)
+        if res.returncode != 0:
+            return f"Failed to create project folder: {res.stderr.decode('utf-8')}"
         logger.info(f"[TOOL] Successfully created project folder: {abs_project_path}")
         return f'Successfully created project folder "{project_name}" at {abs_project_path}'
     except OSError as e:

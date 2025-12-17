@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 GPG_PASSWORD = os.getenv("GPG_PASSWORD", "")
 SSH_FRONTEND = os.getenv("SSH_FRONTEND", "")
 FRONTEND_PORT = os.getenv("FRONTEND_PORT", "")
-
+DEPLOYFILE_PATH = os.getenv("DEPLOYFILE_PATH", "")
 running_processes = {}
 
 
@@ -20,7 +20,7 @@ def run_deploy_script(user_instruction: str):
     Fully autonomous AI deployment.
     user_instruction: e.g. "deploy backend application"
     """
-    deploy_path = "../deploy/deploy_v3.sh"
+    deploy_path = DEPLOYFILE_PATH
 
     try:
         env_vars = os.environ.copy()
