@@ -45,6 +45,15 @@ def call_model(state: AgentState):
         "pending_confirmation", {"tool_name": None, "user_message": None}
     )
 
+    # Debug logging for context tracking
+    logger.info(f"[AGENT] Processing with {len(messages)} messages in context")
+    if len(messages) > 1:
+        last_msg = messages[-1]
+        if hasattr(last_msg, "content"):
+            logger.info(
+                f"[AGENT] Last message: {last_msg.content[:100]}..."
+            )  # First 100 chars
+
     # 1. Handle Pending Confirmation
     if pending_confirmation and pending_confirmation.get("tool_name"):
         tool_name = pending_confirmation["tool_name"]
