@@ -10,6 +10,7 @@ sounddevice
 numpy
 noisereduce
 scipy
-TTS
+# TTS
+coqui-tts
 pyttsx3
 ddgs
