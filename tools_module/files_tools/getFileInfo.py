@@ -7,8 +7,12 @@ logger = logging.getLogger(__name__)
 
 
 @tool
-def get_files_info(working_directory: str, directory: str = ".") -> str:
-    """Get information about files in a directory. Lists files with size and type within a working directory."""
+def get_files_info(working_directory: str = ".", directory: str = ".") -> str:
+    """Get information about files in a directory. Lists files with size and type.
+    Args:
+        working_directory: Root folder for the search (defaults to current project root).
+        directory: Sub-directory to list (relative to working_directory).
+    """
     logger.info(
         f"[TOOL] get_files_info called with working_directory={working_directory}, directory={directory}"
     )

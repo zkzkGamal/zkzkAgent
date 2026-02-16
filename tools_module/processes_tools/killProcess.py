@@ -9,8 +9,12 @@ logger = logging.getLogger(__name__)
 
 
 @tool
-def kill_process(state: AgentState, process_name: str = "deploy_script") -> AgentState:
+def kill_process(
+    state: AgentState = None, process_name: str = "deploy_script"
+) -> AgentState:
     """Kills a running process managed by the agent."""
+    if state is None:
+        return "[ERROR] No state provided to kill_process tool call."
     running_processes = state.get("running_processes", {})
     pid = running_processes.get(process_name)
 

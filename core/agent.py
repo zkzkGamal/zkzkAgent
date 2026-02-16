@@ -67,22 +67,24 @@ def call_model(state: AgentState):
             )
 
             if confirm in ("yes", "y"):
+                tool_name = pending_confirmation["tool_name"]
+                tool_args = pending_confirmation.get("tool_args", {})
                 matched_tool = next(
                     (t for t in tool_functions if t.name == tool_name), None
                 )
                 if matched_tool:
-                    logger.info(f"[AGENT] User confirmed. Executing tool: {tool_name}")
+                    logger.info(
+                        f"[AGENT] User confirmed. Executing tool: {tool_name} with args: {tool_args}"
+                    )
                     try:
-                        output = matched_tool.invoke(
-                            {}
-                        )  # Dangerous tools have no args in this agent
+                        output = matched_tool.invoke(tool_args)
                         messages.append(HumanMessage(content=f"[TOOL OUTPUT] {output}"))
                     except Exception as e:
                         messages.append(HumanMessage(content=f"[TOOL ERROR] {e}"))
 
                 return {
                     "messages": messages,
-                    "pending_confirmation": {"tool_name": None, "user_message": None},
+                    "pending_confirmation": {"tool_name": None, "tool_args": None},
                 }
             else:
                 messages.append(
@@ -90,7 +92,7 @@ def call_model(state: AgentState):
                 )
                 return {
                     "messages": messages,
-                    "pending_confirmation": {"tool_name": None, "user_message": None},
+                    "pending_confirmation": {"tool_name": None, "tool_args": None},
                 }
 
     # 2. Normal AI Invocation
@@ -124,7 +126,7 @@ def call_model(state: AgentState):
                     ],
                     "pending_confirmation": {
                         "tool_name": tc["name"],
-                        "user_message": None,
+                        "tool_args": tc["args"],
                     },  # We assume only one dangerous tool at a time
                 }
 
