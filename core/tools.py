@@ -15,7 +15,7 @@ from tools_module.files_tools import (
     createProjectFolder,
 )
 from tools_module.processes_tools import findProcess, killProcess
-from tools_module.network_tools import checkInternet, enableWifi, networkSearch
+from tools_module.network_tools import checkInternet, enableWifi, duckduckgo_search , duckduckgo_search_images
 from tools_module.applications_tools import openVsCode, openBrowser
 
 __all__ = [
@@ -38,6 +38,7 @@ __all__ = [
     findProcess.find_process,
     checkInternet.check_internet,
     enableWifi.enable_wifi,
-    networkSearch.duckduckgo_search,
+    duckduckgo_search.duckduckgo_search,
+    duckduckgo_search_images.duckduckgo_search_images,
     runCommand.run_command,
 ]

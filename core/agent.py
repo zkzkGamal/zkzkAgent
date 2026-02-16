@@ -23,6 +23,7 @@ def get_model_chain():
         logger.info("[MODEL INIT] Lazily binding tools to ChatOllama")
         _model_chain = llm.bind_tools(tool_functions)
         logger.info("[MODEL INIT] Model initialized and tools bound")
+    logger.info("[MODEL INIT] Model already initialized")
     return _model_chain
 
 
@@ -95,8 +96,19 @@ def call_model(state: AgentState):
     # 2. Normal AI Invocation
     # Lazy load the model chain if not ready
     chain = get_model_chain()
-    response = chain.invoke(messages)
-    logger.info(f"[MODEL RESPONSE] {response.content}")
+
+    print("\n[AI]: ", end="", flush=True)
+    response = None
+    for chunk in chain.stream(messages):
+        if response is None:
+            response = chunk
+        else:
+            response += chunk
+
+        if chunk.content:
+            print(chunk.content, end="", flush=True)
+    print("\n")
+    logger.info(f"[AGENT] Response finished")
 
     # Check for dangerous tools in the response
     if response.tool_calls:

@@ -38,7 +38,19 @@ def main():
     logger.info("[MAIN] Starting AI assistant")
 
     # Warm-up the model
-    logger.info("Initializing and loading local AI model...")
+    logger.info(
+        "Initializing and loading local AI model (this may take a few seconds)..."
+    )
+
+    # Actually invoke the model to force it to load into memory
+    try:
+        # We use a simple, empty invocation to trigger the load
+        # This will make the first user request much faster
+        warmup_msg = [SystemMessage(content="Ignore this message. Just warming up.")]
+        app.invoke({"messages": warmup_msg})
+        logger.info("[MAIN] Model warm-up complete.")
+    except Exception as e:
+        logger.warning(f"[MAIN] Model warm-up failed (non-fatal): {e}")
 
     # Initial State
     messages = [SystemMessage(content=prompt)]

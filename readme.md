@@ -4,7 +4,7 @@
 ![LangChain](https://img.shields.io/badge/LangChain-Latest-green?style=for-the-badge&logo=chainlink)
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange?style=for-the-badge)
 ![Linux](https://img.shields.io/badge/Linux-Only-yellow?style=for-the-badge&logo=linux)
-![Tools](https://img.shields.io/badge/Tools-22-brightgreen?style=for-the-badge)
+![Tools](https://img.shields.io/badge/Tools-23-brightgreen?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)
 
@@ -22,6 +22,8 @@
 - **Process Management**: Track, monitor, and kill background processes directly through chat commands
 - **Smart File Search**: Automatic wildcard matching when exact filenames aren't found
 - **Context-Aware Actions**: AI reads scripts and makes intelligent decisions based on user intent
+- **Real-time Streaming**: Instant feedback with token-by-token response streaming
+- **Low-latency Startup**: Adaptive model warm-up ensures the agent is ready when you are
 
 ### 🌐 Network Awareness
 
@@ -43,7 +45,7 @@
 - **Noise Reduction**: Built-in audio preprocessing for better recognition
 - **Hands-Free Operation**: Control your system with voice commands
 
-### 🛠️ Comprehensive Tooling (22 Tools)
+### 🛠️ Comprehensive Tooling (23 Tools)
 
 #### File Operations (8 tools)
 
@@ -72,11 +74,12 @@
 - **VSCode Integration** (`open_vscode`): Open files and folders in Visual Studio Code
 - **Browser Automation** (`open_browser`): Open URLs in default browser
 
-#### Network Tools (3 tools)
+#### Network Tools (4 tools)
 
 - **Internet Check** (`check_internet`): Verify connectivity by pinging `8.8.8.8`
 - **Wi-Fi Management** (`enable_wifi`): Enable Wi-Fi using NetworkManager (`nmcli`)
 - **Web Search** (`duckduckgo_search`): Search the web using DuckDuckGo API
+- **Image Search** (`duckduckgo_search_images`): Find and download images directly to your media folder
 
 #### Process Management Tools (2 tools)
 
@@ -684,7 +687,7 @@ zkzkAgent/
 ├── modules/                    # Auxiliary modules
 │   └── voice_module.py         # Voice input processing with VAD
 │
-└── tools_module/               # Tool implementations (22 tools)
+└── tools_module/               # Tool implementations (23 tools)
     ├── __init__.py
     │
     ├── files_tools/            # File operation tools (8 tools)
@@ -707,10 +710,11 @@ zkzkAgent/
     │   ├── openVsCode.py       # Launch Visual Studio Code
     │   └── openBrowser.py      # Open URLs in default browser
     │
-    ├── network_tools/          # Network management (3 tools)
+    ├── network_tools/          # Network management (4 tools)
     │   ├── checkInternet.py    # Verify connectivity (ping 8.8.8.8)
     │   ├── enableWifi.py       # Enable Wi-Fi using nmcli
-    │   └── networkSearch.py    # DuckDuckGo web search
+    │   ├── networkSearch.py    # DuckDuckGo web search
+    │   └── duckduckgo_search_images.py # Image search and download
     │
     ├── processes_tools/        # Process management (2 tools)
     │   ├── findProcess.py      # Find processes by name (pgrep)

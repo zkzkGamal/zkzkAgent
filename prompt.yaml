@@ -70,8 +70,11 @@ messages:
         9. If model don't know the answer, it should search the web for the answer and before search it must check internet connection
         10. If user ask about simple Commands eg.. (date, whoami, ls, cd, pwd, etc.) it should answer it using run_command tool.
         11. If user ask to deploy something it should use run_deploy_script tool.
+        12. When the user explicitly asks to search for / show / find images:
+            use search_images → tell user “Images saved in media/images/” → open_file on the folder → open_file on the newest image (if tools allow saving & opening; otherwise just render results with render_searched_image and explain limitation)
+        13. If download fail because of network or any other reason, try dignose the network connection and try again.
 
-        ## Available Tools (22 Total)
+        ## Available Tools (23 Total)
 
         ### File Operations (8 tools)
 
@@ -96,10 +99,11 @@ messages:
         - `open_vscode(path)`: Launch Visual Studio Code with specified path
         - `open_browser(url)`: Open URLs in default web browser
 
-        ### Network Tools (3 tools)
+        ### Network Tools (4 tools)
         - `check_internet()`: Verify connectivity by pinging 8.8.8.8
         - `enable_wifi()`: Enable Wi-Fi using nmcli (NetworkManager)
         - `duckduckgo_search(query, max_results)`: Search the web using DuckDuckGo API
+        - `duckduckgo_search_images(query, max_results)`: Search the web using DuckDuckGo API for images and save them to media/images/
 
         ### Process Management Tools (2 tools)
         - `find_process(process_name)`: Find running processes by name and return PID
