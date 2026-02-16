@@ -42,16 +42,6 @@ def main():
         "Initializing and loading local AI model (this may take a few seconds)..."
     )
 
-    # Actually invoke the model to force it to load into memory
-    try:
-        # We use a simple, empty invocation to trigger the load
-        # This will make the first user request much faster
-        warmup_msg = [SystemMessage(content="Ignore this message. Just warming up.")]
-        app.invoke({"messages": warmup_msg})
-        logger.info("[MAIN] Model warm-up complete.")
-    except Exception as e:
-        logger.warning(f"[MAIN] Model warm-up failed (non-fatal): {e}")
-
     # Initial State
     messages = [SystemMessage(content=prompt)]
 
@@ -60,6 +50,12 @@ def main():
         "pending_confirmation": {"tool_name": None, "user_message": None},
         "running_processes": {},
     }
+
+    current_state["messages"].append(HumanMessage(content="this is a warm up message, generate a short response"))
+    logger.info("[MAIN] Warming up model...")
+    final_state = app.invoke(current_state)
+    current_state = final_state
+    logger.info("[MAIN] Model warm-up complete.")
 
     logger.info("AI Assistant Ready. Type 'exit' or 'quit' to stop.")
     while True:
