@@ -336,6 +336,16 @@ graph TD
 
 ---
 
+## 🚀 Quick Install
+
+Get up and running with a single command:
+
+```bash
+chmod +x install.sh && ./install.sh
+```
+
+---
+
 ## 🚀 Getting Started
 
 ### System Requirements
