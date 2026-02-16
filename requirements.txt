@@ -10,7 +10,15 @@ sounddevice
 numpy
 noisereduce
 scipy
+# Web & Data
+requests
+pyyaml
+duckduckgo-search
+pillow
+# Deployment & Environment
+pexpect
+django-environ
 # TTS
 coqui-tts
 pyttsx3
-ddgs
+
