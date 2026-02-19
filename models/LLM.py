@@ -1,7 +1,7 @@
 from langchain_ollama import ChatOllama
 
 llm = ChatOllama(
-    model="qwen3-vl:4b-instruct-q4_K_M",
+    model="qwen3:4b-instruct-2507-q4_K_M",
     temperature=0.5,
     timeout=30,
     base_url="http://127.0.0.1:11434",

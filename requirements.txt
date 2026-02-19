@@ -13,7 +13,7 @@ scipy
 # Web & Data
 requests
 pyyaml
-duckduckgo-search
+ddgs
 pillow
 # Deployment & Environment
 pexpect
