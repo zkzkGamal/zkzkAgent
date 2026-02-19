@@ -22,7 +22,7 @@ fi
 # 2. Update System and Install System Dependencies
 echo -e "${BLUE}📦 Installing system dependencies (requires sudo)...${NC}"
 sudo apt update
-sudo apt install -y python3-pip python3-venv ffmpeg portaudio19-dev network-manager curl
+sudo apt install -y python3-pip python3-venv ffmpeg portaudio19-dev network-manager curl libportaudio2
 
 # 3. Virtual Environment Setup
 echo -e "${BLUE}🐍 Setting up Python virtual environment...${NC}"

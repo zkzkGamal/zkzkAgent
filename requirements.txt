@@ -21,4 +21,10 @@ django-environ
 # TTS
 coqui-tts
 pyttsx3
-
+coqui-tts[codec]
+# ai models
+torch 
+torchvision 
+torchaudio
+# Transformers
+transformers==4.57

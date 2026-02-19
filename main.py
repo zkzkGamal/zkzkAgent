@@ -5,6 +5,8 @@ from core.agent import app
 # from modules.voice_module import VoiceModule
 from langchain_core.prompts import load_prompt
 
+from models.tts import speak
+
 # from models.tts import speak
 
 # -------------------------
@@ -28,9 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 prompt = load_prompt("prompt.yaml")
-prompt = prompt.format(home=os.path.expanduser("~"))
-
-
+prompt = prompt.format_prompt(home=os.path.expanduser("~"), name="").to_messages()
 # -------------------------
 # Main Execution
 # -------------------------
@@ -43,7 +43,10 @@ def main():
     )
 
     # Initial State
-    messages = [SystemMessage(content=prompt)]
+    messages = [
+        SystemMessage(content=prompt[0].content),
+        HumanMessage(content="this is a warm up message, generate a short response"),
+    ]
 
     current_state = {
         "messages": messages,
@@ -51,7 +54,6 @@ def main():
         "running_processes": {},
     }
 
-    current_state["messages"].append(HumanMessage(content="this is a warm up message, generate a short response"))
     logger.info("[MAIN] Warming up model...")
     final_state = app.invoke(current_state)
     current_state = final_state
@@ -80,10 +82,10 @@ def main():
             last_msg = current_state["messages"][-1]
             if isinstance(last_msg, AIMessage):
                 logger.info(f"\n[AI]: {last_msg.content}\n")
-                # speak(last_msg.content)
+                speak(last_msg.content)
             elif isinstance(last_msg, HumanMessage):
                 logger.info(f"\n[SYSTEM]: {last_msg.content}\n")
-                # speak(last_msg.content)
+                speak(last_msg.content)
 
         except KeyboardInterrupt:
             logger.info("\nExiting...")

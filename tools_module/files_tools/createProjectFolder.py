@@ -12,8 +12,8 @@ def create_project_folder(working_directory: str, project_name: str) -> str:
     logger.info(
         f"[TOOL] create_project_folder called with working_directory={working_directory}, project_name={project_name}"
     )
-    abs_working_dir = os.path.abspath(working_directory)
-    abs_project_path = os.path.abspath(os.path.join(working_directory, project_name))
+    abs_working_dir = os.path.abspath(os.path.expanduser(working_directory))
+    abs_project_path = os.path.abspath(os.path.join(os.path.expanduser(working_directory), project_name))
 
     # Security check: ensure project path is within working directory
     if not abs_project_path.startswith(abs_working_dir):

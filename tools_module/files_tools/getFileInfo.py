@@ -16,8 +16,8 @@ def get_files_info(working_directory: str = ".", directory: str = ".") -> str:
     logger.info(
         f"[TOOL] get_files_info called with working_directory={working_directory}, directory={directory}"
     )
-    abs_working_dir = os.path.abspath(working_directory)
-    abs_directory = os.path.abspath(os.path.join(working_directory, directory))
+    abs_working_dir = os.path.abspath(os.path.expanduser(working_directory))
+    abs_directory = os.path.abspath(os.path.join(os.path.expanduser(working_directory), directory))
 
     if not abs_directory.startswith(abs_working_dir):
         return f"Error: {directory} is not a subdirectory of {working_directory}"

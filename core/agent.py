@@ -1,7 +1,7 @@
 import logging
 from typing import Literal
 from models.LLM import llm
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, ToolMessage
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 
@@ -95,7 +95,6 @@ def call_model(state: AgentState):
                     "pending_confirmation": {"tool_name": None, "tool_args": None},
                 }
 
-    # 2. Normal AI Invocation
     # Lazy load the model chain if not ready
     chain = get_model_chain()
 
@@ -140,6 +139,15 @@ def should_continue(state: AgentState) -> Literal["tools", "__end__", "call_mode
     messages = state["messages"]
     last_message = messages[-1]
     pending_confirmation = state.get("pending_confirmation", {})
+    logger.info(
+        f"""
+                [AGENT] Evaluating next step with
+                \nlast message type: {type(last_message).__name__} and content: {last_message.content[:100]}
+                \npending confirmation: {pending_confirmation}
+                \nTools in last message: {getattr(last_message, 'tool_calls', None)}
+                \n tool names: {[tc['name'] for tc in getattr(last_message, 'tool_calls', [])] if getattr(last_message, 'tool_calls', None) else None}
+                """
+    )
 
     if pending_confirmation and pending_confirmation.get("tool_name"):
         return END

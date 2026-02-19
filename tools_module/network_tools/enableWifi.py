@@ -1,6 +1,7 @@
 import subprocess
 import logging
 from langchain_core.tools import tool
+import time
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -11,6 +12,7 @@ def enable_wifi() -> str:
     """Enables Wi-Fi using nmcli."""
     try:
         subprocess.check_call(["nmcli", "radio", "wifi", "on"])
+        time.sleep(2)  # Wait a moment for the Wi-Fi to enable
         logger.info("[TOOL] Wi-Fi enabled successfully")
         return "Wi-Fi enabled successfully. Please wait a moment for connection."
     except FileNotFoundError:
