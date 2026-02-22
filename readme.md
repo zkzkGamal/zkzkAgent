@@ -15,15 +15,12 @@
 ---
 
 ## 🎬 Demos
-
-> **Note:** The user requested to add links to 2 videos here. Please replace the placeholders below with actual video URLs or file paths.
-
 <div align="center">
-  <video src="https://github.com/zkzkGamal/zkzkAgent/blob/main/search_images_demo_vedio.mp4" width="600" controls></video>
+  <video src="https://www.youtube.com/shorts/eC5XbqPbzSY" width="600" controls></video>
   <br/>
   <em>Demo Video 1</em>
   <br/><br/>
-  <video src="https://github.com/zkzkGamal/zkzkAgent/blob/main/zkzk_agent_create_project.mp4" width="600" controls></video>
+  <video src="https://www.youtube.com/shorts/D0dmyMQFHUs" width="600" controls></video>
   <br/>
   <em>Demo Video 2</em>
 </div>
