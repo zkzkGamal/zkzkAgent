@@ -4,13 +4,49 @@
 ![LangChain](https://img.shields.io/badge/LangChain-Latest-green?style=for-the-badge&logo=chainlink)
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange?style=for-the-badge)
 ![Linux](https://img.shields.io/badge/Linux-Only-yellow?style=for-the-badge&logo=linux)
-![Tools](https://img.shields.io/badge/Tools-23-brightgreen?style=for-the-badge)
+![Tools](https://img.shields.io/badge/Tools-25-brightgreen?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)
 
 > ⚠️ **Linux Only**: This project is specifically designed for Linux systems (Ubuntu/Debian-based distributions). It uses Linux-specific commands and tools like `nmcli`, `xdg-open`, and system paths.
 
 **zkzkAgent** is a powerful, privacy-focused local AI assistant designed to act as your intelligent system manager on Linux. Built on **LangGraph** and **Ollama**, it automates complex workflows, manages system processes, handles network tasks, and provides voice interaction capabilities—all while keeping your data on your machine.
+
+---
+
+## 🎬 Demos
+
+> **Note:** The user requested to add links to 2 videos here. Please replace the placeholders below with actual video URLs or file paths.
+
+<div align="center">
+  <video src="https://github.com/zkzkGamal/zkzkAgent/blob/main/search_images_demo_vedio.mp4" width="600" controls></video>
+  <br/>
+  <em>Demo Video 1</em>
+  <br/><br/>
+  <video src="https://github.com/zkzkGamal/zkzkAgent/blob/main/zkzk_agent_create_project.mp4" width="600" controls></video>
+  <br/>
+  <em>Demo Video 2</em>
+</div>
+
+---
+
+## 📑 Table of Contents
+
+- [✨ Key Features](#-key-features)
+- [🏗️ Architecture](#️-architecture)
+- [🚀 Quick Install](#-quick-install)
+- [🚀 Getting Started](#-getting-started)
+- [💻 Usage](#-usage)
+- [📖 Comprehensive Usage Examples](#-comprehensive-usage-examples)
+- [📂 Project Structure](#-project-structure)
+- [🔧 Advanced Configuration](#-advanced-configuration)
+- [🐛 Troubleshooting](#-troubleshooting)
+- [📊 Performance Tips](#-performance-tips)
+- [🔒 Security Considerations](#-security-considerations)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [🙏 Acknowledgments](#-acknowledgments)
+- [📞 Support](#-support)
 
 ---
 
@@ -34,7 +70,7 @@
 ### 🛡️ Safety & Security
 
 - **Human-in-the-Loop**: Destructive operations require explicit user confirmation (yes/no)
-- **Dangerous Tool Protection**: Automatic safeguards for `empty_trash`, `clear_tmp`, and `remove_file`
+- **Dangerous Tool Protection**: Automatic safeguards for destructive tools like `empty_trash`, `remove_file`, `install_package`, and others
 - **Local Execution**: Powered by local LLMs via Ollama—your data never leaves your device
 - **Privacy-First**: No cloud dependencies, all processing happens locally
 
@@ -45,7 +81,7 @@
 - **Noise Reduction**: Built-in audio preprocessing for better recognition
 - **Hands-Free Operation**: Control your system with voice commands
 
-### 🛠️ Comprehensive Tooling (23 Tools)
+### 🛠️ Comprehensive Tooling (25 Tools)
 
 #### File Operations (8 tools)
 
@@ -63,11 +99,13 @@
 - **Get Files Info** (`get_files_info`): List files and directories with metadata
 - **Create Project** (`create_project_folder`): Create new project directories safely
 
-#### Dangerous Tools (3 tools - Require Confirmation)
+#### Dangerous Tools (5 tools - Require Confirmation)
 
 - **Empty Trash** (`empty_trash`): Clear system trash (`~/.local/share/Trash/*`)
 - **Clear Temp** (`clear_tmp`): Remove temporary files from `~/tmp/*`
 - **Remove File** (`remove_file`): Safely delete files/folders permanently
+- **Install Package** (`install_package`): Install system packages safely using the appropriate package manager
+- **Remove Package** (`remove_package`): Remove system packages safely
 
 #### Application Tools (2 tools)
 
@@ -91,9 +129,15 @@
 - **Deploy Script** (`run_deploy_script`): Run deployment scripts with AI-assisted option selection
 - **Stop Frontend** (`stop_frontend`): Terminate remote frontend process via SSH
 
-#### System Tools (2 tools)
+#### System Tools (1 tool)
 
 - **Run Command** (`run_command`): Execute shell commands and return output (date, whoami, ls, etc.)
+
+#### Package Management Tools (3 tools)
+
+- **Detect OS** (`detect_operating_system`): Detect the Linux distribution (Ubuntu/Debian, Fedora, Arch, etc.)
+- **Install Package** (`install_package`): Install system packages safely (Requires Confirmation)
+- **Remove Package** (`remove_package`): Remove system packages safely (Requires Confirmation)
 
 ---
 
@@ -128,7 +172,7 @@ graph TB
     CheckToolCalls -->|Yes| CheckDangerous{Is Dangerous<br/>Tool?}
 
     %% Dangerous Tool Path
-    CheckDangerous -->|Yes: empty_trash<br/>clear_tmp<br/>remove_file| SetPending[Set Pending Confirmation]
+    CheckDangerous -->|Yes: empty_trash<br/>clear_tmp<br/>remove_file<br/>install_package<br/>remove_package| SetPending[Set Pending Confirmation]
     SetPending --> AskConfirm[Ask User for Confirmation]
     AskConfirm --> End3([Wait for User Response])
 
@@ -200,7 +244,7 @@ graph TD
     CodeFlow --> WriteMs[write_file: Write Code]
     CodeFlow --> ReadCode[get_file_content: Read Code]
     CodeFlow --> ListFiles[get_files_info: List Project Files]
-
+https://github.com/zkzkGamal/zkzkAgent/blob/main/search_images_demo_vedio.mp4
     %% Network Operations
     RouteType -->|Network| NetworkFlow[Network Operations Flow]
     NetworkFlow --> CheckInternet[check_internet: Ping 8.8.8.8]
@@ -226,12 +270,20 @@ graph TD
     RouteType -->|System| SysFlow[System Commands Flow]
     SysFlow --> RunCommand[run_command: Execute shell command]
 
+    %% Package Management
+    RouteType -->|Packages| PkgFlow[Package Management Flow]
+    PkgFlow --> DetectOS[detect_operating_system: Detect distro]
+    PkgFlow --> InstallPkg[install_package: apt/dnf/pacman]
+    PkgFlow --> RemovePkg[remove_package: apt/dnf/pacman]
+
     %% Dangerous Operations
     RouteType -->|Dangerous| DangerFlow[Dangerous Operations Flow]
     DangerFlow --> Confirm{User<br/>Confirmed?}
     Confirm -->|Yes| EmptyTrash[empty_trash: rm -rf ~/.local/share/Trash/*]
     Confirm -->|Yes| ClearTmp[clear_tmp: rm -rf ~/tmp/*]
     Confirm -->|Yes| RemoveFile[remove_file: rm -rf path]
+    Confirm -->|Yes| InstallPkg[install_package: apt/dnf/pacman]
+    Confirm -->|Yes| RemovePkg[remove_package: apt/dnf/pacman]
     Confirm -->|No| Cancel[Cancel Operation]
 
     %% Results
@@ -253,6 +305,9 @@ graph TD
     RunDeploy --> Result
     StopFrontend --> Result
     RunCommand --> Result
+    DetectOS --> Result
+    InstallPkg --> Result
+    RemovePkg --> Result
     EmptyTrash --> Result
     ClearTmp --> Result
     RemoveFile --> Result
@@ -270,6 +325,7 @@ graph TD
     style ProcFlow fill:#e1bee7
     style DeployFlow fill:#b2dfdb
     style SysFlow fill:#ffccbc
+    style PkgFlow fill:#ffb74d
 ```
 
 ### LangGraph Node Structure
@@ -697,7 +753,7 @@ zkzkAgent/
 ├── modules/                    # Auxiliary modules
 │   └── voice_module.py         # Voice input processing with VAD
 │
-└── tools_module/               # Tool implementations (23 tools)
+└── tools_module/               # Tool implementations (25 tools)
     ├── __init__.py
     │
     ├── files_tools/            # File operation tools (8 tools)
@@ -729,6 +785,11 @@ zkzkAgent/
     ├── processes_tools/        # Process management (2 tools)
     │   ├── findProcess.py      # Find processes by name (pgrep)
     │   └── killProcess.py      # Terminate processes (SIGTERM)
+    │
+    ├── package_manager/        # Package management tools (3 tools)
+    │   ├── detectOperatingSystem.py # Detect Linux distribution
+    │   ├── installPackage.py   # Install system packages
+    │   └── removePackage.py    # Remove system packages
     │
     ├── runDeployScript.py      # Deployment tools (2 tools: run_deploy_script, stop_frontend)
     └── runCommand.py           # System command execution (1 tool: run_command)

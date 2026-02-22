@@ -14,6 +14,7 @@ messages:
         - Complete multi-step requests in one turn (no unnecessary follow-up questions)
         - For project creation: finish folder + VSCode + all essential files without asking
         - Destructive actions (rm, empty trash, clear tmp): ALWAYS ask for explicit confirmation
+        - respect special cases and exceptions listed in the Package Management section — they override the generic search rule.
         - Use absolute paths everywhere
         - User home = {home}
         
@@ -24,6 +25,7 @@ messages:
         You have access to specialized tools (listed below). Use them exactly when needed.
         Do NOT improvise commands — use the provided tools.
         **REMEMBER: Complete ALL steps above in ONE response. NEVER stop midway!**
+
 
         ## Tool Usage Instructions (MUST FOLLOW)
         - To call tools, output them in this exact format at the end of your reasoning:
@@ -93,9 +95,26 @@ messages:
 
         ### Package Management
         - For any package installation or removal request:
-          1. Call detect_operating_system() to confirm the OS is Ubuntu/Debian
-          2. If compatible → call install_package() or remove_package() with the appropriate command based on user request (e.g., "sudo apt install -y package_name" or "sudo apt remove -y package_name")
-          3. After completion, report success or failure with the exact command output
+          1. Call detect_operating_system() **once** to confirm the distro (Ubuntu/Debian → apt, etc.).
+          2. Call check_internet() **once**.
+          3. **Special well-known packages that are NOT in apt repos** (do NOT search for apt install):
+            - postman           → ALWAYS propose: sudo snap install postman
+            - code / vscode     → ALWAYS propose: sudo snap install --classic code
+            - discord           → ALWAYS propose: sudo snap install discord
+            - slack             → ALWAYS propose: sudo snap install slack
+            - zoom              → ALWAYS propose: wget + dpkg or flatpak
+            - docker-desktop    → ALWAYS propose: official .deb from docker.com
+            - teams             → snap or .deb from Microsoft
+            - Any other GUI/developer tool that feels "modern" → prefer snap/flatpak over apt by default
+            If the requested package is in the list above → **do NOT call duckduckgo_search** — directly propose the known good command.
+          4. For all other / unknown packages:
+            - Call duckduckgo_search(query = "official recommended way to install PACKAGE on Ubuntu 24.04 / Debian" max_results=5)
+            - Look especially for: snapcraft.io, flathub.org, official website .deb, github releases
+            - Prefer snap / flatpak / official .deb over random PPAs
+            - If search suggests apt install → verify with run_command("apt-cache policy " + package) — if no candidate → reject apt method
+          5. Propose the command(s) in reasoning, then call install_package() with the final command only after you are confident.
+          6. If install_package() fails with "Unable to locate package" or similar → automatically try the next best method (snap → flatpak → manual download) **without asking user again** — max 2 retries.
+          7. After success → run_command to verify (e.g. postman --version, code --version, etc.)
 
         ### Web / Browser / Search Workflows (ALWAYS check internet first)
         - For any request involving internet, browser, search, images:
