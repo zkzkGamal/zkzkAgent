@@ -16,11 +16,15 @@
 
 ## 🎬 Demos
 <div align="center">
-  <video src="https://www.youtube.com/shorts/eC5XbqPbzSY" width="600" controls></video>
+  <a href="https://www.youtube.com/shorts/eC5XbqPbzSY">
+    <img src="https://img.youtube.com/vi/eC5XbqPbzSY/0.jpg" alt="Demo Video 1" width="400">
+  </a>
   <br/>
   <em>Demo Video 1</em>
   <br/><br/>
-  <video src="https://www.youtube.com/shorts/D0dmyMQFHUs" width="600" controls></video>
+  <a href="https://www.youtube.com/shorts/D0dmyMQFHUs">
+    <img src="https://img.youtube.com/vi/D0dmyMQFHUs/0.jpg" alt="Demo Video 2" width="400">
+  </a>
   <br/>
   <em>Demo Video 2</em>
 </div>
@@ -241,7 +245,6 @@ graph TD
     CodeFlow --> WriteMs[write_file: Write Code]
     CodeFlow --> ReadCode[get_file_content: Read Code]
     CodeFlow --> ListFiles[get_files_info: List Project Files]
-https://github.com/zkzkGamal/zkzkAgent/blob/main/search_images_demo_vedio.mp4
     %% Network Operations
     RouteType -->|Network| NetworkFlow[Network Operations Flow]
     NetworkFlow --> CheckInternet[check_internet: Ping 8.8.8.8]
