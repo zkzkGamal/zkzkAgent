@@ -17,6 +17,7 @@ from tools_module.files_tools import (
 from tools_module.processes_tools import findProcess, killProcess
 from tools_module.network_tools import checkInternet, enableWifi, duckduckgo_search , duckduckgo_search_images
 from tools_module.applications_tools import openVsCode, openBrowser
+from tools_module.package_manager import detectOperatingSystem, installPackage, removePackage
 
 __all__ = [
     findFile.find_file,
@@ -41,4 +42,8 @@ __all__ = [
     duckduckgo_search.duckduckgo_search,
     duckduckgo_search_images.duckduckgo_search_images,
     runCommand.run_command,
+
+    detectOperatingSystem.detect_operating_system,
+    installPackage.install_package,
+    removePackage.remove_package,
 ]

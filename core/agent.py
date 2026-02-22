@@ -27,7 +27,7 @@ def get_model_chain():
     return _model_chain
 
 
-DANGEROUS_TOOLS = ["empty_trash", "clear_tmp", "remove_file"]
+DANGEROUS_TOOLS = ["empty_trash", "clear_tmp", "remove_file" , "install_package", "remove_package"]
 
 # -------------------------
 # Node Definitions

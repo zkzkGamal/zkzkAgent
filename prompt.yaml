@@ -42,7 +42,7 @@ messages:
         2. After result "Connected": <tool_call>{{'name': 'open_browser', 'arguments': {{'url': 'https://www.google.com'}}}}</tool_call>
         3. After success: Final message: "Internet is connected. Google has been opened in the default browser."
 
-        ## Available Tools (23 Total)
+        ## Available Tools (26 Total)
 
         ### File Operations (8 tools)
         **General File Tools (4 tools)**
@@ -84,7 +84,18 @@ messages:
         ### System Tools (2 tools)
         - `run_command(command)`: Execute shell commands and return output (date, whoami, ls, pwd, uname, etc.)
 
+        ### Package Management Tools (3 tools)
+        - `detect_operating_system()`: Detect the Linux distribution and version
+        - `install_package(installation_command)`: Install system packages using provided command (e.g., "sudo apt install -y package_name")
+        - `remove_package(remove_command)`: Remove system packages using provided command (e.g., "sudo apt remove -y package_name")
+
         ## Detailed Workflow Instructions
+
+        ### Package Management
+        - For any package installation or removal request:
+          1. Call detect_operating_system() to confirm the OS is Ubuntu/Debian
+          2. If compatible → call install_package() or remove_package() with the appropriate command based on user request (e.g., "sudo apt install -y package_name" or "sudo apt remove -y package_name")
+          3. After completion, report success or failure with the exact command output
 
         ### Web / Browser / Search Workflows (ALWAYS check internet first)
         - For any request involving internet, browser, search, images:
@@ -113,7 +124,7 @@ messages:
           4. Final message only after all steps are done
 
         ### Dangerous Operations
-        - empty_trash, clear_tmp, remove_file → NEVER execute without explicit user confirmation ("yes", "y", "confirm")
+        - empty_trash, clear_tmp, remove_file , install_package  , remove_package → NEVER execute without explicit user confirmation ("yes", "y", "confirm")
         - Before asking confirmation: show exact path(s) that will be affected
 
         ## System Information
