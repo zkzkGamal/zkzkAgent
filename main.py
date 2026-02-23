@@ -2,7 +2,7 @@ import logging, os, sys
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from core.agent import app
 
-from modules.voice_module import VoiceModule
+# from modules.voice_module import VoiceModule
 from langchain_core.prompts import load_prompt
 
 from models.tts import speak
@@ -24,7 +24,7 @@ if not logger.handlers:
 
 logger = logging.getLogger(__name__)
 
-voice_module = VoiceModule()
+# voice_module = VoiceModule()
 
 
 prompt = load_prompt("prompt.yaml")
@@ -63,17 +63,19 @@ def main():
     2- to use text input type 'text'
     3- to exit type 'exit' or 'quit'
     """)
-    user_input_type = input("Enter your input type: ").strip()
+    # user_input_type = input("Enter your input type: ").strip()
+    user_input_type = "text"
     while True:
         try:
-            user_input_type = input("Enter your input type: ").strip()
+            # user_input_type = input("Enter your input type: ").strip()
             if user_input_type == "voice":
-                logger.info("Listening for voice input...")
-                user_input = voice_module()
-                if user_input is None:
-                    logger.info("No valid input detected. Please try again.")
-                    continue
-                logger.info(f"[USER]: {user_input}")
+                # logger.info("Listening for voice input...")
+                # user_input = voice_module()
+                # if user_input is None:
+                #     logger.info("No valid input detected. Please try again.")
+                #     continue
+                # logger.info(f"[USER]: {user_input}")
+                raise NotImplementedError("not implemented yet")
             elif user_input_type == "text":
                 user_input = input("Enter your request: ").strip()
             else:
