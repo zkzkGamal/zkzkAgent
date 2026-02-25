@@ -1,32 +1,36 @@
-# 🤖 zkzkAgent: Local AI System Manager for Linux
+# 🤖 zkzkAgent — Intelligent Local AI System Manager for Linux
+
+<div align="center">
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)
+![LangGraph](https://img.shields.io/badge/LangGraph-Router%20Architecture-6C63FF?style=for-the-badge&logo=graphql)
 ![LangChain](https://img.shields.io/badge/LangChain-Latest-green?style=for-the-badge&logo=chainlink)
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange?style=for-the-badge)
 ![Linux](https://img.shields.io/badge/Linux-Only-yellow?style=for-the-badge&logo=linux)
-![Tools](https://img.shields.io/badge/Tools-25-brightgreen?style=for-the-badge)
+![Tools](https://img.shields.io/badge/Tools-25%2B-brightgreen?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)
 
-> ⚠️ **Linux Only**: This project is specifically designed for Linux systems (Ubuntu/Debian-based distributions). It uses Linux-specific commands and tools like `nmcli`, `xdg-open`, and system paths.
+**A privacy-first, fully local AI agent that thinks before it acts — built with LangGraph's multi-node router architecture.**
 
-**zkzkAgent** is a powerful, privacy-focused local AI assistant designed to act as your intelligent system manager on Linux. Built on **LangGraph** and **Ollama**, it automates complex workflows, manages system processes, handles network tasks, and provides voice interaction capabilities—all while keeping your data on your machine.
+</div>
+
+> ⚠️ **Linux Only**: Designed for Linux (Ubuntu/Debian-based). Uses Linux-specific tools like `nmcli`, `xdg-open`, and system paths.
 
 ---
 
 ## 🎬 Demos
+
 <div align="center">
   <a href="https://www.youtube.com/shorts/eC5XbqPbzSY">
     <img src="https://img.youtube.com/vi/eC5XbqPbzSY/0.jpg" alt="Demo Video 1" width="400">
   </a>
-  <br/>
-  <em>Demo Video 1</em>
+  <br/><em>Demo Video 1</em>
   <br/><br/>
   <a href="https://www.youtube.com/shorts/D0dmyMQFHUs">
     <img src="https://img.youtube.com/vi/D0dmyMQFHUs/0.jpg" alt="Demo Video 2" width="400">
   </a>
-  <br/>
-  <em>Demo Video 2</em>
+  <br/><em>Demo Video 2</em>
 </div>
 
 ---
@@ -34,360 +38,206 @@
 ## 📑 Table of Contents
 
 - [✨ Key Features](#-key-features)
-- [🏗️ Architecture](#️-architecture)
+- [🏗️ Architecture — Router & Conditional Branching](#️-architecture--router--conditional-branching)
 - [🚀 Quick Install](#-quick-install)
 - [🚀 Getting Started](#-getting-started)
 - [💻 Usage](#-usage)
-- [📖 Comprehensive Usage Examples](#-comprehensive-usage-examples)
+- [📖 Usage Examples](#-usage-examples)
 - [📂 Project Structure](#-project-structure)
 - [🔧 Advanced Configuration](#-advanced-configuration)
 - [🐛 Troubleshooting](#-troubleshooting)
 - [📊 Performance Tips](#-performance-tips)
-- [🔒 Security Considerations](#-security-considerations)
+- [🔒 Security](#-security)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
-- [🙏 Acknowledgments](#-acknowledgments)
-- [📞 Support](#-support)
 
 ---
 
 ## ✨ Key Features
 
-### 🧠 Intelligent Automation
+### 🧠 Smart Multi-Path Reasoning (New Architecture)
 
-- **Background Deployment**: Run long-running deployment scripts in the background with automatic option selection by AI
-- **Process Management**: Track, monitor, and kill background processes directly through chat commands
+zkzkAgent doesn't just blindly execute your commands — it **classifies your intent first**, then picks the optimal execution path:
+
+- **Conversational Path**: Direct answers to questions with no tool overhead
+- **Direct Execution Path**: Immediate tool dispatch for clear, single-step tasks
+- **Planning Path**: Multi-step task decomposition before execution — catches hidden dependencies
+
+### ⚡ Intelligent Automation
+
+- **Background Deployment**: Run long-running scripts in the background with AI-assisted option selection
+- **Process Management**: Track, monitor, and terminate background processes via chat
 - **Smart File Search**: Automatic wildcard matching when exact filenames aren't found
-- **Context-Aware Actions**: AI reads scripts and makes intelligent decisions based on user intent
-- **Real-time Streaming**: Instant feedback with token-by-token response streaming
-- **Low-latency Startup**: Adaptive model warm-up ensures the agent is ready when you are
+- **Real-time Streaming**: Token-by-token response streaming for instant feedback
+- **Low-latency Startup**: Adaptive warm-up ensures the agent is ready when you are
 
 ### 🌐 Network Awareness
 
-- **Auto-Connectivity Check**: Automatically verifies internet access before executing network-dependent tasks
-- **Self-Healing Wi-Fi**: Detects disconnections and attempts to enable Wi-Fi automatically using `nmcli`
-- **Network-First Operations**: Browser and deployment tasks always check connectivity first
+- **Auto-Connectivity Check**: Verifies internet access before any network-dependent task
+- **Self-Healing Wi-Fi**: Detects disconnections and auto-enables Wi-Fi via `nmcli`
 
-### 🛡️ Safety & Security
+### 🛡️ Human-in-the-Loop Safety
 
-- **Human-in-the-Loop**: Destructive operations require explicit user confirmation (yes/no)
-- **Dangerous Tool Protection**: Automatic safeguards for destructive tools like `empty_trash`, `remove_file`, `install_package`, and others
-- **Local Execution**: Powered by local LLMs via Ollama—your data never leaves your device
-- **Privacy-First**: No cloud dependencies, all processing happens locally
+- **Confirmation Gates**: Destructive operations require explicit `yes/no` before execution
+- **Dangerous Tool Protection**: Safeguards for `empty_trash`, `remove_file`, `install_package`, and more
+- **Local Execution**: Fully offline — your data never leaves your machine
 
 ### 🎤 Voice Interaction (Optional)
 
-- **Voice Input**: Whisper-based speech recognition with VAD (Voice Activity Detection)
-- **Text-to-Speech**: Natural voice responses using Coqui TTS
-- **Noise Reduction**: Built-in audio preprocessing for better recognition
-- **Hands-Free Operation**: Control your system with voice commands
+- **Voice Input**: Whisper-based speech recognition with Voice Activity Detection (VAD)
+- **Text-to-Speech**: Natural voice responses via Coqui TTS / Kokoro
+- **Noise Reduction**: Built-in audio preprocessing for accurate recognition
 
 ### 🛠️ Comprehensive Tooling (25 Tools)
 
-#### File Operations (8 tools)
-
-**General File Tools (4 tools)**
-
-- **Find File** (`find_file`): Search for files with automatic wildcard matching
-- **Find Folder** (`find_folder`): Locate directories across your system
-- **Read File** (`read_file`): Display file contents
-- **Open File** (`open_file`): Open files with default applications using `xdg-open`
-
-**Coding & Project Tools (4 tools - New)**
-
-- **Get File Content** (`get_file_content`): Read code files within a project limit 10000 chars
-- **Write File** (`write_file`): Write code to files within a project limit 10000 chars
-- **Get Files Info** (`get_files_info`): List files and directories with metadata
-- **Create Project** (`create_project_folder`): Create new project directories safely
-
-#### Dangerous Tools (5 tools - Require Confirmation)
-
-- **Empty Trash** (`empty_trash`): Clear system trash (`~/.local/share/Trash/*`)
-- **Clear Temp** (`clear_tmp`): Remove temporary files from `~/tmp/*`
-- **Remove File** (`remove_file`): Safely delete files/folders permanently
-- **Install Package** (`install_package`): Install system packages safely using the appropriate package manager
-- **Remove Package** (`remove_package`): Remove system packages safely
-
-#### Application Tools (2 tools)
-
-- **VSCode Integration** (`open_vscode`): Open files and folders in Visual Studio Code
-- **Browser Automation** (`open_browser`): Open URLs in default browser
-
-#### Network Tools (4 tools)
-
-- **Internet Check** (`check_internet`): Verify connectivity by pinging `8.8.8.8`
-- **Wi-Fi Management** (`enable_wifi`): Enable Wi-Fi using NetworkManager (`nmcli`)
-- **Web Search** (`duckduckgo_search`): Search the web using DuckDuckGo API
-- **Image Search** (`duckduckgo_search_images`): Find and download images directly to your media folder
-
-#### Process Management Tools (2 tools)
-
-- **Find Process** (`find_process`): Locate running processes by name using `pgrep`
-- **Kill Process** (`kill_process`): Terminate background processes with SIGTERM
-
-#### Deployment Tools (2 tools)
-
-- **Deploy Script** (`run_deploy_script`): Run deployment scripts with AI-assisted option selection
-- **Stop Frontend** (`stop_frontend`): Terminate remote frontend process via SSH
-
-#### System Tools (1 tool)
-
-- **Run Command** (`run_command`): Execute shell commands and return output (date, whoami, ls, etc.)
-
-#### Package Management Tools (3 tools)
-
-- **Detect OS** (`detect_operating_system`): Detect the Linux distribution (Ubuntu/Debian, Fedora, Arch, etc.)
-- **Install Package** (`install_package`): Install system packages safely (Requires Confirmation)
-- **Remove Package** (`remove_package`): Remove system packages safely (Requires Confirmation)
+| Category                              | Tools                                                                                                                             |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **File Operations**                   | `find_file`, `find_folder`, `read_file`, `open_file`, `get_file_content`, `write_file`, `get_files_info`, `create_project_folder` |
+| **Dangerous (Confirmation Required)** | `empty_trash`, `clear_tmp`, `remove_file`, `install_package`, `remove_package`                                                    |
+| **Applications**                      | `open_vscode`, `open_browser`                                                                                                     |
+| **Network**                           | `check_internet`, `enable_wifi`, `duckduckgo_search`, `duckduckgo_search_images`                                                  |
+| **Process Management**                | `find_process`, `kill_process`                                                                                                    |
+| **Deployment**                        | `run_deploy_script`, `stop_frontend`                                                                                              |
+| **System**                            | `run_command`, `detect_operating_system`                                                                                          |
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture — Router & Conditional Branching
 
-The agent operates on a **cyclic graph architecture** using **LangGraph** with stateful execution, conditional routing, and human-in-the-loop safety mechanisms.
+> This is where zkzkAgent differs from a simple ReAct loop. Instead of feeding every request to a single LLM call, the agent uses a **multi-node LangGraph StateGraph** with a dedicated **Router** that classifies intent and conditionally branches to the right node. This makes the agent faster, safer, and more explainable.
 
-### High-Level Agent Flow
+### 📊 Live Graph — Compiled LangGraph
 
-```mermaid
-graph TB
-    Start([User Input]) --> Entry[Entry Point: Agent Node]
+![zkzkAgent LangGraph Architecture](graph.png)
 
-    Entry --> CheckPending{Pending<br/>Confirmation?}
+_Auto-generated from `app.get_graph().draw_mermaid_png()` — this is your actual compiled graph._
 
-    %% Confirmation Flow
-    CheckPending -->|Yes| ParseResponse{User Response}
-    ParseResponse -->|yes/y| ExecuteDangerous[Execute Dangerous Tool]
-    ParseResponse -->|no/other| CancelAction[Cancel Action]
-    ExecuteDangerous --> UpdateState1[Update State]
-    CancelAction --> UpdateState1
-    UpdateState1 --> End1([Return to User])
+---
 
-    %% Normal Flow
-    CheckPending -->|No| InvokeLLM[Invoke LLM with Tools]
-    InvokeLLM --> CheckToolCalls{Tool Calls<br/>Present?}
+### 🔀 How the Router Works
 
-    %% No Tool Calls
-    CheckToolCalls -->|No| End2([Return Response to User])
+Every user message enters the **`classify` node** first. A dedicated LLM (with no tools bound, just classification logic) reads the `router.yaml` prompt and returns a structured JSON decision:
 
-    %% Tool Calls Present
-    CheckToolCalls -->|Yes| CheckDangerous{Is Dangerous<br/>Tool?}
-
-    %% Dangerous Tool Path
-    CheckDangerous -->|Yes: empty_trash<br/>clear_tmp<br/>remove_file<br/>install_package<br/>remove_package| SetPending[Set Pending Confirmation]
-    SetPending --> AskConfirm[Ask User for Confirmation]
-    AskConfirm --> End3([Wait for User Response])
-
-    %% Safe Tool Path
-    CheckDangerous -->|No| ToolNode[Tool Execution Node]
-    ToolNode --> ExecuteTools[Execute Tool Functions]
-    ExecuteTools --> ToolResult[Collect Tool Results]
-    ToolResult --> BackToAgent[Return to Agent Node]
-    BackToAgent --> Entry
-
-    style CheckPending fill:#ff9999
-    style CheckDangerous fill:#ff9999
-    style SetPending fill:#ffcccc
-    style ExecuteDangerous fill:#ff6666
-    style ToolNode fill:#99ccff
-    style InvokeLLM fill:#99ff99
+```json
+{
+  "route": "DIRECT_EXECUTION | NEEDS_PLANNING | CONVERSATIONAL",
+  "rationale": "Why this path was chosen."
+}
 ```
 
-### Detailed State Management
+This decision is stored in `AgentState.category`, and then **`add_conditional_edges`** routes to the correct node:
 
-```mermaid
-graph LR
-    subgraph "AgentState Structure"
-        State[AgentState]
-        State --> Messages[messages: List]
-        State --> Pending[pending_confirmation: Dict]
-        State --> Processes[running_processes: Dict]
-    end
-
-    subgraph "Messages"
-        Messages --> System[SystemMessage]
-        Messages --> Human[HumanMessage]
-        Messages --> AI[AIMessage]
-        Messages --> Tool[ToolMessage]
-    end
-
-    subgraph "Pending Confirmation"
-        Pending --> ToolName[tool_name: str]
-        Pending --> UserMsg[user_message: str]
-    end
-
-    subgraph "Running Processes"
-        Processes --> ProcName[process_name: str]
-        Processes --> PID[pid: int]
-    end
-
-    style State fill:#e1f5ff
-    style Messages fill:#fff9c4
-    style Pending fill:#ffccbc
-    style Processes fill:#c8e6c9
+```python
+graph.add_conditional_edges(
+    "classify",
+    route_after_classify,   # reads state["category"]
+    {
+        "execute":        "execute",       # DIRECT_EXECUTION
+        "plan":           "plan",          # NEEDS_PLANNING
+        "conversational": "conversational" # CONVERSATIONAL
+    }
+)
 ```
 
-### Tool Execution Flow
+---
+
+### 🗺️ Full Execution Flow
 
 ```mermaid
-graph TD
-    ToolCall[Tool Call Received] --> RouteType{Tool Type}
+flowchart TD
+    A([🟢 User Input]) --> B[classify node\nrouter.yaml prompt]
 
-    %% File Operations
-    RouteType -->|File Ops| FileFlow[File Operations Flow]
-    FileFlow --> FindFile[find_file: Search with wildcards]
-    FileFlow --> FindFolder[find_folder: Locate directories]
-    FileFlow --> ReadFile[read_file: Display contents]
-    FileFlow --> OpenFile[open_file: xdg-open]
+    B -->|CONVERSATIONAL| C[conversation node\nconversational.yaml]
+    B -->|DIRECT_EXECUTION| D[execute node\nexecutor.yaml]
+    B -->|NEEDS_PLANNING| E[plan node\nplanner.yaml]
 
-    %% Coding Operations
-    RouteType -->|Coding| CodeFlow[Coding Operations Flow]
-    CodeFlow --> CreateProj[create_project_folder: Init Project]
-    CodeFlow --> WriteMs[write_file: Write Code]
-    CodeFlow --> ReadCode[get_file_content: Read Code]
-    CodeFlow --> ListFiles[get_files_info: List Project Files]
-    %% Network Operations
-    RouteType -->|Network| NetworkFlow[Network Operations Flow]
-    NetworkFlow --> CheckInternet[check_internet: Ping 8.8.8.8]
-    NetworkFlow --> EnableWiFi[enable_wifi: nmcli radio wifi on]
-    NetworkFlow --> WebSearch[duckduckgo_search: Query DuckDuckGo API]
+    E -->|always| D
 
-    %% Application Tools
-    RouteType -->|Applications| AppFlow[Application Tools Flow]
-    AppFlow --> OpenVSCode[open_vscode: Launch IDE]
-    AppFlow --> OpenBrowser[open_browser: xdg-open URL]
+    D -->|has tool_calls?| F{Tool Calls?}
+    F -->|Yes| G{Dangerous Tool?}
+    F -->|No| Z([🔴 END])
 
-    %% Process Management
-    RouteType -->|Process| ProcFlow[Process Management Flow]
-    ProcFlow --> FindProc[find_process: pgrep process_name]
-    ProcFlow --> KillProc[kill_process: SIGTERM]
+    G -->|Yes| H[🛑 Request Confirmation\nHuman-in-the-Loop]
+    H --> Z
 
-    %% Deployment Tools
-    RouteType -->|Deployment| DeployFlow[Deployment Tools Flow]
-    DeployFlow --> RunDeploy[run_deploy_script: Background execution]
-    DeployFlow --> StopFrontend[stop_frontend: Kill remote frontend]
+    G -->|No| I[tools node\nToolNode]
+    I --> D
 
-    %% System Tools
-    RouteType -->|System| SysFlow[System Commands Flow]
-    SysFlow --> RunCommand[run_command: Execute shell command]
+    C --> Z
 
-    %% Package Management
-    RouteType -->|Packages| PkgFlow[Package Management Flow]
-    PkgFlow --> DetectOS[detect_operating_system: Detect distro]
-    PkgFlow --> InstallPkg[install_package: apt/dnf/pacman]
-    PkgFlow --> RemovePkg[remove_package: apt/dnf/pacman]
-
-    %% Dangerous Operations
-    RouteType -->|Dangerous| DangerFlow[Dangerous Operations Flow]
-    DangerFlow --> Confirm{User<br/>Confirmed?}
-    Confirm -->|Yes| EmptyTrash[empty_trash: rm -rf ~/.local/share/Trash/*]
-    Confirm -->|Yes| ClearTmp[clear_tmp: rm -rf ~/tmp/*]
-    Confirm -->|Yes| RemoveFile[remove_file: rm -rf path]
-    Confirm -->|Yes| InstallPkg[install_package: apt/dnf/pacman]
-    Confirm -->|Yes| RemovePkg[remove_package: apt/dnf/pacman]
-    Confirm -->|No| Cancel[Cancel Operation]
-
-    %% Results
-    FindFile --> Result[Return Result to Agent]
-    FindFolder --> Result
-    ReadFile --> Result
-    OpenFile --> Result
-    CreateProj --> Result
-    WriteMs --> Result
-    ReadCode --> Result
-    ListFiles --> Result
-    CheckInternet --> Result
-    EnableWiFi --> Result
-    WebSearch --> Result
-    OpenVSCode --> Result
-    OpenBrowser --> Result
-    FindProc --> Result
-    KillProc --> Result
-    RunDeploy --> Result
-    StopFrontend --> Result
-    RunCommand --> Result
-    DetectOS --> Result
-    InstallPkg --> Result
-    RemovePkg --> Result
-    EmptyTrash --> Result
-    ClearTmp --> Result
-    RemoveFile --> Result
-    Cancel --> Result
-
-    style DangerFlow fill:#ff9999
-    style Confirm fill:#ffcccc
-    style EmptyTrash fill:#ff6666
-    style ClearTmp fill:#ff6666
-    style RemoveFile fill:#ff6666
-    style NetworkFlow fill:#99ccff
-    style FileFlow fill:#c8e6c9
-    style CodeFlow fill:#a5d6a7
-    style AppFlow fill:#fff9c4
-    style ProcFlow fill:#e1bee7
-    style DeployFlow fill:#b2dfdb
-    style SysFlow fill:#ffccbc
-    style PkgFlow fill:#ffb74d
+    style A fill:#22c55e,color:#fff
+    style Z fill:#ef4444,color:#fff
+    style B fill:#6C63FF,color:#fff
+    style C fill:#0ea5e9,color:#fff
+    style D fill:#10b981,color:#fff
+    style E fill:#f59e0b,color:#fff
+    style H fill:#f43f5e,color:#fff
+    style I fill:#8b5cf6,color:#fff
 ```
 
-### LangGraph Node Structure
+---
 
-```mermaid
-graph LR
-    subgraph "Graph Nodes"
-        AgentNode[Agent Node<br/>call_model]
-        ToolsNode[Tools Node<br/>ToolNode]
-    end
+### 🧩 Why This Architecture Wins
 
-    subgraph "Conditional Routing"
-        Router[should_continue]
-        Router --> CheckPending{pending_confirmation?}
-        Router --> CheckToolCalls{tool_calls?}
-    end
+| Approach          | Single-Node ReAct         | zkzkAgent Multi-Node Router             |
+| ----------------- | ------------------------- | --------------------------------------- |
+| **Routing**       | LLM decides on every turn | Dedicated classifier — faster & cheaper |
+| **Complex Tasks** | May miss dependencies     | `plan_node` decomposes first            |
+| **Simple Chat**   | Unnecessarily calls tools | Directly answered via `conversational`  |
+| **Safety**        | Ad-hoc                    | Explicit confirmation gate per node     |
+| **Debuggability** | Black box                 | Each node logs its category & rationale |
+| **Extensibility** | Hard to add paths         | Add a new node + one edge               |
 
-    Start([START]) --> AgentNode
-    AgentNode --> Router
+---
 
-    CheckPending -->|Yes| End1([END])
-    CheckPending -->|No| CheckToolCalls
-    CheckToolCalls -->|Yes| ToolsNode
-    CheckToolCalls -->|No| End2([END])
+### 🧱 Node Responsibilities
 
-    ToolsNode --> AgentNode
+| Node             | Prompt File            | Responsibility                            |
+| ---------------- | ---------------------- | ----------------------------------------- |
+| `classify`       | `router.yaml`          | Classify intent → set `state["category"]` |
+| `conversational` | `conversational.yaml`  | Direct Q&A, no tools bound                |
+| `plan`           | `planner.yaml`         | Break complex tasks into steps            |
+| `execute`        | `executor.yaml`        | Tool-calling agent with streaming         |
+| `tools`          | _(LangGraph built-in)_ | Execute tool functions, return results    |
 
-    style AgentNode fill:#99ff99
-    style ToolsNode fill:#99ccff
-    style Router fill:#fff9c4
+---
+
+### 📦 AgentState — Shared Memory
+
+```python
+class AgentState(TypedDict):
+    messages:             Annotated[Sequence[BaseMessage], add_messages]
+    category:             Optional[Literal["DIRECT_EXECUTION", "NEEDS_PLANNING", "CONVERSATIONAL"]]
+    pending_confirmation: Optional[Dict[str, Optional[str]]]  # Human-in-the-loop gate
+    running_processes:    Optional[Dict[str, int]]             # Background process tracking
 ```
 
-### Internet Connectivity Workflow
+All nodes read from and write to this shared state — the graph is fully stateful across turns.
 
-```mermaid
-graph TD
-    Start[Tool Requires Network?] --> CheckType{Tool Type}
+---
 
-    CheckType -->|duckduckgo_search| DirectSearch[Execute Search Directly]
-    DirectSearch --> SearchResult[Return Results or Error]
+### ⚙️ The Two Routing Functions
 
-    CheckType -->|open_browser| CheckNet[check_internet]
-    CheckType -->|run_deploy_script| CheckNet
+**`route_after_classify`** — runs after `classify`, reads `state["category"]`:
 
-    CheckNet --> IsConnected{Connected?}
-    IsConnected -->|Yes| ExecuteTool[Execute Tool]
-    IsConnected -->|No| EnableWiFi[enable_wifi]
+```python
+def route_after_classify(state: AgentState) -> str:
+    category = state.get("category", "CONVERSATIONAL")
+    if category == "DIRECT_EXECUTION": return "execute"
+    elif category == "NEEDS_PLANNING":  return "plan"
+    else:                               return "conversational"
+```
 
-    EnableWiFi --> Wait[Wait 2-3 seconds]
-    Wait --> Retry[check_internet again]
-    Retry --> RetryCheck{Connected?}
+**`should_continue`** — runs after `execute`, decides tool loop or end:
 
-    RetryCheck -->|Yes| ExecuteTool
-    RetryCheck -->|No| Error[Report Connection Error]
-
-    ExecuteTool --> Success[Return Result]
-
-    style DirectSearch fill:#99ff99
-    style CheckNet fill:#99ccff
-    style EnableWiFi fill:#ffcc99
-    style Error fill:#ff9999
-    style Success fill:#99ff99
+```python
+def should_continue(state: AgentState) -> str:
+    last = state["messages"][-1]
+    if state.get("pending_confirmation", {}).get("tool_name"):
+        return "__end__"  # waiting for human approval
+    if isinstance(last, AIMessage) and last.tool_calls:
+        return "tools"    # more tool calls needed
+    return "__end__"
 ```
 
 ---
@@ -406,92 +256,66 @@ chmod +x install.sh && ./install.sh
 
 ### System Requirements
 
-- **Operating System**: Linux (Ubuntu 20.04+, Debian-based distributions)
-- **Python**: 3.10 or higher
-- **RAM**: Minimum 8GB (16GB recommended for voice features)
-- **Disk Space**: ~5GB for models and dependencies
-- **GPU**: Optional (CUDA support for faster TTS)
+| Requirement | Minimum               | Recommended           |
+| ----------- | --------------------- | --------------------- |
+| OS          | Linux (Ubuntu 20.04+) | Ubuntu 22.04 LTS      |
+| Python      | 3.10                  | 3.11+                 |
+| RAM         | 8 GB                  | 16 GB                 |
+| Disk        | 5 GB                  | 10 GB                 |
+| GPU         | Not required          | CUDA (for faster TTS) |
 
 ### Prerequisites
 
 #### 1. Install Ollama
 
 ```bash
-# Download and install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull the default model
 ollama pull qwen3-vl:4b-instruct-q4_K_M
 ```
 
-> **Note**: You can use any Ollama model. Edit `models/LLM.py` to change the model.
+> **Note**: You can use any Ollama model. Edit `models/LLM.py` to change it.
 
 #### 2. Install System Dependencies
 
 ```bash
-# For Ubuntu/Debian
 sudo apt update
-sudo apt install -y python3-pip python3-dev portaudio19-dev ffmpeg
-
-# NetworkManager (usually pre-installed)
-sudo apt install -y network-manager
+sudo apt install -y python3-pip python3-dev portaudio19-dev ffmpeg network-manager
 ```
 
 ### Installation
 
-1. **Clone the Repository**
+```bash
+# 1. Clone
+git clone https://github.com/zkzkGamal/zkzkAgent.git
+cd zkzkAgent
 
-   ```bash
-   git clone https://github.com/zkzkGamal/zkzkAgent.git
-   cd zkzkAgent
-   ```
+# 2. Virtual environment (recommended)
+python3 -m venv venv
+source venv/bin/activate
 
-2. **Create Virtual Environment** (Recommended)
-
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-3. **Install Python Dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
+# 3. Install dependencies
+pip install -r requirements.txt
+```
 
 ### Configuration
 
-#### System Prompt (`prompt.yaml`)
+#### Prompts (`prompts/`)
 
-Customize the agent's behavior, personality, and rules:
+Each node has its own `.yaml` prompt file — customize behavior per path:
 
-```yaml
-_type: chat
-input_variables:
-  - home
+| File                  | Controls                               |
+| --------------------- | -------------------------------------- |
+| `router.yaml`         | Classification rules & route keywords  |
+| `conversational.yaml` | Conversational tone & knowledge scope  |
+| `planner.yaml`        | Planning strategy & step decomposition |
+| `executor.yaml`       | Tool usage rules, safety instructions  |
 
-messages:
-  - role: system
-    prompt:
-      template: |
-        You are a local AI assistant acting as a **system manager**.
-        # ... customize your prompt here
-```
-
-#### Model Settings (`models/LLM.py`)
-
-Change the LLM model:
+#### Model (`models/LLM.py`)
 
 ```python
 from langchain_ollama import ChatOllama
-
-llm = ChatOllama(model="qwen3-vl:4b-instruct-q4_K_M")  # Change model here
+llm = ChatOllama(model="qwen3-vl:4b-instruct-q4_K_M")  # swap model here
 ```
-
-#### Voice Settings
-
-- **Voice Input** (`models/voice.py`): Change Whisper model size (`tiny`, `base`, `small`, `medium`, `large`)
-- **TTS** (`models/tts.py`): Change TTS model or speaker voice
 
 ---
 
@@ -499,234 +323,94 @@ llm = ChatOllama(model="qwen3-vl:4b-instruct-q4_K_M")  # Change model here
 
 ### Text Mode (Default)
 
-Start the agent with text input:
-
 ```bash
 python3 main.py
 ```
 
-Type your commands and press Enter. Type `exit` or `quit` to stop.
+Type your command and press Enter. Type `exit` or `quit` to stop.
 
 ### Voice Mode (Optional)
 
-Uncomment the voice input lines in `main.py`:
+Uncomment the voice input section in `main.py`:
 
 ```python
-# Change from:
+# Replace:
 user_input = input("Enter your request: ").strip()
 
-# To:
-logger.info("Listening for voice input...")
+# With:
 user_input = voice_module()
 if user_input is None:
-    logger.info("No valid input detected. Please try again.")
     continue
-logger.info(f"[USER]: {user_input}")
+```
+
+### Visualize the Graph
+
+```bash
+python3 core/agent.py   # saves graph.png to project root
 ```
 
 ---
 
-## 📖 Comprehensive Usage Examples
+## 📖 Usage Examples
 
-### File Operations
-
-#### Finding Files
+### 🗣️ Conversational (routed to `conversation_node`)
 
 ```
-User: Find the file main.py
-AI: [Searches and returns file path]
+User: How does grep work?
+AI:   grep searches for patterns in text using regular expressions...
 
-User: Find config file
-AI: [Automatically tries *config* wildcard search]
-
-User: Find all Python files in the project
-AI: [Uses find_file with *.py pattern]
+User: What's the difference between Ubuntu and Debian?
+AI:   [Direct answer — no tools invoked]
 ```
 
-#### Reading Files
+### ⚡ Direct Execution (routed to `execute_node`)
 
 ```
-User: Read the readme file
-AI: [Finds and displays README.md content]
+User: Check my internet connection
+AI:   [check_internet] → Connected. Ping to 8.8.8.8: 12ms
 
-User: Show me the contents of agent.py
-AI: [Displays agent.py content]
+User: What's today's date?
+AI:   [run_command("date")] → Wed Feb 25 15:00:00 EET 2026
+
+User: Open youtube.com
+AI:   [check_internet → open_browser] → Opened in your default browser
 ```
 
-#### Opening Files
+### 🗺️ Planning → Execution (routed to `plan_node → execute_node`)
 
 ```
-User: Open main.py
-AI: [Opens in default text editor using xdg-open]
+User: Set up a new Python project called 'ml-pipeline' with a proper structure
+AI:   [PLAN] I'll: 1) Create folder, 2) Init virtual env, 3) Create main.py and requirements.txt
+      [EXECUTE] create_project_folder → write_file (main.py) → write_file (requirements.txt)
 
-User: Open setup.py in VSCode
-AI: [Uses open_vscode tool to open in VSCode]
+User: Find all log files older than 30 days and remove them
+AI:   [PLAN] First I'll list files, filter by date, then confirm before removing
+      [EXECUTE] run_command("find /var/log -mtime +30") → [confirmation request] → remove_file
 ```
 
-### Coding & Project Management
-
-#### creating New Projects
-
-```
-User: Create a new Python project called 'ai-bot'
-AI: [Uses create_project_folder("~/", "ai-bot") → Creates new directory]
-```
-
-#### Writing and Reading Code
-
-```
-User: Create main.py in myapp with a hello world script
-AI: [Uses write_file("~/myapp", "main.py", "print('Hello')") → Writes content]
-
-User: Read the content of src/utils.py
-AI: [Uses get_file_content("~/myapp", "src/utils.py") → Returns code content]
-```
-
-#### Explroing Project Structure
-
-```
-User: what files are in the current project?
-AI: [Uses get_files_info("~/myapp", ".") → Lists files with metadata]
-```
-
-### System Maintenance
-
-#### Cleaning System
+### 🛡️ Human-in-the-Loop (Dangerous tools)
 
 ```
 User: Empty the trash
-AI: I'm about to perform 'empty_trash'. This will delete data permanently. Please confirm with 'yes' or 'no'.
+AI:   ⚠️ I'm about to perform 'empty_trash'. This will delete data permanently.
+      Please confirm with 'yes' or 'no'.
 User: yes
-AI: [Empties ~/.local/share/Trash]
+AI:   ✓ Trash emptied. ~/.local/share/Trash cleared.
 
-User: Clear temporary files
-AI: I'm about to perform 'clear_tmp'. This will delete data permanently. Please confirm with 'yes' or 'no'.
-User: yes
-AI: [Clears /tmp directory]
+User: Install nginx
+AI:   ⚠️ I'm about to run 'install_package' (nginx). Confirm with 'yes' or 'no'.
+User: no
+AI:   ✓ Installation cancelled.
 ```
 
-#### File Removal
+### 🔍 Web Search & Images
 
 ```
-User: Remove old_backup.tar.gz
-AI: I'm about to perform 'remove_file'. This will delete data permanently. Please confirm with 'yes' or 'no'.
-User: yes
-AI: [Deletes the file]
-```
+User: Search for LangGraph best practices
+AI:   [duckduckgo_search] → Returns top 5 results with titles, descriptions, and URLs
 
-### Network Operations
-
-#### Opening URLs
-
-```
-User: Open youtube.com
-AI: [Checks internet → Enables Wi-Fi if needed → Opens in browser]
-
-User: Browse github.com
-AI: [Verifies connectivity → Opens URL]
-```
-
-#### Network Troubleshooting
-
-```
-User: Check if I'm connected to the internet
-AI: [Uses check_internet tool → Reports status]
-
-User: Enable Wi-Fi
-AI: [Uses nmcli to enable Wi-Fi]
-```
-
-### Development Workflow
-
-#### Opening Projects
-
-```
-User: Open the current project in VSCode
-AI: [Launches VSCode with current directory]
-
-User: Open /home/user/myproject in VSCode
-AI: [Opens specified directory in VSCode]
-```
-
-#### Running Deployments
-
-```
-User: Run the deploy script
-AI: [Reads deploy_v2.sh → Analyzes options → Selects appropriate option → Runs in background]
-AI: Deploy script started in background. PID: 12345. Logs are being written to deploy.log.
-
-User: Kill the deploy script
-AI: [Terminates process 12345]
-```
-
-### Process Management
-
-```
-User: Find all Python processes
-AI: [Uses find_process tool with 'python']
-AI: Found the following Python processes:
-    - PID: 92550
-    - PID: 92560
-    - PID: 96142
-
-User: List all running processes
-AI: [Uses find_process to locate processes]
-
-User: Kill the deploy script
-AI: [Finds and terminates the background deployment process]
-
-User: Stop process 12345
-AI: [Terminates the specified process using kill_process]
-```
-
-### Combined Workflows
-
-```
-User: Find the config file, read it, and open it in VSCode
-AI: [Executes find_file → read_file → open_vscode in sequence]
-
-User: Check internet and open the project documentation
-AI: [Checks connectivity → Enables Wi-Fi if needed → Opens URL]
-```
-
-### Web Search
-
-```
-User: Search for Python best practices
-AI: [Uses duckduckgo_search tool → Returns top 5 results with titles, descriptions, and URLs]
-
-User: Find information about LangGraph framework
-AI: [Searches web and presents results with clickable links]
-
-User: Look up the latest news about AI agents
-AI: [Executes duckduckgo_search("AI agents news", 5) → Displays formatted results]
-```
-
-### System Commands
-
-```
-User: What's the current date?
-AI: [Uses run_command("date") → Returns current date and time]
-
-User: Show me the current user
-AI: [Uses run_command("whoami") → Returns username]
-
-User: Check disk space
-AI: [Uses run_command("df -h") → Returns disk usage information]
-
-User: Show system information
-AI: [Uses run_command("uname -a") → Returns kernel and system details]
-```
-
-### Frontend Management
-
-```
-User: Stop the frontend
-AI: [Uses stop_frontend() → Terminates remote frontend process]
-AI: Frontend stopped successfully. PID 12345 killed on remote server.
-
-User: Kill the frontend deployment
-AI: [Checks running_processes state → Uses stop_frontend() → Reports success]
+User: Find a photo of a sunset
+AI:   [duckduckgo_search_images] → Downloads image to ~/media/
 ```
 
 ---
@@ -735,121 +419,114 @@ AI: [Checks running_processes state → Uses stop_frontend() → Reports success
 
 ```text
 zkzkAgent/
-├── main.py                     # Entry point & CLI loop with logging
-├── prompt.yaml                 # System prompt configuration
-├── requirements.txt            # Python dependencies
+├── main.py                     # Entry point & main chat loop
+├── graph.png                   # Auto-generated LangGraph visualization
+├── requirements.txt
 │
-├── core/                       # Core agent components
-│   ├── __init__.py
-│   ├── agent.py                # LangGraph agent logic & graph definition
-│   ├── state.py                # AgentState TypedDict definition
-│   └── tools.py                # Tool exports & registration
+├── prompts/                    # ✨ Per-node prompt files (New)
+│   ├── router.yaml             # Classifier prompt → DIRECT_EXECUTION | NEEDS_PLANNING | CONVERSATIONAL
+│   ├── conversational.yaml     # Conversational node prompt
+│   ├── planner.yaml            # Planner node prompt
+│   └── executor.yaml           # Executor node prompt
 │
-├── models/                     # AI Model configurations
-│   ├── LLM.py                  # Ollama LLM setup (qwen3-vl)
-│   ├── voice.py                # Whisper model for voice input
-│   └── tts.py                  # Coqui TTS for voice output
+├── core/                       # Core agent logic
+│   ├── agent.py                # LangGraph StateGraph: nodes, edges, router functions
+│   ├── state.py                # AgentState TypedDict
+│   ├── tools.py                # Tool registry
+│   └── loadPrompts.py          # YAML prompt loader
 │
-├── modules/                    # Auxiliary modules
-│   └── voice_module.py         # Voice input processing with VAD
+├── agent_nodes/                # ✨ Multi-node architecture (New)
+│   ├── classify_node.py        # Router: classifies intent, sets state["category"]
+│   ├── conversation_node.py    # Handles CONVERSATIONAL requests
+│   ├── plan_node.py            # Handles NEEDS_PLANNING — decomposes tasks
+│   └── execute_node.py         # Handles DIRECT_EXECUTION — tool-calling agent
 │
-└── tools_module/               # Tool implementations (25 tools)
-    ├── __init__.py
-    │
-    ├── files_tools/            # File operation tools (8 tools)
-    │   ├── findFile.py         # Search for files with wildcards
-    │   ├── findFolder.py       # Search for directories
-    │   ├── readFile.py         # Read file contents
-    │   ├── openFile.py         # Open files with xdg-open
-    │   ├── getFileContent.py   # Read code files (coding tool)
-    │   ├── writeFile.py        # Write code files (coding tool)
-    │   ├── getFileInfo.py      # List file metadata (coding tool)
-    │   └── createProjectFolder.py # Create project directories
-    │
-    ├── dangerous_tools/        # Tools requiring confirmation (3 tools)
-    │   ├── __init__.py
-    │   ├── emptyTrash.py       # Empty ~/.local/share/Trash/*
-    │   ├── emptyTmp.py         # Clear ~/tmp/*
-    │   └── removeFile.py       # Delete files/folders safely
-    │
-    ├── applications_tools/     # Application launchers (2 tools)
-    │   ├── openVsCode.py       # Launch Visual Studio Code
-    │   └── openBrowser.py      # Open URLs in default browser
-    │
-    ├── network_tools/          # Network management (4 tools)
-    │   ├── checkInternet.py    # Verify connectivity (ping 8.8.8.8)
-    │   ├── enableWifi.py       # Enable Wi-Fi using nmcli
-    │   ├── networkSearch.py    # DuckDuckGo web search
-    │   └── duckduckgo_search_images.py # Image search and download
-    │
-    ├── processes_tools/        # Process management (2 tools)
-    │   ├── findProcess.py      # Find processes by name (pgrep)
-    │   └── killProcess.py      # Terminate processes (SIGTERM)
-    │
-    ├── package_manager/        # Package management tools (3 tools)
-    │   ├── detectOperatingSystem.py # Detect Linux distribution
-    │   ├── installPackage.py   # Install system packages
-    │   └── removePackage.py    # Remove system packages
-    │
-    ├── runDeployScript.py      # Deployment tools (2 tools: run_deploy_script, stop_frontend)
-    └── runCommand.py           # System command execution (1 tool: run_command)
+├── models/                     # AI model configs
+│   ├── LLM.py                  # Ollama LLM setup
+│   ├── voice.py                # Whisper speech recognition
+│   └── tts.py                  # Coqui / Kokoro TTS
+│
+├── modules/
+│   └── voice_module.py         # VAD + audio preprocessing
+│
+├── preprocessing/
+│   └── get_clean_history.py    # Message history cleaner
+│
+└── tools_module/               # 25 tool implementations
+    ├── files_tools/            # find, read, write, open (8 tools)
+    ├── dangerous_tools/        # empty_trash, clear_tmp, remove_file
+    ├── applications_tools/     # VSCode, browser
+    ├── network_tools/          # internet check, Wi-Fi, DuckDuckGo
+    ├── processes_tools/        # find_process, kill_process
+    ├── package_manager/        # detect OS, install, remove
+    ├── runDeployScript.py      # run_deploy_script, stop_frontend
+    └── runCommand.py           # run_command
 ```
 
 ---
 
 ## 🔧 Advanced Configuration
 
-### Custom Tools
+### Add a New Route / Node
 
-Add new tools by creating a new file in `tools_module/`:
+1. Create `agent_nodes/my_node.py`:
 
 ```python
+from core.state import AgentState
+from langchain_core.messages import SystemMessage
+
+def my_node(state: AgentState) -> AgentState:
+    # your logic
+    return {"messages": [...]}
+```
+
+2. Register in `core/agent.py`:
+
+```python
+graph.add_node("my_node", my_node)
+```
+
+3. Update the router in `route_after_classify`:
+
+```python
+elif category == "MY_CATEGORY":
+    return "my_node"
+```
+
+4. Add a new key to `add_conditional_edges`:
+
+```python
+graph.add_conditional_edges("classify", route_after_classify, {
+    ...,
+    "my_node": "my_node"
+})
+```
+
+### Add a Custom Tool
+
+```python
+# tools_module/my_tool.py
 from langchain_core.tools import tool
 
 @tool
 def my_custom_tool(param: str) -> str:
     """Description of what this tool does."""
-    # Your implementation
     return "Result"
 ```
 
-Register in `tools.py`:
+Register in `core/tools.py`:
 
 ```python
-from tools_module import my_custom_tool
-
-__all__ = [
-    # ... existing tools
-    my_custom_tool.my_custom_tool,
-]
+from tools_module.my_tool import my_custom_tool
+__all__ = [..., my_custom_tool]
 ```
 
-### Dangerous Tools
+### Add a Dangerous Tool (Requires Confirmation)
 
-To add a tool that requires confirmation, add its name to `agent.py`:
+In `agent_nodes/execute_node.py`:
 
 ```python
 DANGEROUS_TOOLS = ["empty_trash", "clear_tmp", "remove_file", "my_dangerous_tool"]
-```
-
-### Voice Configuration
-
-#### Whisper Model Size
-
-Edit `models/voice.py`:
-
-```python
-# Options: tiny, base, small, medium, large
-whisper_model = whisper.load_model("small", device="cpu").cpu()
-```
-
-#### TTS Voice
-
-Edit `models/tts.py`:
-
-```python
-# Change speaker index (0-108 for VCTK model)
-speaker = tts.speakers[11]  # Try different numbers
 ```
 
 ---
@@ -858,109 +535,61 @@ speaker = tts.speakers[11]  # Try different numbers
 
 ### Common Issues
 
-#### 1. Ollama Connection Error
+#### Ollama Connection Error
 
 ```bash
-# Check if Ollama is running
-ollama list
-
-# Restart Ollama service
-systemctl restart ollama
+ollama list                    # check models
+systemctl restart ollama       # restart service
 ```
 
-#### 2. NetworkManager Not Found
+#### NetworkManager Not Found
 
 ```bash
-# Install NetworkManager
 sudo apt install network-manager
-
-# Enable and start service
-sudo systemctl enable NetworkManager
-sudo systemctl start NetworkManager
+sudo systemctl enable --now NetworkManager
 ```
 
-#### 3. Audio Issues (Voice Mode)
+#### Audio Issues (Voice Mode)
 
 ```bash
-# Install PortAudio
 sudo apt install portaudio19-dev
-
-# Test audio devices
 python3 -c "import sounddevice as sd; print(sd.query_devices())"
 ```
 
-#### 4. Permission Denied for Tools
+#### KeyError on Prompt Template Variables
 
-```bash
-# Make deploy script executable
-chmod +x ../deploy/deploy_v2.sh
-
-# Check file permissions
-ls -la ~/.local/share/Trash
-```
-
-#### 5. VSCode Not Opening
-
-```bash
-# Install VSCode
-sudo snap install code --classic
-
-# Or via apt
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
-sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
-sudo apt update
-sudo apt install code
-```
+If you see `KeyError: missing variables` in a LangChain prompt — you likely have raw `{` `}` in a YAML prompt that LangChain treats as template variables. Use `{{` `}}` to escape literal braces in YAML prompt files, **or** pass the prompt content directly as a `SystemMessage` instead of wrapping it in a second `ChatPromptTemplate`.
 
 ---
 
 ## 📊 Performance Tips
 
-### Optimize for Speed
-
-1. **Use Smaller Models**: Switch to `qwen3-vl:2b` for faster responses
-2. **Disable Voice**: Comment out TTS in `main.py` for text-only mode
-3. **GPU Acceleration**: Enable GPU for TTS in `models/tts.py`:
-   ```python
-   tts = TTS(model_name, progress_bar=False, gpu=True)
-   ```
-
-### Reduce Memory Usage
-
-1. **Use Quantized Models**: Stick with `q4_K_M` quantization
-2. **Smaller Whisper**: Use `tiny` or `base` model
-3. **Disable Unused Features**: Remove voice dependencies if not needed
+1. **Use smaller models**: Switch to `qwen3-vl:2b` for faster classify + conversational paths
+2. **Separate router model**: Use a tiny model (e.g., `tinyllama`) just for `classify_node` — it only outputs JSON
+3. **Disable voice**: Comment out TTS in `main.py` for text-only mode
+4. **GPU for TTS**: In `models/tts.py` set `gpu=True`
 
 ---
 
-## 🔒 Security Considerations
+## 🔒 Security
 
-- **Local Only**: All processing happens on your machine
-- **No Telemetry**: No data is sent to external servers
-- **Confirmation Required**: Destructive operations need explicit approval
-- **Script Inspection**: AI reads scripts before execution
-- **Process Isolation**: Background processes run with user permissions
+- **Fully local**: All LLM inference is on-device via Ollama — zero cloud calls
+- **No telemetry**: Nothing is sent to external servers
+- **Confirmation-gated**: Destructive operations blocked until user explicitly approves
+- **Role separation**: Router, planner, and executor are separate nodes with different prompts and permissions
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these guidelines:
-
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit: `git commit -m 'feat: add my feature'`
+4. Push: `git push origin feature/my-feature`
 5. Open a Pull Request
 
-### Development Setup
-
 ```bash
-# Install development dependencies
-pip install -r requirements.txt
-
-# Run tests
+# Run basic tool tests
 python3 tools_test.py
 ```
 
@@ -968,27 +597,32 @@ python3 tools_test.py
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+MIT License — see `LICENSE` for details.
 
 ---
 
 ## 🙏 Acknowledgments
 
-- **LangChain** & **LangGraph**: For the agent framework
-- **Ollama**: For local LLM inference
-- **OpenAI Whisper**: For speech recognition
-- **Coqui TTS**: For text-to-speech synthesis
-- **NetworkManager**: For Wi-Fi management on Linux
+- **[LangGraph](https://github.com/langchain-ai/langgraph)** — StateGraph, conditional edges, ToolNode
+- **[LangChain](https://github.com/langchain-ai/langchain)** — Runnable interface, prompt templates, message types
+- **[Ollama](https://ollama.com)** — Local LLM inference
+- **[OpenAI Whisper](https://github.com/openai/whisper)** — Speech recognition
+- **[Kokoro / Coqui TTS](https://huggingface.co/hexgrad/Kokoro-82M)** — Text-to-speech synthesis
+- **NetworkManager** — Wi-Fi management on Linux
 
 ---
 
 ## 📞 Support
-
-For issues, questions, or feature requests:
 
 - **GitHub Issues**: [Create an issue](https://github.com/zkzkGamal/zkzkAgent/issues)
 - **Discussions**: [Join the discussion](https://github.com/zkzkGamal/zkzkAgent/discussions)
 
 ---
 
-**Made with ❤️ for the Linux community**
+<div align="center">
+
+**Built with ❤️ for the Linux community**
+
+_"An agent that thinks before it acts."_
+
+</div>
