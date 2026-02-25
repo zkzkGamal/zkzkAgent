@@ -2,9 +2,10 @@ from typing import Annotated, Sequence, List, Dict, Optional
 from typing_extensions import TypedDict
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
-
+from typing import Literal
 
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
+    category: Optional[Literal["DIRECT_EXECUTION", "NEEDS_PLANNING", "CONVERSATIONAL"]]
     pending_confirmation: Optional[Dict[str, Optional[str]]]
     running_processes: Optional[Dict[str, int]]

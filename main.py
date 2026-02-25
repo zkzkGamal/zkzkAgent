@@ -42,7 +42,6 @@ def main():
 
     # Initial State
     messages = [
-        SystemMessage(content=prompt[0].content),
         HumanMessage(content="this is a warm up message, generate a short response"),
     ]
 
@@ -50,6 +49,7 @@ def main():
         "messages": messages,
         "pending_confirmation": {"tool_name": None, "user_message": None},
         "running_processes": {},
+        "category": None,
     }
 
     logger.info("[MAIN] Warming up model...")
