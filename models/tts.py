@@ -1,17 +1,13 @@
-import warnings
-warnings.filterwarnings("ignore", module="librosa")
-
-from TTS.api import TTS
+from kokoro import KPipeline
 import sounddevice as sd
+import torch
 
-model_name = "tts_models/en/vctk/vits"
-tts = TTS(model_name ,progress_bar=False, gpu=True)
+pipeline = KPipeline(lang_code='a')
 
 def speak(text):
-    speaker = tts.speakers[3]
-    wav = tts.tts(
-        text=text,
-        speaker=speaker
-    )
-    sd.play(wav, samplerate=tts.synthesizer.output_sample_rate)
-    sd.wait()
+    generator = pipeline(text, voice='af_heart')
+    for i, (gs, ps, audio) in enumerate(generator):
+        print(f"[Chunk {i}] gs={gs}, ps={ps}, audio_len={len(audio)}")
+    # Play audio chunk immediately
+    sd.play(audio, samplerate=24000)
+    sd.wait()  # Wait until this chunk finishes before continuing

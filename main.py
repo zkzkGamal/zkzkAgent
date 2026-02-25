@@ -93,10 +93,10 @@ def main():
 
             last_msg = current_state["messages"][-1]
             if isinstance(last_msg, AIMessage):
-                logger.info(f"\n[AI]: {last_msg.content}\n")
+                logger.info(f"\n[AI]: {last_msg.content}\n and the type is ai")
                 speak(last_msg.content)
             elif isinstance(last_msg, HumanMessage):
-                logger.info(f"\n[SYSTEM]: {last_msg.content}\n")
+                logger.info(f"\n[SYSTEM]: {last_msg.content}\n and the type is human")
                 speak(last_msg.content)
 
         except KeyboardInterrupt:
