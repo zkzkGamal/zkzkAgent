@@ -6,6 +6,7 @@ from core.agent import app
 from langchain_core.prompts import load_prompt
 
 from models.tts import speak
+from preprocessing.strip_think_tags import strip_think_tags
 
 # -------------------------
 # Configure logging
@@ -29,6 +30,8 @@ logger = logging.getLogger(__name__)
 
 prompt = load_prompt("prompt.yaml")
 prompt = prompt.format_prompt(home=os.path.expanduser("~"), name="").to_messages()
+
+
 # -------------------------
 # Main Execution
 # -------------------------
@@ -58,11 +61,13 @@ def main():
     logger.info("[MAIN] Model warm-up complete.")
 
     logger.info("AI Assistant Ready. Type 'exit' or 'quit' to stop.")
-    logger.info("""
+    logger.info(
+        """
     1- to use voice input type 'voice'
     2- to use text input type 'text'
     3- to exit type 'exit' or 'quit'
-    """)
+    """
+    )
     # user_input_type = input("Enter your input type: ").strip()
     user_input_type = "text"
     while True:
@@ -93,11 +98,13 @@ def main():
 
             last_msg = current_state["messages"][-1]
             if isinstance(last_msg, AIMessage):
-                logger.info(f"\n[AI]: {last_msg.content}\n and the type is ai")
-                speak(last_msg.content)
+                clean_content = strip_think_tags(last_msg.content)
+                logger.info(f"\n[AI]: {clean_content}\n and the type is ai")
+                speak(clean_content)
             elif isinstance(last_msg, HumanMessage):
-                logger.info(f"\n[SYSTEM]: {last_msg.content}\n and the type is human")
-                speak(last_msg.content)
+                clean_content = strip_think_tags(last_msg.content)
+                logger.info(f"\n[SYSTEM]: {clean_content}\n and the type is human")
+                speak(clean_content)
 
         except KeyboardInterrupt:
             logger.info("\nExiting...")

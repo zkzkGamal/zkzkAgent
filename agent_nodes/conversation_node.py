@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 _model_chain = None
 
+
 def get_model_chain():
     global _model_chain
     if _model_chain is None:
@@ -25,11 +26,17 @@ def get_model_chain():
     return _model_chain
 
 
-DANGEROUS_TOOLS = ["empty_trash", "clear_tmp", "remove_file" , "install_package", "remove_package"]
+DANGEROUS_TOOLS = [
+    "empty_trash",
+    "clear_tmp",
+    "remove_file",
+    "install_package",
+    "remove_package",
+]
 
 
 def conversation_node(state: AgentState) -> AgentState:
-    messages = get_clean_history(state)
+    messages = get_clean_history(state, include_tool_messages=False)
     messages = [SystemMessage(conversational_prompt[0].content), *messages]
     model_chain = get_model_chain()
     response = model_chain.invoke(messages).content
