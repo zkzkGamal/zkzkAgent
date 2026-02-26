@@ -44,15 +44,17 @@ def classify_node(state: AgentState) -> AgentState:
     ).content
 
     logger.info(f"[ROUTER] Raw response: {response}")
+    rationale = ""
     try:
         cleaned_text = re.sub(r"```json|```", "", response).strip()
         parsed = json.loads(cleaned_text)
         category = parsed["route"]
+        rationale = parsed.get("rationale", "")
     except (json.JSONDecodeError, KeyError):
         logger.warning(
             "[ROUTER] Failed to parse response, defaulting to CONVERSATIONAL"
         )
         category = "CONVERSATIONAL"
 
-    logger.info(f"[ROUTER] Classified as: {category}")
-    return {"category": category}
+    logger.info(f"[ROUTER] Classified as: {category} | Rationale: {rationale}")
+    return {"category": category, "router_rationale": rationale}

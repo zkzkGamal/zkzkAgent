@@ -15,6 +15,7 @@ execution_prompt = load_prompts.load_prompt("executor.yaml")
 
 _model_chain = None
 
+
 def get_model_chain():
     global _model_chain
     if _model_chain is None:
@@ -25,7 +26,13 @@ def get_model_chain():
     return _model_chain
 
 
-DANGEROUS_TOOLS = ["empty_trash", "clear_tmp", "remove_file" , "install_package", "remove_package"]
+DANGEROUS_TOOLS = [
+    "empty_trash",
+    "clear_tmp",
+    "remove_file",
+    "install_package",
+    "remove_package",
+]
 
 
 def execute_node(state: AgentState):
@@ -52,10 +59,15 @@ def execute_node(state: AgentState):
     # 1. Handle Pending Confirmation
     if pending_confirmation and pending_confirmation.get("tool_name"):
         tool_name = pending_confirmation["tool_name"]
-        last_msg = messages[-1]
 
-        if isinstance(last_msg, HumanMessage):
-            confirm = last_msg.content.strip().lower()
+        # Search backwards — plan_node may have appended an AI message after the user's "yes"
+        last_human = next(
+            (m for m in reversed(messages) if isinstance(m, HumanMessage)),
+            None,
+        )
+
+        if last_human:
+            confirm = last_human.content.strip().lower()
             logger.info(
                 f"[AGENT] Handling pending confirmation for tool: {tool_name}, user said: {confirm}"
             )

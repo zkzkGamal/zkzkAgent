@@ -1,5 +1,4 @@
-from preprocessing.get_clean_history import get_clean_history
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 from core.state import AgentState
 import logging
 from models.LLM import llm
@@ -36,10 +35,25 @@ DANGEROUS_TOOLS = [
 
 
 def plan_node(state: AgentState) -> AgentState:
-    user_messages = get_clean_history(state, include_tool_messages=False)
+    # Use only the last user message for a focused plan — no history noise
+    messages = state.get("messages", [])
+    last_user_msg = next(
+        (m.content for m in reversed(messages) if isinstance(m, HumanMessage)),
+        "",
+    )
+    rationale = state.get("router_rationale", "")
+
+    # Build a focused planning input: user request + router's reasoning
+    planning_input = f"User request: {last_user_msg}"
+    if rationale:
+        planning_input += f"\nContext (why planning is needed): {rationale}"
+
     planning_chain = get_model_chain()
     response = planning_chain.invoke(
-        [SystemMessage(planning_prompt[0].content), *user_messages]
+        [
+            SystemMessage(planning_prompt[0].content),
+            HumanMessage(content=planning_input),
+        ]
     ).content
-    logger.info(f"[PLANNING] Cleaned text: {response}")
+    logger.info(f"[PLANNING] Plan generated: {response}")
     return {"messages": [response]}
