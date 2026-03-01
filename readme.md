@@ -331,6 +331,30 @@ Type your command and press Enter. Type `exit` or `quit` to stop.
 
 ### Voice Mode (Optional)
 
+To use voice mode, you need to install Piper and download a voice model.
+
+#### 1. Install Piper
+
+You can install `piper-tts` via pip:
+
+```bash
+pip install piper-tts
+```
+
+#### 2. Download Voices
+
+Download your preferred voice from the [Piper Voices Repository](https://huggingface.co/rhasspy/piper-voices/tree/main).
+Create a `voices` folder in the project root and place both the `.onnx` and `.onnx.json` files inside it.
+
+```bash
+mkdir -p voices
+# Example: Downloading a sample US English voice
+wget -O voices/en_US-lessac-medium.onnx "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx?download=true"
+wget -O voices/en_US-lessac-medium.onnx.json "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json?download=true"
+```
+
+#### 3. Enable Voice in `main.py`
+
 Uncomment the voice input section in `main.py`:
 
 ```python
