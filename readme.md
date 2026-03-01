@@ -108,7 +108,7 @@ zkzkAgent doesn't just blindly execute your commands — it **classifies your in
 
 ### 📊 Live Graph — Compiled LangGraph
 
-![zkzkAgent LangGraph Architecture](./graph.png)
+![zkzkAgent LangGraph Architecture](./graph_2.png)
 
 _Auto-generated from `app.get_graph().draw_mermaid_png()` — this is your actual compiled graph._
 
