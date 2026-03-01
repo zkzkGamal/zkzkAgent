@@ -14,6 +14,25 @@ logger = logging.getLogger(__name__)
 
 _router_chain = None
 
+def safe_json_parse(raw: str) -> Dict[str, Any]:
+    """More forgiving JSON extraction"""
+    # Remove code fences, thinking traces, etc.
+    cleaned = re.sub(r'^.*?(?=\{)', '', raw, flags=re.DOTALL)   # strip before first {
+    cleaned = re.sub(r"```json|```", "", cleaned)
+    cleaned = cleaned.strip()
+
+    try:
+        return json.loads(cleaned)
+    except JSONDecodeError:
+        # Last-ditch: try to find the outermost {…}
+        start = cleaned.find('{')
+        end = cleaned.rfind('}') + 1
+        if start >= 0 and end > start:
+            try:
+                return json.loads(cleaned[start:end])
+            except JSONDecodeError:
+                pass
+        return {}
 
 def get_router_chain():
     global _router_chain
@@ -35,26 +54,30 @@ def classify_node(state: AgentState) -> AgentState:
     router_prompt_messages = load_prompts.load_prompt("router.yaml")
     system_content = router_prompt_messages[0].content
 
-    model = get_router_chain()
-    response = model.invoke(
-        [
+    if len(query) > 4000:
+        query = query[:3800] + "\n… [truncated]"
+
+    try:
+        response = get_router_chain().invoke([
             SystemMessage(content=system_content),
             HumanMessage(content=query),
-        ]
-    ).content
+        ]).content
+    except Exception as e:
+        logger.exception("[ROUTER] LLM call failed")
+        return {"category": "CONVERSATIONAL", "router_rationale": f"LLM error: {str(e)}"}
 
-    logger.info(f"[ROUTER] Raw response: {response}")
-    rationale = ""
-    try:
-        cleaned_text = re.sub(r"```json|```", "", response).strip()
-        parsed = json.loads(cleaned_text)
-        category = parsed["route"]
-        rationale = parsed.get("rationale", "")
-    except (json.JSONDecodeError, KeyError):
-        logger.warning(
-            "[ROUTER] Failed to parse response, defaulting to CONVERSATIONAL"
-        )
+    logger.debug(f"[ROUTER] Raw:\n{response}")
+
+    parsed = safe_json_parse(response)
+    category = parsed.get("route", "CONVERSATIONAL")
+
+    # Optional: normalize categories (prevents downstream breakage)
+    valid_categories = {"CONVERSATIONAL", "NEEDS_PLANNING", "DIRECT_EXECUTION"}
+    if category not in valid_categories:
+        logger.warning(f"[ROUTER] Invalid category '{category}' → fallback")
         category = "CONVERSATIONAL"
 
-    logger.info(f"[ROUTER] Classified as: {category} | Rationale: {rationale}")
+    rationale = parsed.get("rationale", "").strip()[:300]  # prevent state bloat
+
+    logger.info(f"[ROUTER] → {category} | {rationale[:80]}{'…' if len(rationale) > 80 else ''}")
     return {"category": category, "router_rationale": rationale}
