@@ -30,3 +30,4 @@ torchaudio
 transformers==4.57
 pathvalidate
 piper-tts
+espeak-ng-python

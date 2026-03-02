@@ -242,13 +242,52 @@ def should_continue(state: AgentState) -> str:
 
 ---
 
-## 🚀 Quick Install
+## 🐳 Docker Installation (Recommended)
 
-Get up and running with a single command:
+The easiest way to run zkzkAgent is via Docker. This ensures all system dependencies and Ollama are correctly configured in a isolated environment.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) installed.
+- [Docker Compose](https://docs.docker.com/compose/install/) installed.
+
+### Quick Start with Docker Compose
+
+1. **Clone and Navigate**:
+
+   ```bash
+   git clone https://github.com/zkzkGamal/zkzkAgent.git
+   cd zkzkAgent
+   ```
+
+2. **Run with Compose**:
+   ```bash
+   docker-compose up --build
+   ```
+
+> 💡 **Note**: The first run will take some time as it downloads the base image and pulls the `qwen2` model.
+
+### Manual Docker Build & Run
+
+If you prefer to use `docker build` directly:
 
 ```bash
-chmod +x install.sh && ./install.sh
+# Build the image
+docker build -t zkzkagent .
+
+# Run the container
+docker run -it --privileged --network host \
+  -v ./voices:/app/voices:ro \
+  -v zkzkagent-models:/root/.ollama \
+  --device /dev/snd:/dev/snd \
+  zkzkagent
 ```
+
+### Why use Docker?
+
+- **Isolation**: Prevents dependency conflicts with your host system.
+- **Easy Setup**: `build-essential`, `portaudio`, and `ffmpeg` are pre-installed.
+- **Self-Contained**: Ollama runs inside the container, keeping your host clean.
 
 ---
 

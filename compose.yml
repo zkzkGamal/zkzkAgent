@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  zkzkagent:
+    build: .
+    container_name: zkzkagent
+    privileged: true
+    network_mode: host
+    devices:
+      - /dev/snd:/dev/snd
+    volumes:
+      - ollama-models:/root/.ollama
+      - .:/app
+      - /app/venv # Anonymous volume to prevent host venv from overwriting container venv
+      - ./voices:/app/voices:ro
+    environment:
+      - OLLAMA_HOST=http://localhost:11434
+      - PYTHONUNBUFFERED=1
+    # Use the internal venv directly, model pull check is handled in Dockerfile build (optional)
+    # or can be kept here for runtime flexibility
+    command: >
+      bash -c "ollama serve & sleep 8 &&
+               python3 main.py"
+    restart: unless-stopped
+
+volumes:
+  ollama-models:
