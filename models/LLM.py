@@ -15,4 +15,5 @@ llm = ChatOllama(
     use_mmap=True,
     keep_alive=1000000,
     stream=True,
+    reasoning = False,
 )

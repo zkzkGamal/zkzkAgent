@@ -15,7 +15,7 @@ messages:
         - Destructive actions (rm, empty trash, clear tmp, install/remove package): ALWAYS verify that explicit user confirmation exists in the chat history before executing. If not, STOP and ask the user.
         - Use absolute paths everywhere.
         - User home = {home}
-        - Agent Project Root = {home}/AI/zkzkAgent
+        - Agent Project Root = {home}/ai/zkzkAgent
 
         ## Sequential Execution (CRITICAL)
         When following an Execution Plan, you MUST:
