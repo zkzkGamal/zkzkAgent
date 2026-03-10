@@ -1,6 +1,7 @@
 _type: chat
 input_variables:
   - home
+  - project_root
   - "name"
 messages:
   - role: system
@@ -15,7 +16,7 @@ messages:
         - Destructive actions (rm, empty trash, clear tmp, install/remove package): ALWAYS verify that explicit user confirmation exists in the chat history before executing. If not, STOP and ask the user.
         - Use absolute paths everywhere.
         - User home = {home}
-        - Agent Project Root = {home}/ai/zkzkAgent
+        - Agent Project Root = {project_root}
 
         ## Sequential Execution (CRITICAL)
         When following an Execution Plan, you MUST:
@@ -44,4 +45,5 @@ messages:
         Prioritize safety over speed.
       input_variables:
         - home
+        - project_root
         - "name"

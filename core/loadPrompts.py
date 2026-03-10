@@ -11,4 +11,4 @@ class LoadPrompts:
     def load_prompt(self, prompt_path):
         prompt_path = self.base_path / "prompts" / prompt_path
         prompt = load_prompt(prompt_path)
-        return prompt.format_prompt(home=os.path.expanduser("~"), name="").to_messages()
+        return prompt.format_prompt(home=os.path.expanduser("~"), project_root=self.base_path, name="").to_messages()
