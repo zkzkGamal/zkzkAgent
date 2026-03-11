@@ -25,11 +25,6 @@ logger = logging.getLogger(__name__)
 
 # voice_module = VoiceModule()
 
-
-# prompt = load_prompt("prompt.yaml")
-# prompt = prompt.format_prompt(home=os.path.expanduser("~"), name="").to_messages()
-
-
 # -------------------------
 # Main Execution
 # -------------------------
