@@ -3,8 +3,6 @@ from langchain_core.messages import HumanMessage, AIMessage
 from core.agent import app
 
 # from modules.voice_module import VoiceModule
-from langchain_core.prompts import load_prompt
-
 from models.tts import speak
 from preprocessing.strip_think_tags import strip_think_tags
 
@@ -28,8 +26,8 @@ logger = logging.getLogger(__name__)
 # voice_module = VoiceModule()
 
 
-prompt = load_prompt("prompt.yaml")
-prompt = prompt.format_prompt(home=os.path.expanduser("~"), name="").to_messages()
+# prompt = load_prompt("prompt.yaml")
+# prompt = prompt.format_prompt(home=os.path.expanduser("~"), name="").to_messages()
 
 
 # -------------------------
