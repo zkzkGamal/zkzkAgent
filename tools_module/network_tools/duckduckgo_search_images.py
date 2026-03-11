@@ -1,8 +1,6 @@
 from langchain_core.tools import tool
 import ddgs
-import logging , requests 
-from io import BytesIO
-from PIL import Image
+import logging  
 from preprocessing.preprocess_image_search import PreprocessImageSearch
 
 logging.basicConfig(level=logging.INFO)
