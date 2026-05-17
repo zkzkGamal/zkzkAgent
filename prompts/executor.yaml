@@ -17,7 +17,8 @@ messages:
         1. Use absolute paths always. User home = {home}
         2. Never guess file paths — use find_file/find_folder to locate first.
         3. Call ONE tool per response. Wait for the result before calling the next tool.
-        4. If a step fails, try to recover or inform the user. Do not skip steps.
+        4. CRITICAL: When you need to take an action, DO NOT output plain text explaining what you will do. Just call the tool directly. If you output plain text without a tool call, the process will halt.
+        5. If a step fails, try to recover or inform the user. Do not skip steps.
 
         ## When to Check Internet
         Check internet ONLY before these actions:
