@@ -26,8 +26,12 @@ def get_files_info(working_directory: str = ".", directory: str = ".") -> str:
     contents = os.listdir(abs_directory)
     for content in contents:
         content_path = os.path.join(abs_directory, content)
-        is_dir = os.path.isdir(content_path)
-        size = os.path.getsize(content_path)
-        final_response += f"- {content}: file_size={size} in bytes, is_dir={is_dir}\n"
+        try:
+            is_dir = os.path.isdir(content_path)
+            size = os.path.getsize(content_path)
+            final_response += f"- {content}: file_size={size} in bytes, is_dir={is_dir}\n"
+        except (FileNotFoundError, OSError):
+            # Broken symlink or inaccessible file
+            final_response += f"- {content}: broken_link=true\n"
 
     return final_response

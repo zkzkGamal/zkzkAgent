@@ -18,6 +18,7 @@ pillow
 # Deployment & Environment
 pexpect
 django-environ
+python-dotenv
 # TTS
 coqui-tts
 pyttsx3

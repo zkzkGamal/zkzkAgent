@@ -11,3 +11,4 @@ class AgentState(TypedDict):
     pending_confirmation: Optional[Dict[str, Optional[str]]]
     running_processes: Optional[Dict[str, int]]
     router_rationale: Optional[str]
+    iteration_count: Optional[int]

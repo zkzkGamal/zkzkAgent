@@ -1,4 +1,7 @@
 import logging, os, sys
+from dotenv import load_dotenv
+load_dotenv()  # Load .env before any module reads os.getenv()
+
 from langchain_core.messages import HumanMessage, AIMessage
 from core.agent import app
 
@@ -46,6 +49,7 @@ def main():
         "pending_confirmation": {"tool_name": None, "user_message": None},
         "running_processes": {},
         "category": None,
+        "iteration_count": 0,
     }
 
     logger.info("[MAIN] Warming up model...")
@@ -84,6 +88,7 @@ def main():
 
             # Append user message
             current_state["messages"].append(HumanMessage(content=user_input))
+            current_state["iteration_count"] = 0  # Reset step counter for new request
 
             final_state = app.invoke(current_state)
 

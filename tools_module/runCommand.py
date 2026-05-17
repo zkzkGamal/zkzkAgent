@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 def run_command(command: str) -> str:
     """Run a shell command and return the output."""
     try:
-        result = subprocess.run(command, shell=True, check=True, text=True, capture_output=True)
+        result = subprocess.run(command, shell=True, check=True, text=True, capture_output=True, executable='/bin/bash')
         logger.info(f"Command executed successfully: {result.stdout}")
         return result.stdout
     except subprocess.CalledProcessError as e:
