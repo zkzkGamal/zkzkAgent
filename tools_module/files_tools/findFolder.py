@@ -20,7 +20,6 @@ def find_folder(folder_name: str, search_path: str = "~/") -> str:
             ["find", search_path, "-type", "d", "-name", folder_name],
             capture_output=True,
             text=True,
-            check=True,
         )
 
         output = result.stdout.strip()
@@ -28,8 +27,13 @@ def find_folder(folder_name: str, search_path: str = "~/") -> str:
             logger.info(f"[TOOL] find_folder found:\n{output}")
             return output
 
+        if result.returncode != 0:
+            err_output = result.stderr.strip()
+            logger.error(f"[TOOL] find_folder stderr: {err_output}")
+            return f"Error searching for folder {folder_name} (but this might just be permission denied on some directories): {err_output}"
+
         return f"No folders found matching {folder_name} in {search_path}"
 
-    except subprocess.CalledProcessError as e:
-        logger.error(f"[TOOL] find_folder error: {e.stderr}")
-        return f"Error searching for folder {folder_name}: {e.stderr}"
+    except Exception as e:
+        logger.error(f"[TOOL] find_folder exception: {e}")
+        return f"Exception searching for folder {folder_name}: {e}"

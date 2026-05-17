@@ -35,7 +35,7 @@ messages:
         - This means WRITE FILES locally. Do NOT install packages unless the user explicitly asks.
         - Create the project in the user's home directory ({home}), NOT in the agent project root.
         - Do NOT scan or list the home directory first — go straight to creating.
-        - Plan: create_project_folder (working_directory={home}) → write_file for each file (main script, config, Dockerfile, README, etc.) → open_vscode
+        - Plan: create_project_folder (working_directory={home}) → write_file for each file (args: `working_directory`, `file_path`, `content`) → open_vscode
         - No internet needed. No package installation needed.
 
         ## Package Installation Tasks

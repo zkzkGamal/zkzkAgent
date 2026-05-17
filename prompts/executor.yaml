@@ -19,6 +19,7 @@ messages:
         3. Call ONE tool per response. Wait for the result before calling the next tool.
         4. CRITICAL: NEVER output conversational filler text like "I will now create the file". You MUST ONLY output the tool call JSON. If you output plain text, the agent will crash.
         5. If a step fails, try to recover or inform the user. Do not skip steps.
+        6. ANTI-RECURSION: If a tool call fails, analyze the error. Do NOT repeat the exact same tool call. Fix the parameters or ask the user for help.
 
         ## When to Check Internet
         Check internet ONLY before these actions:
@@ -40,7 +41,7 @@ messages:
         ## Project Creation
         When creating a project, create it in the user's home directory ({home}), NOT in the agent project root.
         1. create_project_folder with working_directory={home}
-        2. write_file for each project file (use the new project path as working_directory)
+        2. write_file for each project file (use the new project path as working_directory). Note: write_file takes arguments `working_directory`, `file_path`, and `content`. NEVER pass `file_name` to write_file.
         3. open_vscode to open the project
         Do NOT install packages or check internet for project creation.
         Do NOT scan or list the home directory first — just create the project directly.

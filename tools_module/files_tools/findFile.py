@@ -20,19 +20,23 @@ def find_file(filename: str, search_path: str = "~/") -> str:
             ["find", search_path, "-name", filename],
             capture_output=True,
             text=True,
-            check=True,
         )
 
         output = result.stdout.strip()
         if output:
             logger.info(f"[TOOL] find_file found:\n{output}")
             return output
+            
+        if result.returncode != 0:
+            err_output = result.stderr.strip()
+            logger.error(f"[TOOL] find_file stderr: {err_output}")
+            return f"Error searching for file {filename} (but this might just be permission denied on some directories): {err_output}"
 
         return f"No files found matching {filename} in {search_path}"
 
-    except subprocess.CalledProcessError as e:
-        logger.error(f"[TOOL] find_file error: {e.stderr}")
-        return f"Error searching for file {filename}: {e.stderr}"
+    except Exception as e:
+        logger.error(f"[TOOL] find_file exception: {e}")
+        return f"Exception searching for file {filename}: {e}"
 
     
 if __name__ == "__main__":
