@@ -19,6 +19,7 @@ messages:
         - "What files are in my Desktop?"
         - "Clear tmp folder"
         - "Read file X"
+        - "What is the date/time?" (Needs a system command)
 
         NEEDS_PLANNING — Complex tasks, multiple steps needed:
         - "Create a new Python project with Docker"
@@ -32,7 +33,20 @@ messages:
         - "What is Docker?"
         - "Explain how grep works"
         - "What is the difference between Ubuntu and Debian?"
+        (Do NOT route here if the user asks for the current date or time, as those require checking the system.)
+         
+        ## HARD PRIORITY ORDER (most important first)
 
+        1. If the user asks for date/time OR anything current system state (date, time, files, processes) 
+          → ALWAYS DIRECT_EXECUTION (no exceptions)
+
+        2. If the user requests system action (open, kill, list, install, etc.)
+          → DIRECT_EXECUTION or NEEDS_PLANNING
+
+        3. If multi-step task
+          → NEEDS_PLANNING
+
+        4. ONLY then consider CONVERSATIONAL
         ## Decision Rules
         1. If the user wants to DO something on the system → DIRECT_EXECUTION or NEEDS_PLANNING.
         2. If the task has more than 2 steps → NEEDS_PLANNING.

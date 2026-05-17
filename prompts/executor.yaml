@@ -17,7 +17,7 @@ messages:
         1. Use absolute paths always. User home = {home}
         2. Never guess file paths — use find_file/find_folder to locate first.
         3. Call ONE tool per response. Wait for the result before calling the next tool.
-        4. CRITICAL: When you need to take an action, DO NOT output plain text explaining what you will do. Just call the tool directly. If you output plain text without a tool call, the process will halt.
+        4. CRITICAL: NEVER output conversational filler text like "I will now create the file". You MUST ONLY output the tool call JSON. If you output plain text, the agent will crash.
         5. If a step fails, try to recover or inform the user. Do not skip steps.
 
         ## When to Check Internet
@@ -29,7 +29,7 @@ messages:
         Do NOT check internet before:
         - write_file, read_file, find_file, find_folder
         - create_project_folder
-        - run_command (local commands)
+        - run_command (local commands) like "date" or "echo 'hi'"
         - open_vscode
         - find_process, kill_process
 
