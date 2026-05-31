@@ -15,6 +15,8 @@
 
 </div>
 
+This repository implements a multi-node LangGraph/StateGraph runtime that mirrors the routing, state management, and tool-gating patterns I build in production. The architecture maps directly to systems I developed at Alohadot and ThePost, including multi-agent orchestration and LLM routing across vLLM/SGLang/OpenAI/Gemini. Use this local runtime to prototype and validate production-grade agent behaviors on Linux.
+
 > ⚠️ **Linux Only**: Designed for Linux (Ubuntu/Debian-based). Uses Linux-specific tools like `nmcli`, `xdg-open`, and system paths.
 
 ---
@@ -658,6 +660,16 @@ python3 tools_test.py
 
 ---
 
+## Production Context & Related Work
+
+This agent runtime reflects patterns used in real production multi-agent systems: multi-node routing, explicit state graphs, tool gating with human-in-the-loop checks, and LLM orchestration across different backends. It is intended as a directly applicable local runtime for validating designs I deploy in production.
+
+| Repository | Notes |
+|---|---|
+| [agentic-ai-engineering](https://github.com/zkzkGamal/agentic-ai-engineering) | Full engineering resource: LangChain, LangGraph, RAG, MCP from foundations to production runtime |
+| [concurrent-llm-serving](https://github.com/zkzkGamal/concurrent-llm-serving) | Benchmark comparing vLLM, SGLang, Ollama under 16 parallel requests on a single GPU |
+| [hands-on-ai-tutorial](https://github.com/zkzkGamal/hands-on-ai-tutorial) | ML fundamentals to deep learning: regression, classification, NLP, and CV |
+
 ## 📄 License
 
 MIT License — see `LICENSE` for details.
@@ -682,10 +694,8 @@ MIT License — see `LICENSE` for details.
 
 ---
 
-<div align="center">
-
-**Built with ❤️ for the Linux community**
-
-_"An agent that thinks before it acts."_
-
-</div>
+## Author
+**Zkaria Gamal — AI Engineer**
+- GitHub: [@zkzkGamal](https://github.com/zkzkGamal)
+- LinkedIn: [Zkaria Gamal](https://www.linkedin.com/in/zkaria-gamal-82b486267/)
+- Portfolio: [zkaria-gamal.vercel.app](https://zkaria-gamal.vercel.app)
