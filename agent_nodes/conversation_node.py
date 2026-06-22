@@ -39,6 +39,20 @@ def conversation_node(state: AgentState) -> AgentState:
     messages = get_clean_history(state, include_tool_messages=False)
     messages = [SystemMessage(conversational_prompt[0].content), *messages]
     model_chain = get_model_chain()
-    response = model_chain.invoke(messages).content
-    logger.info(f"[CONVERSATIONAL] Cleaned text: {response}")
-    return {"messages": [response]}
+
+    # Stream tokens to stdout live (same pattern as execute_node) so the CLI
+    # shows the reply as it is generated instead of in one block.
+    print("\n[AI]: ", end="", flush=True)
+    response = None
+    for chunk in model_chain.stream(messages):
+        if response is None:
+            response = chunk
+        else:
+            response += chunk
+        if chunk.content:
+            print(chunk.content, end="", flush=True)
+    print("\n")
+
+    content = response.content if response is not None else ""
+    logger.info(f"[CONVERSATIONAL] Cleaned text: {content}")
+    return {"messages": [content]}

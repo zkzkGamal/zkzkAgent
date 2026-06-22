@@ -362,6 +362,42 @@ llm = ChatOllama(model="qwen3-vl:4b-instruct-q4_K_M")  # swap model here
 
 ## 💻 Usage
 
+### Interactive Chat CLI (Recommended)
+
+A polished terminal chat session — like the Claude / Codex CLIs — lives in the
+`chat_cli/` package and launches through `cli.sh`:
+
+```bash
+./cli.sh                 # start chatting
+./cli.sh --verbose       # also show the agent's internal INFO logs
+./cli.sh --debug         # show everything (DEBUG)
+./cli.sh --user alice    # override the dummy user id
+
+# equivalently:
+python3 -m chat_cli
+```
+
+Features:
+
+- 🎨 Animated `zkzkAgent` logo, drawn instantly before the heavy model import.
+- 📜 Live-streamed responses, token by token, on every routing path.
+- 🔇 Quiet internal logs by default; verbose progress is shown during startup
+  and model warm-up so the first run isn't a silent wait.
+- ⬆️ ⬇️ Input history recall via `readline`, persisted to
+  `~/.zkzkagent_chat_history`.
+- 🧷 Binds the session to a (dummy) user and session id.
+
+In-session slash commands:
+
+| Command | Description |
+| --- | --- |
+| `/help` | show the command list |
+| `/reset` | start a fresh conversation (new session id) |
+| `/history` | print the conversation history |
+| `/session` | show user / session info |
+| `/verbose` | toggle the internal agent logs on/off |
+| `/exit` | quit (also `/quit`, `Ctrl-D`, `Ctrl-C`) |
+
 ### Text Mode (Default)
 
 ```bash
@@ -485,8 +521,16 @@ AI:   [duckduckgo_search_images] → Downloads image to ~/media/
 ```text
 zkzkAgent/
 ├── main.py                     # Entry point & main chat loop
+├── cli.sh                      # ✨ Launcher for the interactive chat CLI (New)
 ├── graph.png                   # Auto-generated LangGraph visualization
 ├── requirements.txt
+│
+├── chat_cli/                   # ✨ Interactive terminal chat package (New)
+│   ├── app.py                  # REPL, startup, turn handling, ↑/↓ history
+│   ├── ui.py                   # Styling, zkzkAgent logo, response rendering
+│   ├── logging_setup.py        # Clean / verbose logging
+│   ├── session.py              # ChatSession — dummy user/session binding
+│   └── commands.py             # In-session slash commands
 │
 ├── prompts/                    # ✨ Per-node prompt files (New)
 │   ├── router.yaml             # Classifier prompt → DIRECT_EXECUTION | NEEDS_PLANNING | CONVERSATIONAL
