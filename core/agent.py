@@ -108,7 +108,8 @@ graph.add_conditional_edges(
     },
 )
 
-graph.add_edge("plan", "execute")
+# Planning presents the plan and stops — the user reviews it and then asks to
+graph.add_edge("plan", END)
 
 graph.add_conditional_edges(
     "execute",

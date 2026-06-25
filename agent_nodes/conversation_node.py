@@ -5,6 +5,7 @@ import logging
 from models.LLM import llm
 from core.loadPrompts import LoadPrompts
 from core.tools import __all__ as tool_functions
+from agent_nodes._stream import stream_to_stdout
 
 
 load_prompts = LoadPrompts()
@@ -42,16 +43,7 @@ def conversation_node(state: AgentState) -> AgentState:
 
     # Stream tokens to stdout live (same pattern as execute_node) so the CLI
     # shows the reply as it is generated instead of in one block.
-    print("\n[AI]: ", end="", flush=True)
-    response = None
-    for chunk in model_chain.stream(messages):
-        if response is None:
-            response = chunk
-        else:
-            response += chunk
-        if chunk.content:
-            print(chunk.content, end="", flush=True)
-    print("\n")
+    response = stream_to_stdout(model_chain.stream(messages))
 
     content = response.content if response is not None else ""
     logger.info(f"[CONVERSATIONAL] Cleaned text: {content}")

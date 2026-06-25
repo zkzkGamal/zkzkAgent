@@ -30,6 +30,23 @@ def style(text: str, *codes: str) -> str:
     return f"{''.join(codes)}{text}{C.RESET}"
 
 
+# Readline's "non-printing" markers. Wrapping ANSI codes in these tells readline
+# they take up zero columns, so it measures the prompt width correctly. Without
+# them, a wrapped input line corrupts the redraw (eats the first line and the
+# "you ›" prompt, then shows your text starting on line 2).
+RL_START = "\001"  # \x01 — start of ignored (zero-width) sequence
+RL_END = "\002"  # \x02 — end of ignored sequence
+
+
+def prompt_style(text: str, *codes: str) -> str:
+    """Like style(), but readline-safe — for strings passed to input()."""
+    if not codes or not C._on:
+        return text
+    open_codes = RL_START + "".join(codes) + RL_END
+    close = RL_START + C.RESET + RL_END
+    return f"{open_codes}{text}{close}"
+
+
 def term_width() -> int:
     try:
         return os.get_terminal_size().columns

@@ -33,7 +33,7 @@ from . import ui
 from .commands import handle_command
 from .logging_setup import configure_logging, set_level, set_verbose
 from .session import ChatSession
-from .ui import C, rule, style
+from .ui import C, prompt_style, rule, style
 
 log = logging.getLogger("chat")
 
@@ -197,7 +197,8 @@ def main() -> None:
     warm_up(app, verbose_default)
     print()
 
-    prompt = style("you ", C.CYAN, C.BOLD) + style("› ", C.CYAN)
+    pstyle = prompt_style if _readline is not None else style
+    prompt = pstyle("you ", C.CYAN, C.BOLD) + pstyle("› ", C.CYAN)
     while True:
         try:
             user_input = input(prompt).strip()

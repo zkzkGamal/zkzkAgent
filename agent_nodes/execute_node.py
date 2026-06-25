@@ -5,6 +5,7 @@ from core.loadPrompts import LoadPrompts
 import logging
 from models.LLM import llm
 from core.tools import __all__ as tool_functions
+from agent_nodes._stream import stream_to_stdout
 
 
 logging.basicConfig(level=logging.INFO)
@@ -104,21 +105,11 @@ def execute_node(state: AgentState):
     # Lazy load the model chain if not ready
     chain = get_model_chain()
 
-    print("\n[AI]: ", end="", flush=True)
-    response = None
-    for chunk in chain.stream(messages):
-        if response is None:
-            response = chunk
-        else:
-            response += chunk
-
-        if chunk.content:
-            print(chunk.content, end="", flush=True)
-    print("\n")
+    response = stream_to_stdout(chain.stream(messages))
     logger.info(f"[AGENT] Response finished")
 
     # Check for dangerous tools in the response
-    if response.tool_calls:
+    if response is not None and response.tool_calls:
         for tc in response.tool_calls:
             if tc["name"] in DANGEROUS_TOOLS:
                 logger.info(f"[AGENT] Dangerous tool detected: {tc['name']}")

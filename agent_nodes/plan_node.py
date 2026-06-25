@@ -3,7 +3,7 @@ from core.state import AgentState
 import logging
 from models.LLM import llm
 from core.loadPrompts import LoadPrompts
-from core.tools import __all__ as tool_functions
+from agent_nodes._stream import stream_to_stdout
 
 
 load_prompts = LoadPrompts()
@@ -11,27 +11,6 @@ planning_prompt = load_prompts.load_prompt("planner.yaml")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-_model_chain = None
-
-
-def get_model_chain():
-    global _model_chain
-    if _model_chain is None:
-        logger.info("[MODEL INIT] Lazily binding tools to ChatOllama")
-        _model_chain = llm.bind_tools(tool_functions)
-        logger.info("[MODEL INIT] Model initialized and tools bound")
-    logger.info("[MODEL INIT] Model already initialized")
-    return _model_chain
-
-
-DANGEROUS_TOOLS = [
-    "empty_trash",
-    "clear_tmp",
-    "remove_file",
-    "install_package",
-    "remove_package",
-]
 
 
 def plan_node(state: AgentState) -> AgentState:
@@ -48,12 +27,18 @@ def plan_node(state: AgentState) -> AgentState:
     if rationale:
         planning_input += f"\nContext (why planning is needed): {rationale}"
 
-    planning_chain = get_model_chain()
-    response = planning_chain.invoke(
-        [
-            SystemMessage(planning_prompt[0].content),
-            HumanMessage(content=planning_input),
-        ]
-    ).content
-    logger.info(f"[PLANNING] Plan generated: {response}")
-    return {"messages": [response]}
+    # Planning ONLY writes the plan — bind no tools so the model can't start
+    # executing here. The graph stops after this node (plan → END) so the user
+    # can review the plan and then approve it. Stream it live so the CLI shows
+    # the plan as it is written instead of silently generating it.
+    response = stream_to_stdout(
+        llm.stream(
+            [
+                SystemMessage(planning_prompt[0].content),
+                HumanMessage(content=planning_input),
+            ]
+        )
+    )
+    content = response.content if response is not None else ""
+    logger.info("[PLANNING] Plan generated")
+    return {"messages": [content]}
