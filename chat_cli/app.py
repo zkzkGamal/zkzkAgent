@@ -18,11 +18,11 @@ or directly:
 """
 
 import argparse
-import atexit
 import contextlib
 import io
 import logging
 import os
+import sys
 import time
 
 from dotenv import load_dotenv
@@ -33,7 +33,7 @@ from . import ui
 from .commands import handle_command
 from .logging_setup import configure_logging, set_level, set_verbose
 from .session import ChatSession
-from .ui import C, prompt_style, rule, style
+from .ui import C, rule, style
 
 log = logging.getLogger("chat")
 
@@ -41,45 +41,42 @@ HISTORY_FILE = os.path.expanduser("~/.zkzkagent_chat_history")
 
 
 # --------------------------------------------------------------------------- #
-# Input history (↑/↓ recall, like a normal terminal)
+# Line input (↑/↓ recall, like a normal terminal)
+#
+# We use prompt_toolkit rather than the stdlib readline: readline corrupts its
+# redraw when an input line wraps inside a resized/split terminal pane (the next
+# character lands back on the prompt line, e.g. "you ›" becomes "tou ›").
+# prompt_toolkit owns the full-line rendering and handles wrap/resize correctly,
+# and gives us ↑/↓ history for free via FileHistory.
 # --------------------------------------------------------------------------- #
-_readline = None
+_input_session = None
 
 
-def setup_readline() -> None:
-    global _readline
+def setup_input() -> None:
+    """Create a prompt_toolkit session when stdin is a TTY; else stay on input()."""
+    global _input_session
+    if not sys.stdin.isatty():
+        return  # piped input — plain input() is correct and avoids ptk on a pipe
     try:
-        import readline
+        from prompt_toolkit import PromptSession
+        from prompt_toolkit.history import FileHistory
     except ImportError:
-        return  # not available (e.g. some Windows setups) — input() still works
-    _readline = readline
-    try:
-        readline.read_history_file(HISTORY_FILE)
-    except (FileNotFoundError, OSError):
-        pass
-    readline.set_history_length(1000)
-    atexit.register(_save_history, readline)
+        return  # not installed — input() still works (without the wrap fix)
+    _input_session = PromptSession(history=FileHistory(HISTORY_FILE))
 
 
-def record_history(line: str) -> None:
-    """Add a line to the ↑/↓ recall history, skipping consecutive duplicates.
+def read_user_input(prompt: str) -> str:
+    """Read one line. prompt_toolkit when available, else stdlib input().
 
-    In a TTY readline already auto-records, so we de-dup against the last entry
-    to avoid doubles; under a pipe this is what populates history at all.
+    `prompt` carries ANSI color codes (empty when not a TTY); prompt_toolkit's
+    ANSI() parser measures it correctly, so no readline \\001/\\002 markers are
+    needed. Raises EOFError / KeyboardInterrupt like input() does.
     """
-    if _readline is None:
-        return
-    n = _readline.get_current_history_length()
-    if n and _readline.get_history_item(n) == line:
-        return
-    _readline.add_history(line)
+    if _input_session is not None:
+        from prompt_toolkit.formatted_text import ANSI
 
-
-def _save_history(readline) -> None:
-    try:
-        readline.write_history_file(HISTORY_FILE)
-    except OSError:
-        pass
+        return _input_session.prompt(ANSI(prompt)).strip()
+    return input(prompt).strip()
 
 
 # --------------------------------------------------------------------------- #
@@ -187,7 +184,7 @@ def main() -> None:
     ui.draw_logo()
     ui.print_tagline()
 
-    setup_readline()
+    setup_input()
     session = ChatSession(user_id=args.user)
 
     app, model_name = load_runtime(verbose_default)
@@ -197,19 +194,16 @@ def main() -> None:
     warm_up(app, verbose_default)
     print()
 
-    pstyle = prompt_style if _readline is not None else style
-    prompt = pstyle("you ", C.CYAN, C.BOLD) + pstyle("› ", C.CYAN)
+    prompt = style("you ", C.CYAN, C.BOLD) + style("› ", C.CYAN)
     while True:
         try:
-            user_input = input(prompt).strip()
+            user_input = read_user_input(prompt)
         except (EOFError, KeyboardInterrupt):
             print()
             break
 
         if not user_input:
             continue
-
-        record_history(user_input)
 
         if user_input.startswith("/"):
             if not handle_command(user_input, session, verbose_state):
