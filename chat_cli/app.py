@@ -40,15 +40,6 @@ log = logging.getLogger("chat")
 HISTORY_FILE = os.path.expanduser("~/.zkzkagent_chat_history")
 
 
-# --------------------------------------------------------------------------- #
-# Line input (↑/↓ recall, like a normal terminal)
-#
-# We use prompt_toolkit rather than the stdlib readline: readline corrupts its
-# redraw when an input line wraps inside a resized/split terminal pane (the next
-# character lands back on the prompt line, e.g. "you ›" becomes "tou ›").
-# prompt_toolkit owns the full-line rendering and handles wrap/resize correctly,
-# and gives us ↑/↓ history for free via FileHistory.
-# --------------------------------------------------------------------------- #
 _input_session = None
 
 
@@ -128,10 +119,6 @@ def warm_up(app, verbose_default: bool) -> None:
         if not verbose_default:
             set_verbose(False)
 
-
-# --------------------------------------------------------------------------- #
-# Turn handling
-# --------------------------------------------------------------------------- #
 def run_turn(app, session: ChatSession, user_input: str) -> None:
     from langchain_core.messages import HumanMessage
 
@@ -157,9 +144,6 @@ def run_turn(app, session: ChatSession, user_input: str) -> None:
     print()
 
 
-# --------------------------------------------------------------------------- #
-# Main
-# --------------------------------------------------------------------------- #
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="chat_cli", description="Interactive CLI chat for the zkzkAgent project."
@@ -212,7 +196,7 @@ def main() -> None:
 
         run_turn(app, session, user_input)
 
-    print(style("  bye 👋", C.MAGENTA))
+    print(style("  bye", C.MAGENTA))
     log.info("ending session %s after %d turns", session.session_id, session.turns)
 
 
