@@ -9,6 +9,7 @@ class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
     category: Optional[Literal["DIRECT_EXECUTION", "NEEDS_PLANNING", "CONVERSATIONAL"]]
     pending_confirmation: Optional[Dict[str, Optional[str]]]
+    pending_plan: Optional[str]
     running_processes: Optional[Dict[str, int]]
     router_rationale: Optional[str]
     iteration_count: Optional[int]

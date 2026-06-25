@@ -1,5 +1,5 @@
 from preprocessing.get_clean_history import get_clean_history
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from core.state import AgentState
 from core.loadPrompts import LoadPrompts
 import logging
@@ -102,6 +102,20 @@ def execute_node(state: AgentState):
                     "pending_confirmation": {"tool_name": None, "tool_args": None},
                 }
 
+    # If the user just approved a pending plan, inject it as an explicit
+    # instruction so the executor carries it out instead of replanning.
+    pending_plan = state.get("pending_plan")
+    if pending_plan:
+        logger.info("[AGENT] Executing approved plan")
+        messages.append(
+            HumanMessage(
+                content=(
+                    "I approve the plan below. Execute it now: call the necessary "
+                    "tools, then give me the final answer.\n\n" + pending_plan
+                )
+            )
+        )
+
     # Lazy load the model chain if not ready
     chain = get_model_chain()
 
@@ -124,6 +138,17 @@ def execute_node(state: AgentState):
                         "tool_name": tc["name"],
                         "tool_args": tc["args"],
                     },  # We assume only one dangerous tool at a time
+                    "pending_plan": None,  # plan (if any) is now being executed
                 }
 
-    return {"messages": [response]}
+    # The stream produced nothing usable (no text, no tool calls) — emit a
+    # visible fallback so the turn is never silent.
+    if response is None or (
+        not (response.content or "").strip() and not response.tool_calls
+    ):
+        fallback = "I wasn't able to produce a response for that. Could you rephrase?"
+        print(f"\n[AI]: {fallback}\n")
+        logger.warning("[AGENT] Empty response — emitted fallback message")
+        return {"messages": [AIMessage(content=fallback)], "pending_plan": None}
+
+    return {"messages": [response], "pending_plan": None}

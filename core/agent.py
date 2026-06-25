@@ -18,13 +18,43 @@ logger = logging.getLogger(__name__)
 MAX_ITERATIONS = 15  # Maximum tool call cycles before forcing stop
 
 
+# Short approvals that mean "yes, run the plan you just showed me".
+_PLAN_APPROVALS = {
+    "ok", "okay", "k", "kk", "yes", "y", "yeah", "yep", "yup", "sure",
+    "go", "go ahead", "do it", "proceed", "continue", "execute", "run it",
+    "run", "sounds good", "approved", "approve", "lets go", "let's go",
+}
+
+
+def _last_human_content(state: AgentState) -> str:
+    for m in reversed(state.get("messages", [])):
+        if isinstance(m, HumanMessage):
+            return m.content if isinstance(m.content, str) else str(m.content)
+    return ""
+
+
+def _is_plan_approval(text: str) -> bool:
+    return text.strip().lower().rstrip("!.") in _PLAN_APPROVALS
+
+
 def route_entry(state: AgentState) -> str:
-    """Bypass the classifier entirely when a dangerous-tool confirmation is pending."""
+    """Route the very first step of a turn.
+
+    Two flows bypass the classifier:
+    1. A dangerous-tool confirmation is pending → go straight to execute.
+    2. A plan is pending and the user just approved it ("ok"/"yes"/…) → go
+       straight to execute so the plan actually runs (with tools bound). Any
+       other message supersedes the plan and is re-classified normally; the
+       stale plan is cleared inside classify_node.
+    """
     pending = state.get("pending_confirmation", {})
     if pending and pending.get("tool_name"):
         logger.info(
             "[ENTRY ROUTER] Pending confirmation active → routing directly to execute"
         )
+        return "execute"
+    if state.get("pending_plan") and _is_plan_approval(_last_human_content(state)):
+        logger.info("[ENTRY ROUTER] Pending plan approved → routing directly to execute")
         return "execute"
     return "classify"
 

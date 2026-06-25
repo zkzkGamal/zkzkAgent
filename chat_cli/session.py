@@ -17,6 +17,7 @@ class ChatSession:
         return {
             "messages": [],
             "pending_confirmation": {"tool_name": None, "user_message": None},
+            "pending_plan": None,
             "running_processes": {},
             "category": None,
             "iteration_count": 0,
@@ -32,3 +33,7 @@ class ChatSession:
     def awaiting_confirmation(self) -> bool:
         pending = self.state.get("pending_confirmation") or {}
         return bool(pending.get("tool_name"))
+
+    @property
+    def awaiting_plan(self) -> bool:
+        return bool(self.state.get("pending_plan"))

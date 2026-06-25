@@ -1,5 +1,5 @@
 from preprocessing.get_clean_history import get_clean_history
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, AIMessage
 from core.state import AgentState
 import logging
 from models.LLM import llm
@@ -45,6 +45,12 @@ def conversation_node(state: AgentState) -> AgentState:
     # shows the reply as it is generated instead of in one block.
     response = stream_to_stdout(model_chain.stream(messages))
 
-    content = response.content if response is not None else ""
-    logger.info(f"[CONVERSATIONAL] Cleaned text: {content}")
-    return {"messages": [content]}
+    content = (response.content if response is not None else "").strip()
+    if not content:
+        content = "Got it — what would you like to do next?"
+        print(f"\n[AI]: {content}\n")
+        logger.warning("[CONVERSATIONAL] Empty reply — emitted fallback message")
+    else:
+        logger.info(f"[CONVERSATIONAL] Cleaned text: {content}")
+
+    return {"messages": [AIMessage(content=content)], "pending_plan": None}

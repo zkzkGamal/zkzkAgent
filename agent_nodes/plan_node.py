@@ -1,4 +1,4 @@
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from core.state import AgentState
 import logging
 from models.LLM import llm
@@ -27,10 +27,6 @@ def plan_node(state: AgentState) -> AgentState:
     if rationale:
         planning_input += f"\nContext (why planning is needed): {rationale}"
 
-    # Planning ONLY writes the plan — bind no tools so the model can't start
-    # executing here. The graph stops after this node (plan → END) so the user
-    # can review the plan and then approve it. Stream it live so the CLI shows
-    # the plan as it is written instead of silently generating it.
     response = stream_to_stdout(
         llm.stream(
             [
@@ -39,6 +35,20 @@ def plan_node(state: AgentState) -> AgentState:
             ]
         )
     )
-    content = response.content if response is not None else ""
-    logger.info("[PLANNING] Plan generated")
-    return {"messages": [content]}
+    content = (response.content if response is not None else "").strip()
+
+    if not content:
+        # Never end a planning turn silently — the stream produced nothing.
+        content = "I couldn't draft a plan for that. Could you rephrase the request?"
+        print(f"\n[AI]: {content}\n")
+        logger.warning("[PLANNING] Empty plan — emitted fallback message")
+        return {"messages": [AIMessage(content=content)], "pending_plan": None}
+
+
+    hint = "\nReply 'ok' (or 'yes') to run this plan, or tell me what to change."
+    print(hint + "\n")
+    logger.info("[PLANNING] Plan generated — awaiting approval")
+    return {
+        "messages": [AIMessage(content=content + hint)],
+        "pending_plan": content,
+    }

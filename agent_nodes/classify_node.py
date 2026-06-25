@@ -60,7 +60,11 @@ def classify_node(state: AgentState) -> AgentState:
         ]).content
     except Exception as e:
         logger.exception("[ROUTER] LLM call failed")
-        return {"category": "CONVERSATIONAL", "router_rationale": f"LLM error: {str(e)}"}
+        return {
+            "category": "CONVERSATIONAL",
+            "router_rationale": f"LLM error: {str(e)}",
+            "pending_plan": None,
+        }
 
     logger.debug(f"[ROUTER] Raw:\n{response}")
 
@@ -75,4 +79,6 @@ def classify_node(state: AgentState) -> AgentState:
     rationale = parsed.get("rationale", "").strip()[:300]
 
     logger.info(f"[ROUTER] → {category} | {rationale[:80]}{'…' if len(rationale) > 80 else ''}")
-    return {"category": category, "router_rationale": rationale}
+    # Reaching the classifier means this message wasn't a plan approval (those
+    # bypass classify via route_entry), so drop any stale pending plan.
+    return {"category": category, "router_rationale": rationale, "pending_plan": None}
