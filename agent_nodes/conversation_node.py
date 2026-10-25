@@ -20,7 +20,7 @@ _model_chain = None
 def get_model_chain():
     global _model_chain
     if _model_chain is None:
-        logger.info("[MODEL INIT] Lazily binding tools to ChatOllama")
+        logger.info(f"[MODEL INIT] Lazily binding tools to {type(llm).__name__}")
         _model_chain = llm.bind_tools(tool_functions)
         logger.info("[MODEL INIT] Model initialized and tools bound")
     logger.info("[MODEL INIT] Model already initialized")

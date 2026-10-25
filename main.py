@@ -98,11 +98,11 @@ def main():
             if isinstance(last_msg, AIMessage):
                 clean_content = strip_think_tags(last_msg.content)
                 logger.info(f"\n[AI]: {clean_content}\n and the type is ai")
-                speak(clean_content)
+                # speak(clean_content)
             elif isinstance(last_msg, HumanMessage):
                 clean_content = strip_think_tags(last_msg.content)
                 logger.info(f"\n[SYSTEM]: {clean_content}\n and the type is human")
-                speak(clean_content)
+                # speak(clean_content)
 
         except KeyboardInterrupt:
             logger.info("\nExiting...")

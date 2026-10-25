@@ -6,18 +6,21 @@
 ![LangGraph](https://img.shields.io/badge/LangGraph-Router%20Architecture-6C63FF?style=for-the-badge&logo=graphql)
 ![LangChain](https://img.shields.io/badge/LangChain-Latest-green?style=for-the-badge&logo=chainlink)
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange?style=for-the-badge)
+![Nosana](https://img.shields.io/badge/Nosana-Decentralized%20GPU-00C853?style=for-the-badge)
 ![Linux](https://img.shields.io/badge/Linux-Only-yellow?style=for-the-badge&logo=linux)
 ![Tools](https://img.shields.io/badge/Tools-25%2B-brightgreen?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)
 
-**A privacy-first, fully local AI agent that thinks before it acts — built with LangGraph's multi-node router architecture.**
+**A privacy-first AI agent for Linux that thinks before it acts — built with LangGraph's multi-node router architecture. Runs fully local with Ollama, or on decentralized GPUs with Nosana.**
 
 </div>
 
 This repository implements a multi-node LangGraph/StateGraph runtime that mirrors the routing, state management, and tool-gating patterns I build in production. The architecture maps directly to systems I developed at Alohadot and ThePost, including multi-agent orchestration and LLM routing across vLLM/SGLang/OpenAI/Gemini. Use this local runtime to prototype and validate production-grade agent behaviors on Linux.
 
 > ⚠️ **Linux Only**: Designed for Linux (Ubuntu/Debian-based). Uses Linux-specific tools like `nmcli`, `xdg-open`, and system paths.
+
+> 🆕 **Now on Nosana**: set `MODEL_TYPE=NOSANA` and the agent's LLM runs on [Nosana](https://nosana.com)'s decentralized GPU network, so even a small laptop can drive a 27B model. Tools still run on your machine. See [Nosana Decentralized GPU Inference](#-nosana-decentralized-gpu-inference-new) and a [real run](#-real-run-on-nosana-zkzkagent-builds-a-calculator-app).
 
 ---
 
@@ -40,6 +43,8 @@ This repository implements a multi-node LangGraph/StateGraph runtime that mirror
 ## 📑 Table of Contents
 
 - [✨ Key Features](#-key-features)
+- [🌐 Nosana Decentralized GPU Inference (New)](#-nosana-decentralized-gpu-inference-new)
+- [🧪 Real Run on Nosana](#-real-run-on-nosana-zkzkagent-builds-a-calculator-app)
 - [🏗️ Architecture — Router & Conditional Branching](#️-architecture--router--conditional-branching)
 - [🚀 Quick Install](#-quick-install)
 - [🚀 Getting Started](#-getting-started)
@@ -65,6 +70,12 @@ zkzkAgent doesn't just blindly execute your commands — it **classifies your in
 - **Direct Execution Path**: Immediate tool dispatch for clear, single-step tasks
 - **Planning Path**: Multi-step task decomposition before execution — catches hidden dependencies
 
+### 🌐 Decentralized GPU Inference (New)
+
+- **Nosana Backend**: Set `MODEL_TYPE=NOSANA` to run the agent's LLM on Nosana's decentralized GPU network — bigger models (we use a 27B Qwen) on any laptop
+- **Same Agent, Same Tools**: The router, planner, confirmation gates and all 25 tools still run locally; only the model calls go to Nosana
+- **One-File GPU Job**: `nosana-ollama.json` deploys your own Ollama server on a Nosana GPU
+
 ### ⚡ Intelligent Automation
 
 - **Background Deployment**: Run long-running scripts in the background with AI-assisted option selection
@@ -82,7 +93,7 @@ zkzkAgent doesn't just blindly execute your commands — it **classifies your in
 
 - **Confirmation Gates**: Destructive operations require explicit `yes/no` before execution
 - **Dangerous Tool Protection**: Safeguards for `empty_trash`, `remove_file`, `install_package`, and more
-- **Local Execution**: Fully offline — your data never leaves your machine
+- **Local Execution**: Tools always run on your machine; with Ollama, inference does too and nothing leaves it
 
 ### 🎤 Voice Interaction (Optional)
 
@@ -101,6 +112,117 @@ zkzkAgent doesn't just blindly execute your commands — it **classifies your in
 | **Process Management**                | `find_process`, `kill_process`                                                                                                    |
 | **Deployment**                        | `run_deploy_script`, `stop_frontend`                                                                                              |
 | **System**                            | `run_command`, `detect_operating_system`                                                                                          |
+
+---
+
+## 🌐 Nosana Decentralized GPU Inference (New)
+
+Small local models struggle with long, multi-step plans. zkzkAgent can send its LLM calls to [Nosana](https://nosana.com), a decentralized GPU network, so a laptop can drive a much larger model. Only the model calls move. The graph, the router, the confirmation gates and all 25 tools still run on your machine.
+
+Pick the backend with one variable in `.env`. No code changes.
+
+|                         | `MODEL_TYPE=OLLAMA` (default)               | `MODEL_TYPE=NOSANA`                                         |
+| ----------------------- | ------------------------------------------- | ----------------------------------------------------------- |
+| Where the model runs    | Your machine, via Ollama                    | GPU nodes on the Nosana network                             |
+| Model                   | Any Ollama model (default `qwen3:1.7b-q4_K_M`) | Any model Nosana serves (we use `qwen/qwen3.8-27b`)      |
+| Hardware needed         | 8–16 GB RAM                                 | Any machine with internet                                   |
+| What leaves the machine | Nothing                                     | Prompts, chat history and tool output sent to the model     |
+| LangChain client        | `ChatOllama`                                | `ChatOpenAI` (OpenAI-compatible API)                        |
+
+### Option A — Nosana Inference API (what we use)
+
+1. Get an API key from your Nosana account. Keys start with `nos_`.
+2. Add it to `.env` (copy `.env.example` to start):
+
+   ```bash
+   MODEL_TYPE="NOSANA"
+   NOSANA_API_KEY="nos_..."
+   NOSANA_BASE_URL="https://inference.nosana.com/v1"   # optional, this is the default
+   NOSANA_MODEL="qwen/qwen3.8-27b"                     # optional, see below
+   ```
+
+3. Check the connection. The script prints the backend, then streams a reply to "hello":
+
+   ```bash
+   python3 models/LLM.py
+   # [NOSANA] qwen/qwen3.8-27b @ https://inference.nosana.com/v1
+   ```
+
+4. Start the agent as usual (`./cli.sh` or `python3 main.py`).
+
+If `NOSANA_MODEL` is empty, zkzkAgent calls `GET /models` and uses the first model being served. Models only appear in that list while a GPU is serving them, so this always picks a live one. Requests time out after 120 s and retry twice.
+
+### Option B — Run Your Own Ollama on a Nosana GPU
+
+[`nosana-ollama.json`](nosana-ollama.json) is a Nosana job definition. It starts the official Ollama container on a GPU node, pulls `qwen3:14b` and exposes port `11434`.
+
+```bash
+npm install -g @nosana/cli
+nosana market list                                        # pick a GPU market
+nosana job post --file nosana-ollama.json --market <market-slug>
+```
+
+When the job is running, point the normal Ollama client at the service URL the job gives you:
+
+```bash
+MODEL_TYPE="OLLAMA"
+OLLAMA_BASE_URL="https://<your-nosana-service-url>"
+OLLAMA_MODEL="qwen3:14b"
+```
+
+> 💡 The endpoint can take 15–20 minutes to come up while the node pulls the image and model. See the [Nosana Ollama guide](https://docs.nosana.com/inference/examples/ollama.html).
+
+### 🔒 Privacy in Nosana Mode
+
+Nosana mode sends everything the model sees to a remote GPU node: your messages, the conversation history and tool results (for example, file contents returned by `read_file`). Use `MODEL_TYPE=OLLAMA` for sensitive work. Dangerous tools still need your `yes` in both modes, because the confirmation gate runs locally.
+
+---
+
+## 🧪 Real Run on Nosana: zkzkAgent Builds a Calculator App
+
+Recorded on 25 Oct 2026 with `MODEL_TYPE=NOSANA` and `qwen/qwen3.8-27b`. Every LLM call in the [run log](docs/nosana-run-2026-10-25.log) (18 calls) goes to `https://inference.nosana.com/v1/chat/completions` and returns `200 OK`. The tools, the files and VS Code all ran on the local machine.
+
+<div align="center">
+  <img src="docs/images/zkzk-calculator.png" alt="Calculator web app built by zkzkAgent on Nosana" width="700">
+  <br/><em>The finished app, served by uvicorn at http://127.0.0.1:8000</em>
+</div>
+
+**Task:** create a new project, `zkzk_ai`: a calculator web app with a FastAPI backend and an HTML/CSS/JavaScript frontend, then open it in VS Code.
+
+**1. Plan, then wait.** The router sent the request to the planner (`NEEDS_PLANNING`). The planner wrote a 9-step plan with the full content of every file and stopped for approval.
+
+**2. Execute.** After `ok`, the executor made 10 tool calls in 10 graph iterations (the cap is 15):
+
+| #   | Tool                    | What happened                   |
+| --- | ----------------------- | ------------------------------- |
+| 1   | `create_project_folder` | Created `~/zkzk_ai`             |
+| 2   | `write_file`            | `app.py`, 3,186 chars           |
+| 3   | `run_command`           | `mkdir -p ~/zkzk_ai/static`     |
+| 4   | `write_file`            | `static/index.html`, 2,396 chars |
+| 5   | `write_file`            | `static/style.css`, 1,563 chars |
+| 6   | `write_file`            | `static/script.js`, 2,655 chars |
+| 7   | `write_file`            | `requirements.txt`, 43 chars    |
+| 8   | `write_file`            | `README.md`, 996 chars          |
+| 9   | `write_file`            | `.gitignore`, 60 chars          |
+| 10  | `open_vscode`           | Opened the project in VS Code   |
+
+**3. Follow-up edit.** "can you change the zkzk_ai Calculator to be zkzk" went through the planner again (7-step plan). After approval the agent read `static/index.html`, then changed the name in `static/index.html` (page title and heading), `app.py` (FastAPI title) and `README.md`. The calculator logic did not change.
+
+**4. It runs.** Started with `uvicorn app:app`, the page and its assets load and the API answers:
+
+```text
+INFO:     127.0.0.1:52166 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52166 - "GET /static/style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52172 - "GET /static/script.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58438 - "POST /api/calculate HTTP/1.1" 200 OK
+```
+
+**What the generated code gets right**
+
+- **No `eval`**: expressions are parsed with Python's `ast`. Only numbers, parentheses and `+ - * / // % **` are allowed; anything else returns HTTP 400 with a reason.
+- **Clear errors**: division by zero, float overflow, complex and infinite results return a message instead of crashing.
+- **Input limits**: expressions are capped at 500 characters in both the browser and the API (`pydantic` `max_length`).
+- **Keyboard support**: `Enter` evaluates, `Backspace` deletes, `Esc` clears, `^` types a power.
 
 ---
 
@@ -314,7 +436,7 @@ curl -fsSL https://ollama.com/install.sh | sh
 ollama pull qwen3-vl:4b-instruct-q4_K_M
 ```
 
-> **Note**: You can use any Ollama model. Edit `models/LLM.py` to change it.
+> **Note**: You can use any Ollama model: set `OLLAMA_MODEL` in `.env`. Using Nosana instead? Skip this step and see [Nosana Decentralized GPU Inference](#-nosana-decentralized-gpu-inference-new).
 
 #### 2. Install System Dependencies
 
@@ -351,12 +473,17 @@ Each node has its own `.yaml` prompt file — customize behavior per path:
 | `planner.yaml`        | Planning strategy & step decomposition |
 | `executor.yaml`       | Tool usage rules, safety instructions  |
 
-#### Model (`models/LLM.py`)
+#### Model (`.env`)
 
-```python
-from langchain_ollama import ChatOllama
-llm = ChatOllama(model="qwen3-vl:4b-instruct-q4_K_M")  # swap model here
+`models/LLM.py` reads the backend from `.env`, so switching models needs no code changes. Copy `.env.example` to `.env` to start:
+
+```bash
+MODEL_TYPE="OLLAMA"                        # OLLAMA (local) or NOSANA
+OLLAMA_MODEL="qwen3:1.7b-q4_K_M"           # any model you have pulled
+OLLAMA_BASE_URL="http://127.0.0.1:11434"
 ```
+
+For the Nosana settings, see [Nosana Decentralized GPU Inference](#-nosana-decentralized-gpu-inference-new).
 
 ---
 
@@ -524,6 +651,8 @@ zkzkAgent/
 ├── cli.sh                      # ✨ Launcher for the interactive chat CLI (New)
 ├── graph.png                   # Auto-generated LangGraph visualization
 ├── requirements.txt
+├── nosana-ollama.json          # ✨ Nosana GPU job: self-hosted Ollama (New)
+├── docs/                       # ✨ Nosana run log + screenshots (New)
 │
 ├── chat_cli/                   # ✨ Interactive terminal chat package (New)
 │   ├── app.py                  # REPL, startup, turn handling, ↑/↓ history
@@ -551,7 +680,7 @@ zkzkAgent/
 │   └── execute_node.py         # Handles DIRECT_EXECUTION — tool-calling agent
 │
 ├── models/                     # AI model configs
-│   ├── LLM.py                  # Ollama LLM setup
+│   ├── LLM.py                  # LLM backend: Ollama (local) or Nosana, set by MODEL_TYPE
 │   ├── voice.py                # Whisper speech recognition
 │   └── tts.py                  # Coqui / Kokoro TTS
 │
@@ -651,6 +780,14 @@ ollama list                    # check models
 systemctl restart ollama       # restart service
 ```
 
+#### Nosana Errors
+
+| Message                                                      | Fix                                                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `NOSANA_API_KEY missing or invalid (must start with 'nos_')` | Set `NOSANA_API_KEY` in `.env`                                            |
+| `No Nosana models are being served right now.`               | No GPU is serving a model at the moment. Try again later, or switch to `MODEL_TYPE=OLLAMA` |
+| `Unknown MODEL_TYPE '...'`                                   | Use `OLLAMA` or `NOSANA`                                                  |
+
 #### NetworkManager Not Found
 
 ```bash
@@ -682,8 +819,9 @@ If you see `KeyError: missing variables` in a LangChain prompt — you likely ha
 
 ## 🔒 Security
 
-- **Fully local**: All LLM inference is on-device via Ollama — zero cloud calls
-- **No telemetry**: Nothing is sent to external servers
+- **Local by default**: With `MODEL_TYPE=OLLAMA`, all LLM inference is on-device — zero cloud calls
+- **Opt-in remote inference**: With `MODEL_TYPE=NOSANA`, prompts, chat history and tool output go to a Nosana GPU node; tools still execute locally
+- **No telemetry**: zkzkAgent sends no analytics or usage data
 - **Confirmation-gated**: Destructive operations blocked until user explicitly approves
 - **Role separation**: Router, planner, and executor are separate nodes with different prompts and permissions
 
@@ -725,6 +863,7 @@ MIT License — see `LICENSE` for details.
 - **[LangGraph](https://github.com/langchain-ai/langgraph)** — StateGraph, conditional edges, ToolNode
 - **[LangChain](https://github.com/langchain-ai/langchain)** — Runnable interface, prompt templates, message types
 - **[Ollama](https://ollama.com)** — Local LLM inference
+- **[Nosana](https://nosana.com)** — Decentralized GPU inference
 - **[OpenAI Whisper](https://github.com/openai/whisper)** — Speech recognition
 - **[Kokoro / Coqui TTS](https://huggingface.co/hexgrad/Kokoro-82M)** — Text-to-speech synthesis
 - **NetworkManager** — Wi-Fi management on Linux

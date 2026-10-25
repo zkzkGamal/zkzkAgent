@@ -1,6 +1,8 @@
 langchain
 langgraph
 langchain-ollama
+langchain-openai
+httpx
 langchain-core
 pydantic
 typing-extensions

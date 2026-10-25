@@ -5,3 +5,5 @@ old_code/
 media/
 content/
 *.onnx
+temp_output.wav
+tm.out
