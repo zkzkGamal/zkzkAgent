@@ -7,3 +7,4 @@ content/
 *.onnx
 temp_output.wav
 tm.out
+HACKATHON_CHECKLIST.md

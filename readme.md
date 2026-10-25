@@ -20,7 +20,7 @@ This repository implements a multi-node LangGraph/StateGraph runtime that mirror
 
 > ⚠️ **Linux Only**: Designed for Linux (Ubuntu/Debian-based). Uses Linux-specific tools like `nmcli`, `xdg-open`, and system paths.
 
-> 🆕 **Now on Nosana**: set `MODEL_TYPE=NOSANA` and the agent's LLM runs on [Nosana](https://nosana.com)'s decentralized GPU network, so even a small laptop can drive a 27B model. Tools still run on your machine. See [Nosana Decentralized GPU Inference](#-nosana-decentralized-gpu-inference-new) and a [real run](#-real-run-on-nosana-zkzkagent-builds-a-calculator-app).
+> 🆕 **Now on Nosana**: set `MODEL_TYPE=NOSANA` and the agent's LLM runs on [Nosana](https://nosana.com)'s decentralized GPU network, so even a small laptop can drive a 27B model. Tools still run on your machine. See [Nosana Decentralized GPU Inference](#-nosana-decentralized-gpu-inference-new) and a [real run](#-real-run-on-nosana-zkzkagent-builds-a-calculator-app), whose code is on GitHub at [zkzkGamal/calculator](https://github.com/zkzkGamal/calculator).
 
 ---
 
@@ -181,6 +181,8 @@ Nosana mode sends everything the model sees to a remote GPU node: your messages,
 ## 🧪 Real Run on Nosana: zkzkAgent Builds a Calculator App
 
 Recorded on 25 Oct 2026 with `MODEL_TYPE=NOSANA` and `qwen/qwen3.8-27b`. Every LLM call in the [run log](docs/nosana-run-2026-10-25.log) (18 calls) goes to `https://inference.nosana.com/v1/chat/completions` and returns `200 OK`. The tools, the files and VS Code all ran on the local machine.
+
+> 📦 **The code the agent wrote is on GitHub: [zkzkGamal/calculator](https://github.com/zkzkGamal/calculator)**
 
 <div align="center">
   <img src="docs/images/zkzk-calculator.png" alt="Calculator web app built by zkzkAgent on Nosana" width="700">
