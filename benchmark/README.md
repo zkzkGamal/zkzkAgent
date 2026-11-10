@@ -11,9 +11,11 @@ Every model runs the **same agent**: the same code, prompts, tools and safety ga
 | `local-0.8b` | `qwen3.5:0.8b` | Ollama, on the laptop | |
 | `local-2b` | `qwen3.5:2b-q4_K_M` | Ollama, on the laptop | zkzkAgent's usual local model |
 | `local-4b` | `qwen3:4b` | Ollama, on the laptop | Qwen3-4B-Thinking-2507, runs with `OLLAMA_REASONING=true` ([why](#thinking-models)) |
-| `nosana` | `qwen/qwen3.8-27b` | Nosana inference API | Only the model calls go to Nosana; tools run on the laptop |
+| `nosana` | `qwen/qwen3.8-27b` | Nosana inference API | Qwen3.8 27B AWQ (4-bit), 131K context, 16K max output. Only the model calls go to Nosana; tools run on the laptop |
 
-Laptop: Intel i7-10850H, 31 GB RAM, NVIDIA Quadro T2000 with 4 GB VRAM. A 27B model needs roughly 15 GB or more at 4-bit, so it can't run on this GPU.
+Laptop: Intel i7-10850H, 31 GB RAM, NVIDIA Quadro T2000 with 4 GB VRAM. A 27B model needs roughly 15 GB or more at 4-bit, so it can't run on this GPU. The local models run with Ollama's default 4,096-token context unless `OLLAMA_NUM_CTX` is set.
+
+Nosana price at the time of the run: **$0.20 per 1M input tokens, $2.00 per 1M output tokens**. Cost is computed from the token counts of every call.
 
 ## Tasks
 
@@ -36,6 +38,14 @@ Every task has automatic pass/fail checks. A run passes only when **all** of its
    - if the agent asks in plain chat instead of acting (T5), it says yes once, so the test reaches the tool the agent picks
 3. A LangChain callback counts every model call, input and output tokens, and every tool call across all nodes. On Nosana, the call count matched the HTTP request lines in every log we checked.
 4. The task's checks run, and one JSON row is written per run.
+
+## Speed and Context Tests
+
+- **`speed.py`** sends the executor node's real first call: the same system prompt, all the tool schemas and one short question, 5 times per model, after an untimed warm-up. It streams straight from the model API, so every token counts, including reasoning that LangChain's OpenAI client hides. It records:
+  - time to first token (reasoning included)
+  - output tokens per second after the first token
+  - Ollama's own decode speed, for local models
+- **The 8K context test** reruns T4 on the 2B and 4B models with `OLLAMA_NUM_CTX=8192`. It tests whether Ollama's 4,096-token default explains the local T4 failures: one executor call is already about 3,000 tokens before any history.
 
 ## Safety
 
@@ -62,7 +72,14 @@ unload; MODEL_TYPE=OLLAMA python3 -m benchmark.run_all --backend local-2b --mode
 unload; OLLAMA_REASONING=true MODEL_TYPE=OLLAMA python3 -m benchmark.run_all --backend local-4b --model qwen3:4b --out $OUT
 unload; MODEL_TYPE=NOSANA python3 -m benchmark.run_all --backend nosana --model qwen/qwen3.8-27b --out $OUT
 
-python3 -m benchmark.report $OUT --cost nosana=<credits used>
+# Speed: time to first token and tokens per second (5 calls each)
+unload; MODEL_TYPE=OLLAMA python3 -m benchmark.speed --backend local-2b --model qwen3.5:2b-q4_K_M --out $OUT
+unload; MODEL_TYPE=NOSANA python3 -m benchmark.speed --backend nosana --model qwen/qwen3.8-27b --out $OUT
+
+# Context: T4 again with an 8K window, in its own folder
+unload; OLLAMA_NUM_CTX=8192 MODEL_TYPE=OLLAMA python3 -m benchmark.run_all --backend local-2b-8k --model qwen3.5:2b-q4_K_M --tasks T4 --out $OUT-ctx8k
+
+python3 -m benchmark.report $OUT --price nosana=0.20/2.00 --window nosana=131072
 ```
 
 `run_all` refuses to start without `MODEL_TYPE`, so `.env` can't pick the backend silently. With `--model`, it checks after warm-up that the agent loaded that exact model. Use `--tasks T1,T3` and `--reps 1` for quick checks.
@@ -71,7 +88,8 @@ python3 -m benchmark.report $OUT --cost nosana=<credits used>
 
 | File | Contents |
 |---|---|
-| `runs_<backend>.jsonl` | One row per run: pass/fail, every check, route, tool calls, model calls, tokens, time, refused calls |
+| `runs_<backend>.jsonl` | One row per run: pass/fail, every check, route, tool calls, model calls, tokens, largest single prompt, time, refused calls |
+| `speed_<backend>.jsonl` | One row per speed call: time to first token, tokens per second, prompt and output tokens |
 | `meta.json` | Per backend: model, CPU, RAM, GPU, `ollama ps` (GPU vs CPU split), package versions, git commit |
 | `logs/<backend>_<task>_rep<n>.log` | Everything the agent printed and logged in that run |
 | `summary.md` | The tables from `report.py` |
@@ -84,4 +102,5 @@ python3 -m benchmark.report $OUT --cost nosana=<credits used>
   - Ollama's default 4,096-token context
   - LangGraph's default step limit of 25, which stops a run at about 12 tool rounds
 - **Nosana times include network round trips.**
-- **Cost:** Nosana cost comes from the account's credit balance before and after the run. Local runs use hardware we already own.
+- **Cost** is tokens × Nosana's listed price. Local runs use hardware we already own, so their cost isn't counted.
+- **Token counts depend on the tokenizer,** so the same prompt counts slightly differently for each model family.

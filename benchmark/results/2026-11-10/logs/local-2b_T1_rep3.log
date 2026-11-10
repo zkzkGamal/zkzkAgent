@@ -1,0 +1,35 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:09:19,137 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-2b/T1/rep3)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:09:19,267 [INFO] __main__: [BENCH] local-2b T1 (chat) rep 3
+2026-11-10 12:09:19,269 [INFO] agent_nodes.classify_node: [ROUTER] Query: What does `chmod 755` do to a file? Answer briefly.
+2026-11-10 12:09:19,271 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:09:19,271 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:09:20,675 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:09:21,561 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | The user is asking a general knowledge question about a specific Unix command, n…
+2026-11-10 12:09:21,561 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-10 12:09:21,561 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 12:09:21,587 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:09:21,587 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-10 12:09:26,389 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: `chmod 755` sets the permissions for a file to **755**.
+
+This is a standard Linux chmod command:
+- **7** means Read (r) and Write (w) permissions
+- **5** means Execute (x) permission
+- **3** means Read (r) permission
+
+So a file with `755` permissions can be read, written, and executed.
+
+2026-11-10 12:09:28,160 [INFO] agent_nodes.conversation_node: [CONVERSATIONAL] Cleaned text: `chmod 755` sets the permissions for a file to **755**.
+
+This is a standard Linux chmod command:
+- **7** means Read (r) and Write (w) permissions
+- **5** means Execute (x) permission
+- **3** means Read (r) permission
+
+So a file with `755` permissions can be read, written, and executed.
+2026-11-10 12:09:28,162 [INFO] __main__: [BENCH] FAIL {'routed_conversational': True, 'no_tool_calls': True, 'mentions_owner': False, 'mentions_execute': True}

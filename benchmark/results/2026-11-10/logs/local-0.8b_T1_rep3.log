@@ -1,0 +1,36 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:02:33,014 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-0.8b/T1/rep3)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:02:33,142 [INFO] __main__: [BENCH] local-0.8b T1 (chat) rep 3
+2026-11-10 12:02:33,143 [INFO] agent_nodes.classify_node: [ROUTER] Query: What does `chmod 755` do to a file? Answer briefly.
+2026-11-10 12:02:33,146 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:02:33,146 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:02:33,938 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:02:34,421 [INFO] agent_nodes.classify_node: [ROUTER] → DIRECT_EXECUTION | File permissions are system settings that must be manually configured by the use…
+2026-11-10 12:02:34,421 [INFO] core.agent: [ROUTER] Routing to: DIRECT_EXECUTION
+2026-11-10 12:02:34,422 [INFO] agent_nodes.execute_node: [AGENT] Processing with 2 messages in context
+2026-11-10 12:02:34,422 [INFO] agent_nodes.execute_node: [AGENT] Last message: What does `chmod 755` do to a file? Answer briefly....
+2026-11-10 12:02:34,422 [INFO] agent_nodes.execute_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 12:02:34,443 [INFO] agent_nodes.execute_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:02:34,443 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:02:37,465 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: 755 means read, write, and execute permissions for the owner (7 = 4 read + 3 write + 0 execute), group (5 = 1 read + 3 write + 0 execute), and everyone (3 = 0 read + 2 write + 1 execute).
+
+2026-11-10 12:02:38,551 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:02:38,552 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 755 means read, write, and execute permissions for the owner (7 = 4 read + 3 write + 0 execute), gro
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 0/15
+                
+2026-11-10 12:02:38,554 [INFO] __main__: [BENCH] FAIL {'routed_conversational': False, 'no_tool_calls': True, 'mentions_owner': True, 'mentions_execute': True}

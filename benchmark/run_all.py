@@ -122,7 +122,8 @@ def machine_info() -> dict:
         "python": platform.python_version(),
         "packages": versions,
         "git_commit": _command_output(["git", "rev-parse", "HEAD"]),
-        "git_dirty": bool(_command_output(["git", "status", "--porcelain"])),
+        # Tracked files only: the untracked results folder being written must not count
+        "git_dirty": bool(_command_output(["git", "status", "--porcelain", "--untracked-files=no"])),
     }
 
 
@@ -195,6 +196,7 @@ def main() -> int:
         model=warm.get("model"),
         model_type=warm.get("model_type"),
         reasoning=warm.get("reasoning"),
+        num_ctx=warm.get("num_ctx"),
         reps=args.reps,
         tasks=[task.id for task in tasks],
         run_timeout_s=args.timeout,

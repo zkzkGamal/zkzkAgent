@@ -1,0 +1,81 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:30:19,822 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-4b/T3/rep2)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:30:19,964 [INFO] __main__: [BENCH] local-4b T3 (find_and_read) rep 2
+2026-11-10 12:30:19,965 [INFO] agent_nodes.classify_node: [ROUTER] Query: Find the file project_code.txt inside /home/aloha-zkaria/zkzk-bench/local-4b/T3/rep2 and tell me the deployment code written in it.
+2026-11-10 12:30:19,968 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:30:19,968 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:30:22,878 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:30:59,637 [INFO] agent_nodes.classify_node: [ROUTER] → DIRECT_EXECUTION | User wants to read a specific file's content (deployment code) which is a direct…
+2026-11-10 12:30:59,637 [INFO] core.agent: [ROUTER] Routing to: DIRECT_EXECUTION
+2026-11-10 12:30:59,637 [INFO] agent_nodes.execute_node: [AGENT] Processing with 2 messages in context
+2026-11-10 12:30:59,637 [INFO] agent_nodes.execute_node: [AGENT] Last message: Find the file project_code.txt inside /home/aloha-zkaria/zkzk-bench/local-4b/T3/rep2 and tell me the...
+2026-11-10 12:30:59,637 [INFO] agent_nodes.execute_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 12:30:59,671 [INFO] agent_nodes.execute_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:30:59,671 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:31:11,798 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:31:58,675 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:31:58,675 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'find_file', 'args': {'filename': 'project_code.txt', 'search_path': '/home/aloha-zkaria/zkzk-bench/local-4b/T3/rep2'}, 'id': 'e4dc5b5c-bd8d-433c-a5bc-37d3697cedf7', 'type': 'tool_call'}]
+                
+ tool names: ['find_file']
+                
+ iteration: 0/15
+                
+2026-11-10 12:31:58,677 [INFO] tools_module.files_tools.findFile: [TOOL] find_file called with filename=project_code.txt, search_path=/home/aloha-zkaria/zkzk-bench/local-4b/T3/rep2
+2026-11-10 12:31:58,678 [INFO] tools_module.files_tools.findFile: [TOOL] find_file found:
+/home/aloha-zkaria/zkzk-bench/local-4b/T3/rep2/notes/project_code.txt
+2026-11-10 12:31:58,678 [INFO] agent_nodes.execute_node: [AGENT] Processing with 4 messages in context
+2026-11-10 12:31:58,678 [INFO] agent_nodes.execute_node: [AGENT] Last message: /home/aloha-zkaria/zkzk-bench/local-4b/T3/rep2/notes/project_code.txt...
+2026-11-10 12:31:58,679 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:31:59,447 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:32:17,506 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:32:17,508 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'read_file', 'args': {'path': '/home/aloha-zkaria/zkzk-bench/local-4b/T3/rep2/notes/project_code.txt'}, 'id': '7b8c5e14-b2e0-4035-ae20-7367556eaf8c', 'type': 'tool_call'}]
+                
+ tool names: ['read_file']
+                
+ iteration: 1/15
+                
+2026-11-10 12:32:17,512 [INFO] tools_module.files_tools.readFile: [TOOL] read_file called with path=/home/aloha-zkaria/zkzk-bench/local-4b/T3/rep2/notes/project_code.txt
+2026-11-10 12:32:17,513 [INFO] tools_module.files_tools.readFile: [TOOL] read_file success, 91 chars
+2026-11-10 12:32:17,515 [INFO] agent_nodes.execute_node: [AGENT] Processing with 6 messages in context
+2026-11-10 12:32:17,515 [INFO] agent_nodes.execute_node: [AGENT] Last message: Deployment notes
+
+The deployment code is ZK-8090-NOSANA.
+Do not share it outside the team.
+...
+2026-11-10 12:32:17,515 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:32:18,307 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: ZK-8090-NOSANA
+
+2026-11-10 12:33:25,837 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:33:25,837 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: ZK-8090-NOSANA
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 2/15
+                
+2026-11-10 12:33:25,838 [INFO] __main__: [BENCH] PASS {'used_a_tool': True, 'code_in_answer': True}

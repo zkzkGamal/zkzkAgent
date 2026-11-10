@@ -1,0 +1,23 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:57:15,464 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/nosana/T1/rep1)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:57:15,517 [INFO] __main__: [BENCH] nosana T1 (chat) rep 1
+2026-11-10 12:57:15,519 [INFO] agent_nodes.classify_node: [ROUTER] Query: What does `chmod 755` do to a file? Answer briefly.
+2026-11-10 12:57:15,521 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:57:15,521 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:57:17,874 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-10 12:57:17,885 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | The user is asking for general knowledge about chmod, not requesting a system ac…
+2026-11-10 12:57:17,885 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-10 12:57:17,885 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to ChatOpenAI
+2026-11-10 12:57:17,916 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:57:17,916 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-10 12:57:18,112 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+
+[AI]: 
+
+`chmod 755` sets permissions so the **owner** can read, write, and execute (7 = rwx), while **group** and **others** can only read and execute (5 = r-x). Common for scripts and executable files ♪
+
+2026-11-10 12:57:24,896 [INFO] agent_nodes.conversation_node: [CONVERSATIONAL] Cleaned text: `chmod 755` sets permissions so the **owner** can read, write, and execute (7 = rwx), while **group** and **others** can only read and execute (5 = r-x). Common for scripts and executable files ♪
+2026-11-10 12:57:24,898 [INFO] __main__: [BENCH] PASS {'routed_conversational': True, 'no_tool_calls': True, 'mentions_owner': True, 'mentions_execute': True}

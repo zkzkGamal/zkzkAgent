@@ -1,0 +1,59 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 13:06:10,267 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/nosana/T2/rep2)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 13:06:10,346 [INFO] __main__: [BENCH] nosana T2 (system_info) rep 2
+2026-11-10 13:06:10,348 [INFO] agent_nodes.classify_node: [ROUTER] Query: Which Linux kernel version is this machine running?
+2026-11-10 13:06:10,350 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 13:06:10,350 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 13:06:12,669 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-10 13:06:12,702 [INFO] agent_nodes.classify_node: [ROUTER] → DIRECT_EXECUTION | Checking the running Linux kernel version requires a system command.
+2026-11-10 13:06:12,703 [INFO] core.agent: [ROUTER] Routing to: DIRECT_EXECUTION
+2026-11-10 13:06:12,704 [INFO] agent_nodes.execute_node: [AGENT] Processing with 2 messages in context
+2026-11-10 13:06:12,704 [INFO] agent_nodes.execute_node: [AGENT] Last message: Which Linux kernel version is this machine running?...
+2026-11-10 13:06:12,704 [INFO] agent_nodes.execute_node: [MODEL INIT] Lazily binding tools to ChatOpenAI
+2026-11-10 13:06:12,734 [INFO] agent_nodes.execute_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 13:06:12,734 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 13:06:12,913 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-10 13:06:20,929 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 13:06:20,930 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'run_command', 'args': {'command': 'uname -r'}, 'id': 'chatcmpl-tool-8f0e7a60c10fa96c', 'type': 'tool_call'}]
+                
+ tool names: ['run_command']
+                
+ iteration: 0/15
+                
+2026-11-10 13:06:20,942 [INFO] agent_nodes.execute_node: [AGENT] Processing with 4 messages in context
+2026-11-10 13:06:20,942 [INFO] agent_nodes.execute_node: [AGENT] Last message: 6.8.0-138-generic
+...
+2026-11-10 13:06:20,942 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 13:06:21,474 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+
+[AI]: 
+
+This machine is running Linux kernel **6.8.0-138-generic**.
+
+2026-11-10 13:06:23,508 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 13:06:23,509 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+
+This machine is running Linux kernel **6.8.0-138-generic**.
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 1/15
+                
+2026-11-10 13:06:23,510 [INFO] __main__: [BENCH] PASS {'used_a_tool': True, 'kernel_in_answer': True}
