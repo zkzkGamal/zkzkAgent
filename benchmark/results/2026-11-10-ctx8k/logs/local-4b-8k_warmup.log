@@ -1,0 +1,19 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 13:56:50,815 [INFO] benchmark.guards: [GUARD] Installed (sandbox: None)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 13:56:50,961 [INFO] agent_nodes.classify_node: [ROUTER] Query: this is a warm up message, generate a short response
+2026-11-10 13:56:50,964 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 13:56:50,964 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 13:56:55,527 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 13:57:29,202 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | User is sending a warm-up message requesting a short response, which is a genera…
+2026-11-10 13:57:29,203 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-10 13:57:29,204 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 13:57:29,242 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 13:57:29,242 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-10 13:57:38,070 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: Hello! I'm zkzkAgent, your friendly Linux assistant. Ready to help! ♪
+
+2026-11-10 13:57:58,250 [INFO] agent_nodes.conversation_node: [CONVERSATIONAL] Cleaned text: Hello! I'm zkzkAgent, your friendly Linux assistant. Ready to help! ♪

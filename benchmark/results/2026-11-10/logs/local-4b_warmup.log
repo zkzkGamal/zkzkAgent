@@ -1,0 +1,19 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:11:12,278 [INFO] benchmark.guards: [GUARD] Installed (sandbox: None)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:11:12,407 [INFO] agent_nodes.classify_node: [ROUTER] Query: this is a warm up message, generate a short response
+2026-11-10 12:11:12,410 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:11:12,410 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:11:16,631 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:11:31,991 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | User is sending a warm-up message and asking for a short response, which is a co…
+2026-11-10 12:11:31,992 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-10 12:11:31,992 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 12:11:32,046 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:11:32,047 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-10 12:11:40,747 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: Hello! Ready to help with your Linux questions? ♪
+
+2026-11-10 12:11:48,567 [INFO] agent_nodes.conversation_node: [CONVERSATIONAL] Cleaned text: Hello! Ready to help with your Linux questions? ♪

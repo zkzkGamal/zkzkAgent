@@ -1,0 +1,19 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:03:51,065 [INFO] benchmark.guards: [GUARD] Installed (sandbox: None)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:03:51,190 [INFO] agent_nodes.classify_node: [ROUTER] Query: this is a warm up message, generate a short response
+2026-11-10 12:03:51,192 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:03:51,192 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:03:54,885 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:03:55,676 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | The user is greeting you as a warm-up, which is a conversational request requiri…
+2026-11-10 12:03:55,677 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-10 12:03:55,678 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 12:03:55,729 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:03:55,729 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-10 12:04:00,608 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: 🎉 Hi there! I'd love to chat about warmups! What would you like to talk about this time? I'm here to help! 😊
+
+2026-11-10 12:04:01,239 [INFO] agent_nodes.conversation_node: [CONVERSATIONAL] Cleaned text: 🎉 Hi there! I'd love to chat about warmups! What would you like to talk about this time? I'm here to help! 😊

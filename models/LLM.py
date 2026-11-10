@@ -55,12 +55,15 @@ elif MODEL_TYPE == "OLLAMA":
     # Thinking-only models (e.g. qwen3:4b = Qwen3-4B-Thinking-2507) ignore think=false and
     # leak their reasoning into the reply; "true" keeps it in a separate field instead.
     REASONING = _env("OLLAMA_REASONING", "false").lower() == "true"
+    # Context window in tokens (prompt + reply); unset keeps Ollama's default of 4,096
+    NUM_CTX = int(_env("OLLAMA_NUM_CTX", "0")) or None
 
     llm = ChatOllama(
         model=MODEL_NAME,
         base_url=BASE_URL,
         keep_alive=-1,
         reasoning=REASONING,
+        num_ctx=NUM_CTX,
         client_kwargs={"timeout": 60},
     )
 else:

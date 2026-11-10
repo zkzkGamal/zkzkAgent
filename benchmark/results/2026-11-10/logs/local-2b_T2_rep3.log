@@ -1,0 +1,73 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:09:32,225 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-2b/T2/rep3)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:09:32,356 [INFO] __main__: [BENCH] local-2b T2 (system_info) rep 3
+2026-11-10 12:09:32,358 [INFO] agent_nodes.classify_node: [ROUTER] Query: Which Linux kernel version is this machine running?
+2026-11-10 12:09:32,361 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:09:32,361 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:09:33,772 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:09:35,120 [INFO] agent_nodes.classify_node: [ROUTER] → DIRECT_EXECUTION | The user is asking for the current system state (specifically the Linux kernel v…
+2026-11-10 12:09:35,121 [INFO] core.agent: [ROUTER] Routing to: DIRECT_EXECUTION
+2026-11-10 12:09:35,121 [INFO] agent_nodes.execute_node: [AGENT] Processing with 2 messages in context
+2026-11-10 12:09:35,121 [INFO] agent_nodes.execute_node: [AGENT] Last message: Which Linux kernel version is this machine running?...
+2026-11-10 12:09:35,121 [INFO] agent_nodes.execute_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 12:09:35,146 [INFO] agent_nodes.execute_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:09:35,146 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:09:41,301 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:09:41,320 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:09:41,320 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'detect_operating_system', 'args': {}, 'id': '08118896-2d3e-4e6d-957b-924474879ed0', 'type': 'tool_call'}]
+                
+ tool names: ['detect_operating_system']
+                
+ iteration: 0/15
+                
+2026-11-10 12:09:41,323 [INFO] agent_nodes.execute_node: [AGENT] Processing with 4 messages in context
+2026-11-10 12:09:41,324 [INFO] agent_nodes.execute_node: [AGENT] Last message: Detected OS: Linux...
+2026-11-10 12:09:41,324 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:09:46,755 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:09:46,778 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:09:46,779 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'run_command', 'args': {'command': 'uname -r'}, 'id': '8c720ee8-0e56-48e5-8a8d-dcd76fdf5b58', 'type': 'tool_call'}]
+                
+ tool names: ['run_command']
+                
+ iteration: 1/15
+                
+2026-11-10 12:09:46,787 [INFO] agent_nodes.execute_node: [AGENT] Processing with 6 messages in context
+2026-11-10 12:09:46,787 [INFO] agent_nodes.execute_node: [AGENT] Last message: 6.8.0-138-generic
+...
+2026-11-10 12:09:46,788 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:09:51,741 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: The Linux kernel version is 6.8.0-138-generic.
+
+2026-11-10 12:09:52,102 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:09:52,104 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: The Linux kernel version is 6.8.0-138-generic.
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 2/15
+                
+2026-11-10 12:09:52,105 [INFO] __main__: [BENCH] PASS {'used_a_tool': True, 'kernel_in_answer': True}

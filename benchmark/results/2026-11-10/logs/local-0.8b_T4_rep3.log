@@ -1,0 +1,21 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:03:09,323 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-0.8b/T4/rep3)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:03:09,449 [INFO] __main__: [BENCH] local-0.8b T4 (build_app) rep 3
+2026-11-10 12:03:09,451 [INFO] agent_nodes.classify_node: [ROUTER] Query: Create a project folder called calc_app inside /home/aloha-zkaria/zkzk-bench/local-0.8b/T4/rep3. It should be a calculator web app with a FastAPI backend in app.py that serves static/index.html and has POST /api/calculate, which takes JSON {"expression": "..."} and returns {"result": ...}. Also write requirements.txt. Do not open VS Code and do not start the server.
+2026-11-10 12:03:09,453 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:03:09,453 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:03:10,336 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:03:13,062 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | 
+2026-11-10 12:03:13,063 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-10 12:03:13,065 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 12:03:13,099 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:03:13,100 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-10 12:03:16,562 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: Got it — what would you like to do next?
+
+2026-11-10 12:03:16,581 [WARNING] agent_nodes.conversation_node: [CONVERSATIONAL] Empty reply — emitted fallback message
+2026-11-10 12:03:16,605 [INFO] __main__: [BENCH] FAIL {'files_exist': False, 'get_root': False, 'calculates': False, 'rejects_code': False}

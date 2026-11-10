@@ -1,0 +1,94 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:00:42,016 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-0.8b/T2/rep2)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:00:42,149 [INFO] __main__: [BENCH] local-0.8b T2 (system_info) rep 2
+2026-11-10 12:00:42,151 [INFO] agent_nodes.classify_node: [ROUTER] Query: Which Linux kernel version is this machine running?
+2026-11-10 12:00:42,154 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:00:42,154 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:00:42,938 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:00:43,606 [INFO] agent_nodes.classify_node: [ROUTER] → DIRECT_EXECUTION | To check the current system's kernel version, I am requesting a system command, …
+2026-11-10 12:00:43,607 [INFO] core.agent: [ROUTER] Routing to: DIRECT_EXECUTION
+2026-11-10 12:00:43,608 [INFO] agent_nodes.execute_node: [AGENT] Processing with 2 messages in context
+2026-11-10 12:00:43,608 [INFO] agent_nodes.execute_node: [AGENT] Last message: Which Linux kernel version is this machine running?...
+2026-11-10 12:00:43,608 [INFO] agent_nodes.execute_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 12:00:43,635 [INFO] agent_nodes.execute_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:00:43,635 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:00:46,934 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:00:46,954 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:00:46,956 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'detect_operating_system', 'args': {}, 'id': '1fe95d79-e076-4274-bd2b-58a951de899c', 'type': 'tool_call'}]
+                
+ tool names: ['detect_operating_system']
+                
+ iteration: 0/15
+                
+2026-11-10 12:00:46,961 [INFO] agent_nodes.execute_node: [AGENT] Processing with 4 messages in context
+2026-11-10 12:00:46,961 [INFO] agent_nodes.execute_node: [AGENT] Last message: Detected OS: Linux...
+2026-11-10 12:00:46,961 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:00:49,735 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:00:49,752 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:00:49,752 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'detect_os', 'args': {}, 'id': 'a9870c9d-a774-46b0-a3ea-535d75b02099', 'type': 'tool_call'}]
+                
+ tool names: ['detect_os']
+                
+ iteration: 1/15
+                
+2026-11-10 12:00:49,753 [INFO] agent_nodes.execute_node: [AGENT] Processing with 6 messages in context
+2026-11-10 12:00:49,754 [INFO] agent_nodes.execute_node: [AGENT] Last message: Error: detect_os is not a valid tool, try one of [find_file, read_file, open_file, find_folder, get_...
+2026-11-10 12:00:49,754 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:00:53,138 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:00:53,155 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:00:53,156 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'run_command', 'args': {'command': 'cat /etc/os-release | grep -E "^PRETTY_NAME|NAME="'}, 'id': '2b694fee-5d7e-43ef-84af-2f14cc671524', 'type': 'tool_call'}]
+                
+ tool names: ['run_command']
+                
+ iteration: 2/15
+                
+2026-11-10 12:00:53,173 [INFO] agent_nodes.execute_node: [AGENT] Processing with 8 messages in context
+2026-11-10 12:00:53,173 [INFO] agent_nodes.execute_node: [AGENT] Last message: PRETTY_NAME="Ubuntu 22.04.5 LTS"
+NAME="Ubuntu"
+VERSION_CODENAME=jammy
+UBUNTU_CODENAME=jammy
+...
+2026-11-10 12:00:53,173 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-10 12:00:53,645 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: This is a Linux machine running **Ubuntu 22.04.5 LTS** with the Ubuntu system.
+
+2026-11-10 12:00:54,049 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-10 12:00:54,050 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: This is a Linux machine running **Ubuntu 22.04.5 LTS** with the Ubuntu system.
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 3/15
+                
+2026-11-10 12:00:54,052 [INFO] __main__: [BENCH] FAIL {'used_a_tool': True, 'kernel_in_answer': False}

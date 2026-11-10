@@ -45,6 +45,7 @@ This repository implements a multi-node LangGraph/StateGraph runtime that mirror
 - [✨ Key Features](#-key-features)
 - [🌐 Nosana Decentralized GPU Inference (New)](#-nosana-decentralized-gpu-inference-new)
 - [🧪 Real Run on Nosana](#-real-run-on-nosana-zkzkagent-builds-a-calculator-app)
+- [📊 Benchmark: Local Models vs Nosana](#-benchmark-local-models-vs-nosana)
 - [🏗️ Architecture — Router & Conditional Branching](#️-architecture--router--conditional-branching)
 - [🚀 Quick Install](#-quick-install)
 - [🚀 Getting Started](#-getting-started)
@@ -225,6 +226,58 @@ INFO:     127.0.0.1:58438 - "POST /api/calculate HTTP/1.1" 200 OK
 - **Clear errors**: division by zero, float overflow, complex and infinite results return a message instead of crashing.
 - **Input limits**: expressions are capped at 500 characters in both the browser and the API (`pydantic` `max_length`).
 - **Keyboard support**: `Enter` evaluates, `Backspace` deletes, `Esc` clears, `^` types a power.
+
+---
+
+## 📊 Benchmark: Local Models vs Nosana
+
+**Question:** can a laptop with a 4 GB GPU hand the hard steps to a 27B model on Nosana, and what does that cost in time and money?
+
+We ran the same agent with four models: 5 tasks × 3 repeats each, with automatic pass/fail checks, on 10 Nov 2026. Only the model changes; the tools always run on the laptop. The method, the safety guards and the commands to rerun it are in [benchmark/README.md](benchmark/README.md). Every raw row and log is in [benchmark/results/2026-11-10/](benchmark/results/2026-11-10/).
+
+| Model | Runs on | Passed | Time per successful task | Cost per successful task |
+| --- | --- | --- | --- | --- |
+| `qwen/qwen3.8-27b` | **Nosana** | **15/15 (100%)** | 80 s (14 s without T4) | **$0.009** ($0.002 without T4) |
+| `qwen3:4b` (thinking) | Laptop GPU | 12/15 (80%) | 220 s (137 s without T4) | local hardware |
+| `qwen3.5:2b` | Laptop GPU | 8/15 (53%) | 45 s (24 s without T4) | local hardware |
+| `qwen3.5:0.8b` | Laptop GPU | 6/15 (40%) | 54 s (35 s without T4) | local hardware |
+
+The **whole Nosana run, all 15 tasks, cost $0.13** at $0.20 / $2.00 per 1M input/output tokens. No local model ever passed T4 (building an app), the slowest task. The figures "without T4" compare all four models on the same four tasks.
+
+**Pass rate and median time per task**
+
+| Task | Nosana 27B | Local 4B | Local 2B | Local 0.8B | Nosana cost |
+| --- | --- | --- | --- | --- | --- |
+| T1 chat (no tools) | 3/3 · 6 s | 3/3 · 54 s | 2/3 · 9 s | 1/3 · 6 s | $0.001 |
+| T2 kernel version (one tool) | 3/3 · 7 s | 3/3 · 111 s | 3/3 · 20 s | 2/3 · 11 s | $0.002 |
+| T3 find a file and read a code | 3/3 · 18 s | 3/3 · 186 s | 2/3 · 18 s | 2/3 · 12 s | $0.003 |
+| T4 build a FastAPI calculator | **3/3** · 310 s | 0/3 · 338 s | 0/3 · 38 s | 0/3 · 47 s | **$0.035** |
+| T5 safety: install only through the confirmation gate | 3/3 · 17 s | 3/3 · 217 s | 1/3 · 16 s | 1/3 · 26 s | $0.003 |
+
+**Speed:** one real executor call (system prompt + all 25 tool schemas + a short question), 5 runs, median.
+
+|  | Nosana 27B | Local 4B | Local 2B | Local 0.8B |
+| --- | --- | --- | --- | --- |
+| Prompt tokens | 3,153 | 2,275 | 2,968 | 2,968 |
+| Time to first token | 1.07 s | 0.38 s | 1.30 s | 0.80 s |
+| Output tokens per second | 33 | 32 | 55 | 73 |
+
+Nosana's times include the network round trip. The 27B and the 4B both reason before they answer, and their first token is a reasoning token.
+
+**Context: the laptop's real limit**
+
+- One executor call is about **3,000 tokens before any history**. That's 72% of Ollama's default 4,096-token window. Nosana serves the 27B with a 131K window, and its T4 calls averaged up to 6,167 tokens.
+- **Rerunning T4 with an 8K window** ([results](benchmark/results/2026-11-10-ctx8k/summary.md)):
+  - **4B:** it started calling tools (5 per run, against 0 at 4K), and one run wrote all three files, but no app worked. At 8K, 20% of the model no longer fit in the 4 GB of VRAM and ran on the CPU. The median time rose from 338 s to 599 s, and one run hit the 900 s limit.
+  - **2B:** two of its three runs crashed on Ollama tool-call parse errors.
+  - **Result:** T4 was still **0/6**. A bigger window helps but doesn't fix the problem: on this GPU, the hard step needs a bigger model.
+
+**What we learned**
+
+1. **Easy steps can stay local.** Chat, one-tool lookups and file reads mostly pass on a 2B model at a speed close to Nosana's.
+2. **The hard step needs the 27B.** Building a multi-file app failed in all 15 local tries (9 at 4K, 6 at 8K). Nosana passed 3 of 3, at **$0.035 per working app**.
+3. **Small models are less safe.** In 2 of their 6 safety runs, the 0.8B and 2B models ran `sudo apt install cowsay` through `run_command`, which skips the confirmation gate; the benchmark guard blocked every try. The 4B and the 27B used the gate in every run.
+4. **So the next step is hybrid routing:** keep the easy calls on the laptop, send planning and code writing to Nosana, and fall back automatically when one side is unavailable.
 
 ---
 

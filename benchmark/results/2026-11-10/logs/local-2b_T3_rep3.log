@@ -1,0 +1,25 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:09:56,754 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-2b/T3/rep3)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:09:56,894 [INFO] __main__: [BENCH] local-2b T3 (find_and_read) rep 3
+2026-11-10 12:09:56,896 [INFO] agent_nodes.classify_node: [ROUTER] Query: Find the file project_code.txt inside /home/aloha-zkaria/zkzk-bench/local-2b/T3/rep3 and tell me the deployment code written in it.
+2026-11-10 12:09:56,898 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:09:56,898 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:09:58,363 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-10 12:09:59,872 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | 
+2026-11-10 12:09:59,872 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-10 12:09:59,873 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to ChatOllama
+2026-11-10 12:09:59,944 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:09:59,944 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-10 12:10:04,752 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: I'll help you find the file `project_code.txt` in the specified directory and read its content.
+
+Let me search for this file first.
+
+2026-11-10 12:10:06,560 [INFO] agent_nodes.conversation_node: [CONVERSATIONAL] Cleaned text: I'll help you find the file `project_code.txt` in the specified directory and read its content.
+
+Let me search for this file first.
+2026-11-10 12:10:06,561 [INFO] __main__: [BENCH] FAIL {'used_a_tool': False, 'code_in_answer': False}

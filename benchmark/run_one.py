@@ -44,6 +44,7 @@ class Meter(BaseCallbackHandler):
         self.llm_calls = 0
         self.tokens_in = 0
         self.tokens_out = 0
+        self.max_tokens_in = 0  # largest single prompt: how much of the context window was used
         self.tool_calls = []
 
     def on_chat_model_start(self, serialized, messages, **kwargs):
@@ -56,6 +57,7 @@ class Meter(BaseCallbackHandler):
                 usage = getattr(message, "usage_metadata", None) or {}
                 self.tokens_in += usage.get("input_tokens", 0)
                 self.tokens_out += usage.get("output_tokens", 0)
+                self.max_tokens_in = max(self.max_tokens_in, usage.get("input_tokens", 0))
 
     def on_tool_start(self, serialized, input_str, **kwargs):
         name = kwargs.get("name") or (serialized or {}).get("name", "?")
@@ -66,6 +68,7 @@ class Meter(BaseCallbackHandler):
             "n_llm_calls": self.llm_calls,
             "tokens_in": self.tokens_in,
             "tokens_out": self.tokens_out,
+            "max_tokens_in": self.max_tokens_in,
             "n_tool_calls": len(self.tool_calls),
             "tool_calls": self.tool_calls,
         }
@@ -244,6 +247,7 @@ def main() -> int:
         model=llm_config.MODEL_NAME,
         model_type=llm_config.MODEL_TYPE,
         reasoning=getattr(llm_config, "REASONING", None),  # Ollama only
+        num_ctx=getattr(llm_config, "NUM_CTX", None),  # Ollama only; None = Ollama's default
     )
     if args.warmup:
         return warm_up(app, row)

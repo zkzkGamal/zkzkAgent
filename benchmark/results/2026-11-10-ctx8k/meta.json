@@ -1,0 +1,56 @@
+{
+  "local-2b-8k": {
+    "cpu": "Intel(R) Core(TM) i7-10850H CPU @ 2.70GHz",
+    "ram": "31 GB",
+    "gpu": "Quadro T2000 with Max-Q Design, 4096 MiB",
+    "os": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "packages": {
+      "langchain-core": "1.5.3",
+      "langgraph": "1.0.9",
+      "langchain-openai": "1.1.11",
+      "langchain-ollama": "1.0.1"
+    },
+    "git_commit": "ad09b2062e2b16f0383d970b535797c85f8c9aca",
+    "git_dirty": true,
+    "model": "qwen3.5:2b-q4_K_M",
+    "model_type": "OLLAMA",
+    "reasoning": false,
+    "num_ctx": 8192,
+    "reps": 3,
+    "tasks": [
+      "T4"
+    ],
+    "run_timeout_s": 900,
+    "started_at": "2026-11-10T13:54:22",
+    "ollama_ps": "NAME                 ID              SIZE      PROCESSOR    CONTEXT    UNTIL   \nqwen3.5:2b-q4_K_M    124a03c34777    3.6 GB    100% GPU     8192       Forever",
+    "finished_at": "2026-11-10T13:56:46"
+  },
+  "local-4b-8k": {
+    "cpu": "Intel(R) Core(TM) i7-10850H CPU @ 2.70GHz",
+    "ram": "31 GB",
+    "gpu": "Quadro T2000 with Max-Q Design, 4096 MiB",
+    "os": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "packages": {
+      "langchain-core": "1.5.3",
+      "langgraph": "1.0.9",
+      "langchain-openai": "1.1.11",
+      "langchain-ollama": "1.0.1"
+    },
+    "git_commit": "ad09b2062e2b16f0383d970b535797c85f8c9aca",
+    "git_dirty": true,
+    "model": "qwen3:4b",
+    "model_type": "OLLAMA",
+    "reasoning": true,
+    "num_ctx": 8192,
+    "reps": 3,
+    "tasks": [
+      "T4"
+    ],
+    "run_timeout_s": 900,
+    "started_at": "2026-11-10T13:57:58",
+    "ollama_ps": "NAME        ID              SIZE      PROCESSOR          CONTEXT    UNTIL   \nqwen3:4b    359d7dd4bcda    4.2 GB    20%/80% CPU/GPU    8192       Forever",
+    "finished_at": "2026-11-10T14:33:06"
+  }
+}

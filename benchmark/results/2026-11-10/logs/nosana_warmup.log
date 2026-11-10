@@ -1,0 +1,21 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-10 12:57:03,748 [INFO] benchmark.guards: [GUARD] Installed (sandbox: None)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-10 12:57:03,803 [INFO] agent_nodes.classify_node: [ROUTER] Query: this is a warm up message, generate a short response
+2026-11-10 12:57:03,806 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-10 12:57:03,806 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-10 12:57:08,781 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-10 12:57:08,793 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | The user is giving a general warm-up request and asking for a short response, wi…
+2026-11-10 12:57:08,793 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-10 12:57:08,794 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to ChatOpenAI
+2026-11-10 12:57:08,819 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-10 12:57:08,819 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-10 12:57:09,059 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+
+[AI]: 
+
+Hey there! ♪ Ready to help — what's on your mind?
+
+2026-11-10 12:57:10,618 [INFO] agent_nodes.conversation_node: [CONVERSATIONAL] Cleaned text: Hey there! ♪ Ready to help — what's on your mind?
