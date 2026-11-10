@@ -8,3 +8,5 @@ content/
 temp_output.wav
 tm.out
 HACKATHON_CHECKLIST.md
+drafts/
+benchmark/results/dryrun*/

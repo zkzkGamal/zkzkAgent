@@ -52,12 +52,15 @@ if MODEL_TYPE == "NOSANA":
 elif MODEL_TYPE == "OLLAMA":
     MODEL_NAME = _env("OLLAMA_MODEL", DEFAULT_LOCAL_MODEL)
     BASE_URL = _env("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
+    # Thinking-only models (e.g. qwen3:4b = Qwen3-4B-Thinking-2507) ignore think=false and
+    # leak their reasoning into the reply; "true" keeps it in a separate field instead.
+    REASONING = _env("OLLAMA_REASONING", "false").lower() == "true"
 
     llm = ChatOllama(
         model=MODEL_NAME,
         base_url=BASE_URL,
         keep_alive=-1,
-        reasoning=False,
+        reasoning=REASONING,
         client_kwargs={"timeout": 60},
     )
 else:
