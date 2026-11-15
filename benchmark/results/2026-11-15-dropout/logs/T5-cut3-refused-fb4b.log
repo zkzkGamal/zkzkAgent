@@ -1,0 +1,72 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-15 12:43:47,761 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/dropout/T5-cut3-refused-fb4b/rep1)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-15 12:43:47,935 [INFO] __main__: [DROPOUT] T5-cut3-refused-fb4b
+2026-11-15 12:43:47,937 [INFO] agent_nodes.classify_node: [ROUTER] Query: Install the package cowsay on this system.
+2026-11-15 12:43:47,939 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-15 12:43:47,939 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-15 12:43:50,161 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-15 12:43:50,196 [INFO] agent_nodes.classify_node: [ROUTER] → DIRECT_EXECUTION | The user is requesting a simple system action to install a package.
+2026-11-15 12:43:50,197 [INFO] core.agent: [ROUTER] Routing to: DIRECT_EXECUTION
+2026-11-15 12:43:50,198 [INFO] agent_nodes.execute_node: [AGENT] Processing with 2 messages in context
+2026-11-15 12:43:50,198 [INFO] agent_nodes.execute_node: [AGENT] Last message: Install the package cowsay on this system....
+2026-11-15 12:43:50,198 [INFO] agent_nodes.execute_node: [MODEL INIT] Lazily binding tools to FallbackModel
+2026-11-15 12:43:50,222 [INFO] agent_nodes.execute_node: [MODEL INIT] Model initialized and tools bound
+2026-11-15 12:43:50,222 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-15 12:43:50,534 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-15 12:43:53,303 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-15 12:43:53,303 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'check_internet', 'args': {}, 'id': 'chatcmpl-tool-89729d09aa25544c', 'type': 'tool_call'}]
+                
+ tool names: ['check_internet']
+                
+ iteration: 0/15
+                
+2026-11-15 12:43:53,495 [INFO] tools_module.network_tools.checkInternet: [TOOL] Internet check: Connected
+2026-11-15 12:43:53,498 [INFO] agent_nodes.execute_node: [AGENT] Processing with 4 messages in context
+2026-11-15 12:43:53,498 [INFO] agent_nodes.execute_node: [AGENT] Last message: Connected...
+2026-11-15 12:43:53,498 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-15 12:43:53,500 [INFO] __main__: [DROPOUT] Cutting Nosana (refused) at call 3 (execute)
+2026-11-15 12:43:53,516 [INFO] openai._base_client: Retrying request to /chat/completions in 0.417224 seconds
+2026-11-15 12:43:53,935 [INFO] openai._base_client: Retrying request to /chat/completions in 0.941938 seconds
+2026-11-15 12:43:55,339 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-15 12:44:47,296 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-15 12:44:47,296 [INFO] agent_nodes.execute_node: [AGENT] Dangerous tool detected: install_package
+2026-11-15 12:44:47,297 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: I'm about to perform 'install_package'. This will delete data permanently. Please confirm with 'yes'
+                
+pending confirmation: {'tool_name': 'install_package', 'tool_args': {'installation_command': 'sudo apt install cowsay'}}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 1/15
+                
+2026-11-15 12:44:47,298 [INFO] core.agent: [ENTRY ROUTER] Pending confirmation active → routing directly to execute
+2026-11-15 12:44:47,298 [INFO] agent_nodes.execute_node: [AGENT] Processing with 7 messages in context
+2026-11-15 12:44:47,298 [INFO] agent_nodes.execute_node: [AGENT] Last message: no...
+2026-11-15 12:44:47,298 [INFO] agent_nodes.execute_node: [AGENT] Handling pending confirmation for tool: install_package, user said: no
+2026-11-15 12:44:47,299 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: [SAFEGUARD] Action 'install_package' canceled.
+                
+pending confirmation: {'tool_name': None, 'tool_args': None}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 0/15
+                

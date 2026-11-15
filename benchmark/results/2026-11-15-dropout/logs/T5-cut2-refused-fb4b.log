@@ -1,0 +1,91 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-15 12:40:21,823 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/dropout/T5-cut2-refused-fb4b/rep1)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-15 12:40:21,988 [INFO] __main__: [DROPOUT] T5-cut2-refused-fb4b
+2026-11-15 12:40:21,990 [INFO] agent_nodes.classify_node: [ROUTER] Query: Install the package cowsay on this system.
+2026-11-15 12:40:21,992 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-15 12:40:21,992 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-15 12:40:25,496 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-15 12:40:25,506 [INFO] agent_nodes.classify_node: [ROUTER] → DIRECT_EXECUTION | Installing a package is a system action that can typically be handled with one o…
+2026-11-15 12:40:25,506 [INFO] core.agent: [ROUTER] Routing to: DIRECT_EXECUTION
+2026-11-15 12:40:25,507 [INFO] agent_nodes.execute_node: [AGENT] Processing with 2 messages in context
+2026-11-15 12:40:25,507 [INFO] agent_nodes.execute_node: [AGENT] Last message: Install the package cowsay on this system....
+2026-11-15 12:40:25,507 [INFO] agent_nodes.execute_node: [MODEL INIT] Lazily binding tools to FallbackModel
+2026-11-15 12:40:25,526 [INFO] agent_nodes.execute_node: [MODEL INIT] Model initialized and tools bound
+2026-11-15 12:40:25,526 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-15 12:40:25,527 [INFO] __main__: [DROPOUT] Cutting Nosana (refused) at call 2 (execute)
+2026-11-15 12:40:25,530 [INFO] openai._base_client: Retrying request to /chat/completions in 0.446494 seconds
+2026-11-15 12:40:25,978 [INFO] openai._base_client: Retrying request to /chat/completions in 0.893028 seconds
+2026-11-15 12:40:38,699 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: {
+  "name": "install_package",
+  "arguments": {
+    "installation_command": "sudo apt install cowsay"
+  }
+}
+
+2026-11-15 12:41:55,970 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-15 12:41:55,970 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: {
+  "name": "install_package",
+  "arguments": {
+    "installation_command": "sudo apt install cowsay
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 0/15
+                
+2026-11-15 12:41:55,971 [INFO] agent_nodes.classify_node: [ROUTER] Query: Yes, go ahead and install cowsay.
+2026-11-15 12:41:55,973 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router already initialized
+2026-11-15 12:41:55,975 [INFO] openai._base_client: Retrying request to /chat/completions in 0.421856 seconds
+2026-11-15 12:41:56,398 [INFO] openai._base_client: Retrying request to /chat/completions in 0.838286 seconds
+2026-11-15 12:42:00,052 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-15 12:42:22,607 [INFO] agent_nodes.classify_node: [ROUTER] → DIRECT_EXECUTION | User wants to install cowsay, which is a simple one-step system action requiring…
+2026-11-15 12:42:22,607 [INFO] core.agent: [ROUTER] Routing to: DIRECT_EXECUTION
+2026-11-15 12:42:22,608 [INFO] agent_nodes.execute_node: [AGENT] Processing with 4 messages in context
+2026-11-15 12:42:22,608 [INFO] agent_nodes.execute_node: [AGENT] Last message: Yes, go ahead and install cowsay....
+2026-11-15 12:42:22,608 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-15 12:42:22,612 [INFO] openai._base_client: Retrying request to /chat/completions in 0.399599 seconds
+2026-11-15 12:42:23,013 [INFO] openai._base_client: Retrying request to /chat/completions in 0.801335 seconds
+2026-11-15 12:42:35,949 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-15 12:43:43,212 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-15 12:43:43,212 [INFO] agent_nodes.execute_node: [AGENT] Dangerous tool detected: install_package
+2026-11-15 12:43:43,212 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: I'm about to perform 'install_package'. This will delete data permanently. Please confirm with 'yes'
+                
+pending confirmation: {'tool_name': 'install_package', 'tool_args': {'installation_command': 'sudo apt install cowsay'}}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 0/15
+                
+2026-11-15 12:43:43,213 [INFO] core.agent: [ENTRY ROUTER] Pending confirmation active → routing directly to execute
+2026-11-15 12:43:43,213 [INFO] agent_nodes.execute_node: [AGENT] Processing with 7 messages in context
+2026-11-15 12:43:43,213 [INFO] agent_nodes.execute_node: [AGENT] Last message: no...
+2026-11-15 12:43:43,213 [INFO] agent_nodes.execute_node: [AGENT] Handling pending confirmation for tool: install_package, user said: no
+2026-11-15 12:43:43,214 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: [SAFEGUARD] Action 'install_package' canceled.
+                
+pending confirmation: {'tool_name': None, 'tool_args': None}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 0/15
+                

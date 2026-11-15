@@ -1,0 +1,128 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-15 11:08:02,120 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/dropout/T4-cut1-refused-shipped/rep1)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-15 11:08:02,264 [INFO] __main__: [DROPOUT] T4-cut1-refused-shipped
+2026-11-15 11:08:02,266 [INFO] agent_nodes.classify_node: [ROUTER] Query: Create a project folder called calc_app inside /home/aloha-zkaria/zkzk-bench/dropout/T4-cut1-refused-shipped/rep1. It should be a calculator web app with a FastAPI backend in app.py that serves static/index.html and has POST /api/calculate, which takes JSON {"expression": "..."} and returns {"result": ...}. Also write requirements.txt. Do not open VS Code and do not start the server.
+2026-11-15 11:08:02,268 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-15 11:08:02,268 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-15 11:08:02,268 [INFO] __main__: [DROPOUT] Cutting Nosana (refused) at call 1 (classify)
+2026-11-15 11:08:02,272 [INFO] openai._base_client: Retrying request to /chat/completions in 0.496588 seconds
+2026-11-15 11:08:02,771 [INFO] openai._base_client: Retrying request to /chat/completions in 0.814020 seconds
+2026-11-15 11:08:03,587 [ERROR] agent_nodes.classify_node: [ROUTER] LLM call failed
+Traceback (most recent call last):
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_base_client.py", line 1080, in request
+    response = self._send_request(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_client.py", line 491, in _send_request
+    response = self._send_with_auth_retry(request, stream=stream, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_client.py", line 469, in _send_with_auth_retry
+    response = super()._send_request(request, stream=stream, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_base_client.py", line 1005, in _send_request
+    return self._client.send(request, stream=stream, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/home/aloha-zkaria/zkzkAgent/benchmark/dropout.py", line 178, in handle_request
+    raise httpx.ConnectError("simulated: connection refused", request=request)
+httpx.ConnectError: simulated: connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aloha-zkaria/zkzkAgent/agent_nodes/classify_node.py", line 57, in classify_node
+    response = get_router_chain().invoke([
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 476, in invoke
+    self.generate_prompt(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 1849, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 1656, in generate
+    self._generate_with_cache(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 1994, in _generate_with_cache
+    result = self._generate(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_openai/chat_models/base.py", line 1492, in _generate
+    _handle_openai_api_error(e)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_openai/chat_models/base.py", line 1487, in _generate
+    raw_response = self.client.with_raw_response.create(**payload)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_legacy_response.py", line 369, in wrapped
+    return cast(LegacyAPIResponse[R], func(*args, **kwargs))
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/resources/chat/completions/completions.py", line 1296, in create
+    return self._post(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_base_client.py", line 1375, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_base_client.py", line 1115, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.
+2026-11-15 11:08:03,632 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-15 11:08:03,634 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to ChatOpenAI
+2026-11-15 11:08:03,686 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-15 11:08:03,686 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-15 11:08:03,690 [INFO] openai._base_client: Retrying request to /chat/completions in 0.474165 seconds
+2026-11-15 11:08:04,166 [INFO] openai._base_client: Retrying request to /chat/completions in 0.936227 seconds
+2026-11-15 11:08:05,107 [ERROR] __main__: [DROPOUT] The turn raised an error
+Traceback (most recent call last):
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_base_client.py", line 1080, in request
+    response = self._send_request(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_client.py", line 491, in _send_request
+    response = self._send_with_auth_retry(request, stream=stream, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_client.py", line 469, in _send_with_auth_retry
+    response = super()._send_request(request, stream=stream, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_base_client.py", line 1005, in _send_request
+    return self._client.send(request, stream=stream, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/home/aloha-zkaria/zkzkAgent/benchmark/dropout.py", line 178, in handle_request
+    raise httpx.ConnectError("simulated: connection refused", request=request)
+httpx.ConnectError: simulated: connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/aloha-zkaria/zkzkAgent/benchmark/dropout.py", line 363, in say
+    new_state = app.invoke(state, config={"callbacks": [tracer]})
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+  File "/home/aloha-zkaria/zkzkAgent/agent_nodes/conversation_node.py", line 46, in conversation_node
+    response = stream_to_stdout(model_chain.stream(messages))
+  File "/home/aloha-zkaria/zkzkAgent/agent_nodes/_stream.py", line 16, in stream_to_stdout
+    for chunk in stream:
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_core/runnables/base.py", line 6179, in stream
+    yield from self.bound.stream(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 778, in stream
+    for chunk in self._stream(input_messages, stop=stop, **kwargs):
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_openai/chat_models/base.py", line 1437, in _stream
+    _handle_openai_api_error(e)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_openai/chat_models/base.py", line 1410, in _stream
+    response = self.client.create(**payload)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/resources/chat/completions/completions.py", line 1296, in create
+    return self._post(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_base_client.py", line 1375, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_base_client.py", line 1115, in request
+    raise APIConnectionError(request=request) from err
+openai.APIConnectionError: Connection error.

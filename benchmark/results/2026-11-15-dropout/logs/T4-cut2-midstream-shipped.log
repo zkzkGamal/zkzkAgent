@@ -1,0 +1,60 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-15 11:08:09,478 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/dropout/T4-cut2-midstream-shipped/rep1)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-15 11:08:09,562 [INFO] __main__: [DROPOUT] T4-cut2-midstream-shipped
+2026-11-15 11:08:09,564 [INFO] agent_nodes.classify_node: [ROUTER] Query: Create a project folder called calc_app inside /home/aloha-zkaria/zkzk-bench/dropout/T4-cut2-midstream-shipped/rep1. It should be a calculator web app with a FastAPI backend in app.py that serves static/index.html and has POST /api/calculate, which takes JSON {"expression": "..."} and returns {"result": ...}. Also write requirements.txt. Do not open VS Code and do not start the server.
+2026-11-15 11:08:09,566 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-15 11:08:09,566 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-15 11:08:12,268 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-15 11:08:12,287 [INFO] agent_nodes.classify_node: [ROUTER] → NEEDS_PLANNING | Multi-step system task requiring folder creation and writing multiple project fi…
+2026-11-15 11:08:12,288 [INFO] core.agent: [ROUTER] Routing to: NEEDS_PLANNING
+2026-11-15 11:08:12,289 [INFO] __main__: [DROPOUT] Cutting Nosana (midstream) at call 2 (plan)
+2026-11-15 11:08:12,469 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+
+[AI]: 
+
+**Goal:** Create a local FastAPI calculator web app at `/home/aloha-zkaria/zk2026-11-15 11:10:01,335 [ERROR] __main__: [DROPOUT] The turn raised an error
+Traceback (most recent call last):
+  File "/home/aloha-zkaria/zkzkAgent/benchmark/dropout.py", line 363, in say
+    new_state = app.invoke(state, config={"callbacks": [tracer]})
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/pregel/main.py", line 3071, in invoke
+    for chunk in self.stream(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/pregel/main.py", line 2646, in stream
+    for _ in runner.tick(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/pregel/_runner.py", line 167, in tick
+    run_with_retry(
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/pregel/_retry.py", line 42, in run_with_retry
+    return task.proc.invoke(task.input, config)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/_internal/_runnable.py", line 656, in invoke
+    input = context.run(step.invoke, input, config, **kwargs)
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/_internal/_runnable.py", line 400, in invoke
+    ret = self.func(*args, **kwargs)
+  File "/home/aloha-zkaria/zkzkAgent/agent_nodes/plan_node.py", line 30, in plan_node
+    response = stream_to_stdout(
+  File "/home/aloha-zkaria/zkzkAgent/agent_nodes/_stream.py", line 16, in stream_to_stdout
+    for chunk in stream:
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_core/language_models/chat_models.py", line 778, in stream
+    for chunk in self._stream(input_messages, stop=stop, **kwargs):
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/langchain_openai/chat_models/base.py", line 1414, in _stream
+    for chunk in response:
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_streaming.py", line 49, in __iter__
+    for item in self._iterator:
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_streaming.py", line 62, in __stream__
+    for sse in iterator:
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_streaming.py", line 53, in _iter_events
+    yield from self._decoder.iter_bytes(self.response.iter_bytes())
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_streaming.py", line 297, in iter_bytes
+    for chunk in self._iter_chunks(iterator):
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/openai/_streaming.py", line 308, in _iter_chunks
+    for chunk in iterator:
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_models.py", line 897, in iter_bytes
+    for raw_bytes in self.iter_raw():
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_models.py", line 951, in iter_raw
+    for raw_stream_bytes in self.stream:
+  File "/home/aloha-zkaria/.local/lib/python3.10/site-packages/httpx/_client.py", line 153, in __iter__
+    for chunk in self._stream:
+  File "/home/aloha-zkaria/zkzkAgent/benchmark/dropout.py", line 131, in __iter__
+    raise httpx.ReadError("simulated: connection dropped mid-reply", request=self._request)
+httpx.ReadError: simulated: connection dropped mid-reply

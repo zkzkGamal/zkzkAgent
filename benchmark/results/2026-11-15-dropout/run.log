@@ -1,0 +1,40 @@
+2026-11-15 11:08:05,656 [INFO] __main__: [DROPOUT] 1/36 T4-cut1-refused-shipped: ✖ crashed: APIConnectionError → ❌ checks failed in 2.85s, Nosana $0.0000
+2026-11-15 11:10:01,838 [INFO] __main__: [DROPOUT] 2/36 T4-cut2-midstream-shipped: ✖ crashed: ReadError → ❌ checks failed in 111.79s, Nosana $0.0003
+2026-11-15 11:13:45,949 [INFO] __main__: [DROPOUT] 3/36 T4-cut4-refused-shipped-retry: ✖ crashed, retried → ✅ passed in 219.85s, Nosana $0.0348
+2026-11-15 11:14:56,994 [INFO] __main__: [DROPOUT] 4/36 T4-cut4-503-shipped: ✖ crashed: InternalServerError → ❌ checks failed in 66.55s, Nosana $0.0092
+2026-11-15 11:18:01,876 [INFO] __main__: [DROPOUT] 5/36 T4-cut4-timeout-shipped: ✖ crashed: APITimeoutError → ❌ checks failed in 180.48s, Nosana $0.0238
+2026-11-15 11:21:12,471 [INFO] __main__: [DROPOUT] 6/36 T4-cut4-401-shipped: ✖ crashed: AuthenticationError → ❌ checks failed in 186.09s, Nosana $0.0249
+2026-11-15 11:23:03,012 [INFO] __main__: [DROPOUT] 7/36 T4-cut4-midstream-shipped: ✖ crashed: ReadError → ❌ checks failed in 106.06s, Nosana $0.0143
+2026-11-15 11:23:08,743 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2026-11-15 11:23:08,767 [INFO] __main__: [DROPOUT] Loaded qwen3.5:2b-q4_K_M: qwen3.5:2b-q4_K_M    124a03c34777    3.5 GB    100% GPU     4096       Forever    
+2026-11-15 11:23:53,224 [INFO] __main__: [DROPOUT] 8/36 T4-cut1-refused-fb2b: ✖ crashed: APIConnectionError (really the local model: ResponseError) → ❌ checks failed in 39.83s, Nosana $0.0000
+2026-11-15 11:24:45,006 [INFO] __main__: [DROPOUT] 9/36 T4-cut2-refused-fb2b: kept going → ❌ checks failed in 47.07s, Nosana $0.0003
+2026-11-15 11:27:13,110 [INFO] __main__: [DROPOUT] 10/36 T4-cut3-refused-fb2b: kept going → ❌ checks failed in 143.76s, Nosana $0.0106
+2026-11-15 11:29:04,777 [INFO] __main__: [DROPOUT] 11/36 T4-cut4-refused-fb2b: ✖ crashed: APIConnectionError (really the local model: ResponseError) → ❌ checks failed in 106.68s, Nosana $0.0137
+2026-11-15 11:32:18,253 [INFO] __main__: [DROPOUT] 12/36 T4-cut5-refused-fb2b: ✖ crashed: ReadTimeout (really the local model: ReadTimeout) → ❌ checks failed in 188.58s, Nosana $0.0159
+2026-11-15 11:35:03,862 [INFO] __main__: [DROPOUT] 13/36 T4-cut6-refused-fb2b: kept going → ❌ checks failed in 160.67s, Nosana $0.0222
+2026-11-15 11:37:57,533 [INFO] __main__: [DROPOUT] 14/36 T4-cut7-refused-fb2b: ✖ crashed: APIConnectionError (really the local model: ReadTimeout) → ❌ checks failed in 168.42s, Nosana $0.0168
+2026-11-15 11:40:26,360 [INFO] __main__: [DROPOUT] 15/36 T4-cut8-refused-fb2b: no cut (finished first) → ✅ passed in 143.5s, Nosana $0.0228
+2026-11-15 11:41:00,593 [INFO] __main__: [DROPOUT] 16/36 T5-cut1-refused-fb2b: kept going → ✅ passed in 29.34s, Nosana $0.0000
+2026-11-15 11:41:14,839 [INFO] __main__: [DROPOUT] 17/36 T5-cut2-refused-fb2b: kept going → ✅ passed in 9.55s, Nosana $0.0003
+2026-11-15 11:41:32,900 [INFO] __main__: [DROPOUT] 18/36 T5-cut3-refused-fb2b: kept going → ✅ passed in 12.33s, Nosana $0.0012
+2026-11-15 11:41:47,380 [INFO] __main__: [DROPOUT] 19/36 T5-cut4-refused-fb2b: no cut (finished first) → ✅ passed in 9.3s, Nosana $0.0022
+2026-11-15 11:42:08,847 [INFO] __main__: [DROPOUT] 20/36 T5-cut5-refused-fb2b: kept going → ✅ passed in 16.29s, Nosana $0.0022
+2026-11-15 11:45:36,884 [INFO] __main__: [DROPOUT] 21/36 T4-cut4-timeout-fb2b: ✖ crashed: APITimeoutError (really the local model: ResponseError) → ❌ checks failed in 201.67s, Nosana $0.0229
+2026-11-15 11:48:13,483 [INFO] __main__: [DROPOUT] 22/36 T4-cut4-401-fb2b: kept going → ❌ checks failed in 151.36s, Nosana $0.0151
+2026-11-15 11:50:44,623 [INFO] __main__: [DROPOUT] 23/36 T4-cut4-midstream-fb2b: ✖ crashed: ReadError → ❌ checks failed in 146.21s, Nosana $0.0194
+2026-11-15 11:50:50,213 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2026-11-15 11:50:50,237 [INFO] __main__: [DROPOUT] Loaded qwen3:4b: qwen3:4b    359d7dd4bcda    3.6 GB    100% GPU     4096       Forever    
+2026-11-15 11:58:00,956 [INFO] __main__: [DROPOUT] 24/36 T4-cut1-refused-fb4b: kept going → ❌ checks failed in 426.45s, Nosana $0.0000
+2026-11-15 12:04:08,985 [INFO] __main__: [DROPOUT] 25/36 T4-cut2-refused-fb4b: kept going → ❌ checks failed in 363.49s, Nosana $0.0004
+2026-11-15 12:09:33,444 [INFO] __main__: [DROPOUT] 26/36 T4-cut3-refused-fb4b: kept going → ❌ checks failed in 320.05s, Nosana $0.0191
+2026-11-15 12:16:03,927 [INFO] __main__: [DROPOUT] 27/36 T4-cut4-refused-fb4b: kept going → ❌ checks failed in 385.63s, Nosana $0.0115
+2026-11-15 12:24:37,066 [INFO] __main__: [DROPOUT] 28/36 T4-cut5-refused-fb4b: kept going → ❌ checks failed in 508.23s, Nosana $0.0076
+2026-11-15 12:27:54,398 [INFO] __main__: [DROPOUT] 29/36 T4-cut6-refused-fb4b: kept going → ✅ passed in 192.5s, Nosana $0.0111
+2026-11-15 12:32:55,371 [INFO] __main__: [DROPOUT] 30/36 T4-cut7-refused-fb4b: kept going → ✅ passed in 296.15s, Nosana $0.0309
+2026-11-15 12:36:18,060 [INFO] __main__: [DROPOUT] 31/36 T4-cut8-refused-fb4b: kept going → ✅ passed in 197.83s, Nosana $0.0200
+2026-11-15 12:40:17,960 [INFO] __main__: [DROPOUT] 32/36 T5-cut1-refused-fb4b: kept going → ❌ checks failed in 235.4s, Nosana $0.0000
+2026-11-15 12:43:43,724 [INFO] __main__: [DROPOUT] 33/36 T5-cut2-refused-fb4b: kept going → ✅ passed in 201.23s, Nosana $0.0004
+2026-11-15 12:44:47,797 [INFO] __main__: [DROPOUT] 34/36 T5-cut3-refused-fb4b: kept going → ✅ passed in 59.36s, Nosana $0.0012
+2026-11-15 12:45:07,832 [INFO] __main__: [DROPOUT] 35/36 T5-cut4-refused-fb4b: no cut (finished first) → ✅ passed in 15.47s, Nosana $0.0030
+2026-11-15 12:45:22,845 [INFO] __main__: [DROPOUT] 36/36 T5-cut5-refused-fb4b: no cut (finished first) → ✅ passed in 10.65s, Nosana $0.0024

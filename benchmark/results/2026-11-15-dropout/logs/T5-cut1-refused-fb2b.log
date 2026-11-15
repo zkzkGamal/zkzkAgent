@@ -1,0 +1,99 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-15 11:40:30,549 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/dropout/T5-cut1-refused-fb2b/rep1)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-15 11:40:30,727 [INFO] __main__: [DROPOUT] T5-cut1-refused-fb2b
+2026-11-15 11:40:30,729 [INFO] agent_nodes.classify_node: [ROUTER] Query: Install the package cowsay on this system.
+2026-11-15 11:40:30,732 [INFO] agent_nodes.classify_node: [ROUTER INIT] Lazily initializing router LLM (no tools needed)
+2026-11-15 11:40:30,732 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router initialized
+2026-11-15 11:40:30,732 [INFO] __main__: [DROPOUT] Cutting Nosana (refused) at call 1 (classify)
+2026-11-15 11:40:30,737 [INFO] openai._base_client: Retrying request to /chat/completions in 0.484844 seconds
+2026-11-15 11:40:31,223 [INFO] openai._base_client: Retrying request to /chat/completions in 0.841144 seconds
+2026-11-15 11:40:33,468 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-15 11:40:34,367 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | 
+2026-11-15 11:40:34,368 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-15 11:40:34,368 [INFO] agent_nodes.conversation_node: [MODEL INIT] Lazily binding tools to FallbackModel
+2026-11-15 11:40:34,400 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model initialized and tools bound
+2026-11-15 11:40:34,400 [INFO] agent_nodes.conversation_node: [MODEL INIT] Model already initialized
+2026-11-15 11:40:34,404 [INFO] openai._base_client: Retrying request to /chat/completions in 0.453309 seconds
+2026-11-15 11:40:34,858 [INFO] openai._base_client: Retrying request to /chat/completions in 0.773768 seconds
+2026-11-15 11:40:40,452 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: I'll help you install the cowsay package!
+
+Let me check what package management system is available on this system.
+
+2026-11-15 11:40:41,302 [INFO] agent_nodes.conversation_node: [CONVERSATIONAL] Cleaned text: I'll help you install the cowsay package!
+
+Let me check what package management system is available on this system.
+2026-11-15 11:40:41,308 [INFO] agent_nodes.classify_node: [ROUTER] Query: Yes, go ahead and install cowsay.
+2026-11-15 11:40:41,314 [INFO] agent_nodes.classify_node: [ROUTER INIT] Router already initialized
+2026-11-15 11:40:41,319 [INFO] openai._base_client: Retrying request to /chat/completions in 0.414844 seconds
+2026-11-15 11:40:41,736 [INFO] openai._base_client: Retrying request to /chat/completions in 0.842863 seconds
+2026-11-15 11:40:43,892 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-15 11:40:44,989 [INFO] agent_nodes.classify_node: [ROUTER] → DIRECT_EXECUTION | The user wants to install a specific package (cowsay). This is a standard system…
+2026-11-15 11:40:44,989 [INFO] core.agent: [ROUTER] Routing to: DIRECT_EXECUTION
+2026-11-15 11:40:44,990 [INFO] agent_nodes.execute_node: [AGENT] Processing with 4 messages in context
+2026-11-15 11:40:44,990 [INFO] agent_nodes.execute_node: [AGENT] Last message: Yes, go ahead and install cowsay....
+2026-11-15 11:40:44,990 [INFO] agent_nodes.execute_node: [MODEL INIT] Lazily binding tools to FallbackModel
+2026-11-15 11:40:44,994 [INFO] agent_nodes.execute_node: [MODEL INIT] Model initialized and tools bound
+2026-11-15 11:40:44,994 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-15 11:40:45,000 [INFO] openai._base_client: Retrying request to /chat/completions in 0.488369 seconds
+2026-11-15 11:40:45,490 [INFO] openai._base_client: Retrying request to /chat/completions in 0.831089 seconds
+2026-11-15 11:40:52,360 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: I'll install the cowsay package for you. Let me check the system to determine the package manager.
+
+2026-11-15 11:40:53,113 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-15 11:40:53,113 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: I'll install the cowsay package for you. Let me check the system to determine the package manager.
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'detect_operating_system', 'args': {}, 'id': '30f6a845-75c3-4613-b99e-1261ee711141', 'type': 'tool_call'}]
+                
+ tool names: ['detect_operating_system']
+                
+ iteration: 0/15
+                
+2026-11-15 11:40:53,117 [INFO] agent_nodes.execute_node: [AGENT] Processing with 6 messages in context
+2026-11-15 11:40:53,117 [INFO] agent_nodes.execute_node: [AGENT] Last message: Detected OS: Linux...
+2026-11-15 11:40:53,117 [INFO] agent_nodes.execute_node: [MODEL INIT] Model already initialized
+2026-11-15 11:40:53,122 [INFO] openai._base_client: Retrying request to /chat/completions in 0.427031 seconds
+2026-11-15 11:40:53,551 [INFO] openai._base_client: Retrying request to /chat/completions in 0.841380 seconds
+2026-11-15 11:41:00,028 [INFO] httpx: HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-15 11:41:00,053 [INFO] agent_nodes.execute_node: [AGENT] Response finished
+2026-11-15 11:41:00,053 [INFO] agent_nodes.execute_node: [AGENT] Dangerous tool detected: install_package
+2026-11-15 11:41:00,055 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: I'm about to perform 'install_package'. This will delete data permanently. Please confirm with 'yes'
+                
+pending confirmation: {'tool_name': 'install_package', 'tool_args': {'installation_command': 'apt-get install cowsay'}}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 1/15
+                
+2026-11-15 11:41:00,060 [INFO] core.agent: [ENTRY ROUTER] Pending confirmation active → routing directly to execute
+2026-11-15 11:41:00,062 [INFO] agent_nodes.execute_node: [AGENT] Processing with 9 messages in context
+2026-11-15 11:41:00,062 [INFO] agent_nodes.execute_node: [AGENT] Last message: no...
+2026-11-15 11:41:00,063 [INFO] agent_nodes.execute_node: [AGENT] Handling pending confirmation for tool: install_package, user said: no
+2026-11-15 11:41:00,064 [INFO] core.agent: 
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: [SAFEGUARD] Action 'install_package' canceled.
+                
+pending confirmation: {'tool_name': None, 'tool_args': None}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 0/15
+                

@@ -47,6 +47,22 @@ Every task has automatic pass/fail checks. A run passes only when **all** of its
   - Ollama's own decode speed, for local models
 - **The 8K context test** reruns T4 on the 2B and 4B models with `OLLAMA_NUM_CTX=8192`. It tests whether Ollama's 4,096-token default explains the local T4 failures: one executor call is already about 3,000 tokens before any history.
 
+## Dropout Trace
+
+**`dropout.py`** answers the question "what if Nosana drops out in the middle of a task?" Each case runs T4 or T5 with the model on Nosana and cuts Nosana off from its k-th model call. The cut happens in the HTTP transport under the OpenAI client, so the client's own retries and timeouts behave as they do in the agent.
+
+- **Failure types:**
+  - connection refused
+  - 503 (no GPU serving the model)
+  - timeout
+  - 401 (bad key or no credits)
+  - a reply that drops mid-stream
+- **Modes:**
+  - `shipped`: the agent as it is today, with no fallback
+  - `fb2b` / `fb4b`: every node uses LangChain's `with_fallbacks()` to the local 2B or 4B model, so the local model carries on with the history the 27B model built
+
+The agent's code isn't changed: the harness swaps the model object the nodes use. Each case records a timeline of every model and tool call (which model served it, and how big the history was against the local 4,096-token window), the files left on disk, and the task's checks. Results: [`results/2026-11-15-dropout/summary.md`](results/2026-11-15-dropout/summary.md).
+
 ## Safety
 
 The benchmark runs the agent unattended on a real machine, so `guards.py` wraps the risky tools before the first call:
@@ -80,6 +96,10 @@ unload; MODEL_TYPE=NOSANA python3 -m benchmark.speed --backend nosana --model qw
 unload; OLLAMA_NUM_CTX=8192 MODEL_TYPE=OLLAMA python3 -m benchmark.run_all --backend local-2b-8k --model qwen3.5:2b-q4_K_M --tasks T4 --out $OUT-ctx8k
 
 python3 -m benchmark.report $OUT --price nosana=0.20/2.00 --window nosana=131072
+
+# Dropout: cut Nosana mid-task, as shipped and with a local fallback (36 cases, ~$0.40, ~1h40m)
+python3 -m benchmark.dropout --list
+python3 -m benchmark.dropout --all --out $OUT-dropout                # or --only shipped,T5
 ```
 
 `run_all` refuses to start without `MODEL_TYPE`, so `.env` can't pick the backend silently. With `--model`, it checks after warm-up that the agent loaded that exact model. Use `--tasks T1,T3` and `--reps 1` for quick checks.
