@@ -2,9 +2,11 @@
 
     MODEL_TYPE=OLLAMA python3 -m benchmark.run_all --backend local-4b --model qwen3:4b --reps 3
     MODEL_TYPE=NOSANA python3 -m benchmark.run_all --backend nosana --reps 3
+    MODEL_TYPE=HYBRID python3 -m benchmark.run_all --backend hybrid --model qwen/qwen3.8-27b --local-model qwen3.5:2b-q4_K_M
 
---model sets OLLAMA_MODEL / NOSANA_MODEL for the runs (default: from .env);
-give each model its own --backend label so its rows get their own file.
+--model sets OLLAMA_MODEL (OLLAMA) or NOSANA_MODEL (NOSANA, HYBRID) for the
+runs, and --local-model sets OLLAMA_MODEL next to Nosana (default: from .env);
+give each setup its own --backend label so its rows get their own file.
 
 Writes to benchmark/results/<date>/ (or --out):
     runs_<backend>.jsonl              one JSON row per run (see run_one.py)
@@ -148,6 +150,10 @@ def main() -> int:
         "--model",
         help="model for this backend; sets OLLAMA_MODEL or NOSANA_MODEL (default: from .env)",
     )
+    parser.add_argument(
+        "--local-model",
+        help="HYBRID (or NOSANA with fallback): the local model; sets OLLAMA_MODEL",
+    )
     parser.add_argument("--reps", type=int, default=3, help="repeats per task (default: 3)")
     parser.add_argument("--tasks", help="comma-separated task ids (default: all), e.g. T1,T3")
     parser.add_argument(
@@ -165,11 +171,13 @@ def main() -> int:
     args = parser.parse_args()
 
     if not os.environ.get("MODEL_TYPE"):
-        parser.error("set MODEL_TYPE explicitly (OLLAMA or NOSANA) so .env can't pick the backend for you")
+        parser.error("set MODEL_TYPE explicitly (OLLAMA, NOSANA or HYBRID) so .env can't pick the backend for you")
     model_type = os.environ["MODEL_TYPE"].strip().upper()
+    # Inherited by every run_one subprocess; load_dotenv never overrides them
     if args.model:
-        # Inherited by every run_one subprocess; load_dotenv never overrides it
-        os.environ["NOSANA_MODEL" if model_type == "NOSANA" else "OLLAMA_MODEL"] = args.model
+        os.environ["OLLAMA_MODEL" if model_type == "OLLAMA" else "NOSANA_MODEL"] = args.model
+    if args.local_model:
+        os.environ["OLLAMA_MODEL"] = args.local_model
 
     tasks = [get_task(t) for t in args.tasks.split(",")] if args.tasks else TASKS
     out_dir = (args.out or base_dir / "benchmark" / "results" / datetime.date.today().isoformat()).resolve()
@@ -189,11 +197,15 @@ def main() -> int:
     if args.model and warm.get("model") != args.model:
         logger.error(f"[BENCH] Asked for {args.model} but the agent loaded {warm.get('model')}")
         return 1
+    if args.local_model and warm.get("local_model") != args.local_model:
+        logger.error(f"[BENCH] Asked for local {args.local_model} but the agent loaded {warm.get('local_model')}")
+        return 1
     logger.info(f"[BENCH] {warm.get('model')} ready in {warm.get('wall_s')}s")
 
     info = machine_info()
     info.update(
         model=warm.get("model"),
+        local_model=warm.get("local_model"),
         model_type=warm.get("model_type"),
         reasoning=warm.get("reasoning"),
         num_ctx=warm.get("num_ctx"),
@@ -202,7 +214,7 @@ def main() -> int:
         run_timeout_s=args.timeout,
         started_at=datetime.datetime.now().isoformat(timespec="seconds"),
     )
-    if model_type == "OLLAMA":
+    if model_type in ("OLLAMA", "HYBRID"):
         # Shows whether the model fit in VRAM ("100% GPU") or spilled onto the CPU
         info["ollama_ps"] = _command_output(["ollama", "ps"])
     write_meta(out_dir, backend, info)

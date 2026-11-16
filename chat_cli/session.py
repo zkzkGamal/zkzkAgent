@@ -21,6 +21,9 @@ class ChatSession:
             "running_processes": {},
             "category": None,
             "iteration_count": 0,
+            "exec_backend": None,
+            "interrupted": None,
+            "takeover": None,
         }
 
     def reset(self) -> None:
@@ -33,6 +36,11 @@ class ChatSession:
     def awaiting_confirmation(self) -> bool:
         pending = self.state.get("pending_confirmation") or {}
         return bool(pending.get("tool_name"))
+
+    @property
+    def awaiting_recovery(self) -> bool:
+        """A model failure stopped the task; the user can reply retry or continue."""
+        return bool(self.state.get("interrupted"))
 
     @property
     def awaiting_plan(self) -> bool:

@@ -103,14 +103,18 @@ def guarded_run_command(command: str) -> str:
     if outside:
         return _refuse(f"run_command: {command}", f"writes outside the sandbox: {outside}")
 
+    # Like the real tool: an allow-listed command runs without a shell
+    from tools_module.runCommand import command_argv
+
+    argv = command_argv(command, cwd=_sandbox)
     process = subprocess.Popen(
-        command,
-        shell=True,
+        argv if argv is not None else command,
+        shell=argv is None,
         text=True,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        executable="/bin/bash",
+        executable="/bin/bash" if argv is None else None,
         cwd=_sandbox,
         start_new_session=True,  # own process group, so a timeout kills its children too
     )

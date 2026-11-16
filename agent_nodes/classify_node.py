@@ -1,9 +1,9 @@
 from core.state import AgentState
 import re
 import json, logging
-from models.LLM import llm
 from core.loadPrompts import LoadPrompts
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from models.selector import AllBackendsFailed, run_role
 from typing import Dict, Any
 from json import JSONDecodeError
 
@@ -12,8 +12,6 @@ load_prompts = LoadPrompts()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-_router_chain = None
 
 def safe_json_parse(raw: str) -> Dict[str, Any]:
     cleaned = re.sub(r'^.*?(?=\{)', '', raw, flags=re.DOTALL)
@@ -32,17 +30,6 @@ def safe_json_parse(raw: str) -> Dict[str, Any]:
                 pass
         return {}
 
-def get_router_chain():
-    global _router_chain
-    if _router_chain is None:
-        logger.info("[ROUTER INIT] Lazily initializing router LLM (no tools needed)")
-        _router_chain = llm  # router only classifies — no tools needed
-        logger.info("[ROUTER INIT] Router initialized")
-    else:
-        logger.info("[ROUTER INIT] Router already initialized")
-    return _router_chain
-
-
 def classify_node(state: AgentState) -> AgentState:
     query = state["messages"][-1].content
     logger.info(f"[ROUTER] Query: {query}")
@@ -53,17 +40,22 @@ def classify_node(state: AgentState) -> AgentState:
     if len(query) > 4000:
         query = query[:3800] + "\n… [truncated]"
 
+    router_input = [SystemMessage(content=system_content), HumanMessage(content=query)]
     try:
-        response = get_router_chain().invoke([
-            SystemMessage(content=system_content),
-            HumanMessage(content=query),
-        ]).content
-    except Exception as e:
-        logger.exception("[ROUTER] LLM call failed")
+        # The router only classifies: no tools, and no history, so any backend can do it
+        response = run_role("classify", lambda chat, backend: chat.invoke(router_input).content)
+    except AllBackendsFailed as e:
+        text = e.user_message()
+        logger.error(f"[ROUTER] {text}")
+        print(f"\n[AI]: {text}\n")
+        # category None ends the turn (see route_after_classify)
         return {
-            "category": "CONVERSATIONAL",
-            "router_rationale": f"LLM error: {str(e)}",
+            "messages": [AIMessage(content=text)],
+            "category": None,
+            "router_rationale": "",
             "pending_plan": None,
+            "interrupted": None,
+            "takeover": None,
         }
 
     logger.debug(f"[ROUTER] Raw:\n{response}")
@@ -79,6 +71,13 @@ def classify_node(state: AgentState) -> AgentState:
     rationale = parsed.get("rationale", "").strip()[:300]
 
     logger.info(f"[ROUTER] → {category} | {rationale[:80]}{'…' if len(rationale) > 80 else ''}")
-    # Reaching the classifier means this message wasn't a plan approval (those
-    # bypass classify via route_entry), so drop any stale pending plan.
-    return {"category": category, "router_rationale": rationale, "pending_plan": None}
+    # Reaching the classifier means this message wasn't a plan approval or a
+    # retry/continue (those bypass classify via route_entry), so it starts a
+    # new task: drop any stale plan and any stopped task.
+    return {
+        "category": category,
+        "router_rationale": rationale,
+        "pending_plan": None,
+        "interrupted": None,
+        "takeover": None,
+    }

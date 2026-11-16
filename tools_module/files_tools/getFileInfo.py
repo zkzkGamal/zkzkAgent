@@ -22,6 +22,9 @@ def get_files_info(working_directory: str = ".", directory: str = ".") -> str:
     if not abs_directory.startswith(abs_working_dir):
         return f"Error: {directory} is not a subdirectory of {working_directory}"
 
+    if not os.path.isdir(abs_directory):
+        return f"Error: directory '{abs_directory}' does not exist"
+
     final_response = ""
     contents = os.listdir(abs_directory)
     for content in contents:

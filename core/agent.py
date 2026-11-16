@@ -11,19 +11,12 @@ from agent_nodes.classify_node import classify_node
 from agent_nodes.plan_node import plan_node
 from agent_nodes.conversation_node import conversation_node
 from agent_nodes.execute_node import execute_node
+from agent_nodes.handover import is_continue, is_plan_approval, is_retry
 
 base_path = pathlib.Path(__file__).parent.parent
 logger = logging.getLogger(__name__)
 
 MAX_ITERATIONS = 15  # Maximum tool call cycles before forcing stop
-
-
-# Short approvals that mean "yes, run the plan you just showed me".
-_PLAN_APPROVALS = {
-    "ok", "okay", "k", "kk", "yes", "y", "yeah", "yep", "yup", "sure",
-    "go", "go ahead", "do it", "proceed", "continue", "execute", "run it",
-    "run", "sounds good", "approved", "approve", "lets go", "let's go",
-}
 
 
 def _last_human_content(state: AgentState) -> str:
@@ -33,16 +26,14 @@ def _last_human_content(state: AgentState) -> str:
     return ""
 
 
-def _is_plan_approval(text: str) -> bool:
-    return text.strip().lower().rstrip("!.") in _PLAN_APPROVALS
-
-
 def route_entry(state: AgentState) -> str:
     """Route the very first step of a turn.
 
-    Two flows bypass the classifier:
+    Three flows bypass the classifier:
     1. A dangerous-tool confirmation is pending → go straight to execute.
-    2. A plan is pending and the user just approved it ("ok"/"yes"/…) → go
+    2. A model failure stopped the task and the user replied "retry" or
+       "continue" → go straight to execute, which picks the model.
+    3. A plan is pending and the user just approved it ("ok"/"yes"/…) → go
        straight to execute so the plan actually runs (with tools bound). Any
        other message supersedes the plan and is re-classified normally; the
        stale plan is cleared inside classify_node.
@@ -53,7 +44,11 @@ def route_entry(state: AgentState) -> str:
             "[ENTRY ROUTER] Pending confirmation active → routing directly to execute"
         )
         return "execute"
-    if state.get("pending_plan") and _is_plan_approval(_last_human_content(state)):
+    text = _last_human_content(state)
+    if state.get("interrupted") and (is_continue(text) or is_retry(text)):
+        logger.info("[ENTRY ROUTER] Recovering an interrupted task → routing directly to execute")
+        return "execute"
+    if state.get("pending_plan") and is_plan_approval(text):
         logger.info("[ENTRY ROUTER] Pending plan approved → routing directly to execute")
         return "execute"
     return "classify"
@@ -62,6 +57,8 @@ def route_entry(state: AgentState) -> str:
 def route_after_classify(state: AgentState) -> str:
     category = state.get("category", "CONVERSATIONAL")
     logger.info(f"[ROUTER] Routing to: {category}")
+    if category is None:  # no model could classify; classify_node already replied
+        return "end"
     if category == "DIRECT_EXECUTION":
         return "execute"
     elif category == "NEEDS_PLANNING":
@@ -103,7 +100,8 @@ def should_continue(state: AgentState) -> Literal["tools", "__end__", "call_mode
     return "__end__"
 
 
-_tool_node = ToolNode(tools=tool_functions)
+# Tool errors go back to the model as an error result instead of ending the run
+_tool_node = ToolNode(tools=tool_functions, handle_tool_errors=True)
 
 def tool_node_with_counter(state: AgentState) -> dict:
     """Run tools and increment the iteration counter."""
@@ -135,6 +133,7 @@ graph.add_conditional_edges(
         "execute": "execute",
         "plan": "plan",
         "conversational": "conversational",
+        "end": END,
     },
 )
 

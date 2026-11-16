@@ -13,3 +13,6 @@ class AgentState(TypedDict):
     running_processes: Optional[Dict[str, int]]
     router_rationale: Optional[str]
     iteration_count: Optional[int]
+    exec_backend: Optional[str]  # backend the executor uses for the current task
+    interrupted: Optional[Dict]  # {backend, error, handover, can_continue}: a model failure stopped the task
+    takeover: Optional[Dict]  # {text, start}: a second model finishes the task from a handover summary

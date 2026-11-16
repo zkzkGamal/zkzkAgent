@@ -76,19 +76,19 @@ def read_user_input(prompt: str) -> str:
 def load_runtime(verbose_default: bool):
     """
     Import the heavy agent graph while showing INFO logs so the ~5s init isn't
-    a silent wait. Returns (app, model_name). Logging level is restored to the
+    a silent wait. Returns (app, a one-line description of the models). Logging level is restored to the
     user's chosen verbosity afterwards.
     """
     set_level(logging.INFO)  # show init progress regardless of --verbose
     log.info("loading agent runtime…")
     start = time.time()
     from core.agent import app
-    from models.LLM import MODEL_NAME
+    from models.LLM import describe
 
     log.info("agent graph imported in %.1fs", time.time() - start)
     if not verbose_default:
         set_verbose(False)  # back to quiet for the chat itself
-    return app, MODEL_NAME
+    return app, describe()
 
 
 def warm_up(app, verbose_default: bool) -> None:

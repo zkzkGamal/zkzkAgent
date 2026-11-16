@@ -1,9 +1,10 @@
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from core.state import AgentState
 import logging
-from models.LLM import llm
 from core.loadPrompts import LoadPrompts
 from agent_nodes._stream import stream_to_stdout
+from agent_nodes.handover import PLAN_HINT
+from models.selector import AllBackendsFailed, current, run_role
 
 
 load_prompts = LoadPrompts()
@@ -27,14 +28,20 @@ def plan_node(state: AgentState) -> AgentState:
     if rationale:
         planning_input += f"\nContext (why planning is needed): {rationale}"
 
-    response = stream_to_stdout(
-        llm.stream(
-            [
-                SystemMessage(planning_prompt[0].content),
-                HumanMessage(content=planning_input),
-            ]
+    plan_input = [
+        SystemMessage(planning_prompt[0].content),
+        HumanMessage(content=planning_input),
+    ]
+    try:
+        # Planning sees only the request, so a failed backend can be swapped mid-reply
+        response, backend = run_role(
+            "plan", lambda chat, backend: (stream_to_stdout(chat.stream(plan_input)), backend)
         )
-    )
+    except AllBackendsFailed as e:
+        text = e.user_message()
+        logger.error(f"[PLANNING] {text}")
+        print(f"\n[AI]: {text}\n")
+        return {"messages": [AIMessage(content=text)], "pending_plan": None}
     content = (response.content if response is not None else "").strip()
 
     if not content:
@@ -44,11 +51,19 @@ def plan_node(state: AgentState) -> AgentState:
         logger.warning("[PLANNING] Empty plan — emitted fallback message")
         return {"messages": [AIMessage(content=content)], "pending_plan": None}
 
+    sel = current()
+    primary = sel.primary("plan")
+    if backend != primary:
+        note = (
+            f"\n\n(Planned by {sel.label(backend)} because {sel.label(primary)} failed: "
+            f"{sel.why('plan', primary)})"
+        )
+        print(note.strip())
+        content += note
 
-    hint = "\nReply 'ok' (or 'yes') to run this plan, or tell me what to change."
-    print(hint + "\n")
+    print(PLAN_HINT + "\n")
     logger.info("[PLANNING] Plan generated — awaiting approval")
     return {
-        "messages": [AIMessage(content=content + hint)],
+        "messages": [AIMessage(content=content + PLAN_HINT)],
         "pending_plan": content,
     }

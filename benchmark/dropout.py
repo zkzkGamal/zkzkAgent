@@ -2,13 +2,13 @@
 
     python3 -m benchmark.dropout --list
     python3 -m benchmark.dropout --all --out benchmark/results/<date>-dropout
-    python3 -m benchmark.dropout --all --only shipped --out ...     # cases whose id contains "shipped"
+    python3 -m benchmark.dropout --all --only hybrid-continue --out ...   # cases whose id contains it
     python3 -m benchmark.dropout --report benchmark/results/<date>-dropout
 
-Each case runs a benchmark task (T4 build_app or T5 safety_install) with the
-model on Nosana, and cuts Nosana off at the k-th model call. The cut happens
-in the HTTP transport under the OpenAI client, so the client's own retries
-and timeouts behave exactly as they do in the agent. Failure types:
+Each case runs a benchmark task (T1, T4 build_app or T5 safety_install) and
+cuts Nosana off at its k-th model call. The cut happens in the HTTP transport
+under the OpenAI client, so the client's own retries and timeouts behave
+exactly as they do in the agent. Failure types:
 
     refused    the connection is refused (network down)
     503        Nosana answers 503 (no GPU is serving the model)
@@ -16,17 +16,22 @@ and timeouts behave exactly as they do in the agent. Failure types:
     401        Nosana answers 401 (bad key, or no credits left)
     midstream  the reply starts streaming, then the connection drops; refused after that
 
-Modes:
+Modes (the M2 agent, see models/selector.py):
 
-    shipped    the agent as it is today, with no fallback
-    fb2b/fb4b  every node uses Nosana with LangChain's with_fallbacks() to a local
-               Ollama model (the simplest possible fallback), so after the cut the
-               local model carries on with the history the 27B model built
+    nosana     every node on Nosana, no fallback
+    hybrid     MODEL_TYPE=HYBRID: routing and chat on the local 2B (8K window),
+               planning and tools on Nosana, with the local fallback on
 
-The agent's code is not changed: the harness swaps the model object the
-nodes use. One subprocess per case. Writes dropout.jsonl (one row per case,
-with a timeline of every model and tool call), logs/<case>.log and
-summary.md to --out.
+When a model failure stops the task, the harness replies like a user would:
+"continue" (finish on the local model from a handover summary; Nosana stays
+down, an outage) or "retry" (Nosana comes back first, a blip). Local-down
+cases point the local model at a closed port while Nosana works.
+
+The 15 Nov modes (shipped, fb2b, fb4b) measured the code at ec7a1e6; check
+out that commit to rerun them. The harness swaps the selector the nodes use;
+the agent's code is not changed. One subprocess per case. Writes
+dropout.jsonl (one row per case, with a timeline of every model and tool
+call), logs/<case>.log and summary.md to --out.
 
 --primary-url/--primary-model point the "Nosana" side at another
 OpenAI-compatible server (e.g. Ollama's /v1) to test the harness for free.
@@ -59,13 +64,12 @@ base_dir = pathlib.Path(__file__).resolve().parent.parent
 NOSANA_MODEL = "qwen/qwen3.8-27b"
 PRICE = (0.20, 2.00)  # USD per 1M input / output tokens on Nosana
 OLLAMA_URL = (os.getenv("OLLAMA_BASE_URL") or "http://127.0.0.1:11434").strip().rstrip("/")
-LOCAL_WINDOW = 4096  # Ollama's default context; the agent ships without OLLAMA_NUM_CTX
-# Same settings as the OLLAMA branch of models/LLM.py, one per fallback mode
-FALLBACK_MODELS = {
-    "fb2b": {"model": "qwen3.5:2b-q4_K_M", "reasoning": False},
-    "fb4b": {"model": "qwen3:4b", "reasoning": True},  # thinking-only model, see README
-}
-MODES = ["shipped", *FALLBACK_MODELS]
+CLOSED_PORT_URL = "http://127.0.0.1:9"  # nothing listens here: the local model is "down"
+# The local side of MODEL_TYPE=HYBRID, as models/LLM.py builds it
+LOCAL_MODEL = {"model": "qwen3.5:2b-q4_K_M", "reasoning": False, "num_ctx": 8192}
+MODES = ["nosana", "hybrid"]
+OLD_MODES = ["shipped", "fb2b", "fb4b"]
+MAX_RECOVERIES = 2  # retry/continue replies per case
 CASE_TIMEOUT = 1200  # seconds per case: Nosana's plan call alone can stream for ~6 min
 PREVIEW = 160  # characters kept from replies, tool inputs and outputs
 
@@ -76,28 +80,31 @@ PREVIEW = 160  # characters kept from replies, tool inputs and outputs
 @dataclasses.dataclass(frozen=True)
 class Case:
     task: str
-    cut_at: int  # Nosana fails from its k-th model call on
+    cut_at: int  # Nosana fails from its k-th model call on (0: never)
     kind: str
     mode: str
-    retry: bool = False  # after the error, Nosana comes back and the user sends the message again
+    reply: str = "continue"  # what the user answers when a failure stops the task
+    local_down: bool = False  # the local model can't be reached; Nosana works
 
     @property
     def id(self) -> str:
-        return f"{self.task}-cut{self.cut_at}-{self.kind}-{self.mode}" + ("-retry" if self.retry else "")
+        if self.local_down:
+            return f"{self.task}-localdown-{self.mode}"
+        return f"{self.task}-cut{self.cut_at}-{self.kind}-{self.mode}-{self.reply}"
 
 
 def build_cases() -> list:
-    cases = [
-        Case("T4", 1, "refused", "shipped"),
-        Case("T4", 2, "midstream", "shipped"),
-        Case("T4", 4, "refused", "shipped", retry=True),
-        *(Case("T4", 4, kind, "shipped") for kind in ("503", "timeout", "401", "midstream")),
+    """In hybrid mode, routing is local, so Nosana's call 1 is the plan (T4) or
+    the first tool step (T5): hybrid cut3 is the same point as the 15 Nov cut4."""
+    return [
+        *(Case("T4", k, "refused", "hybrid") for k in range(1, 8)),  # outage: finish locally
+        *(Case("T5", k, "refused", "hybrid") for k in range(1, 4)),
+        *(Case("T4", 3, kind, "hybrid", reply="retry") for kind in ("refused", "503", "timeout", "midstream")),
+        Case("T4", 3, "401", "hybrid"),  # a bad key: retrying can't help
+        Case("T4", 3, "refused", "nosana", reply="retry"),  # no fallback: stop, keep progress, retry
+        Case("T1", 0, "none", "hybrid", local_down=True),
+        Case("T4", 0, "none", "hybrid", local_down=True),
     ]
-    for mode in FALLBACK_MODELS:
-        cases += [Case("T4", k, "refused", mode) for k in range(1, 9)]
-        cases += [Case("T5", k, "refused", mode) for k in range(1, 6)]
-    cases += [Case("T4", 4, kind, "fb2b") for kind in ("timeout", "401", "midstream")]
-    return sorted(cases, key=lambda c: MODES.index(c.mode))  # stable: one local model at a time
 
 
 CASES = build_cases()
@@ -184,30 +191,6 @@ class FaultTransport(httpx.BaseTransport):
 # --------------------------------------------------------------------------- #
 # Models
 # --------------------------------------------------------------------------- #
-class FallbackModel:
-    """Nosana first, the local model when Nosana raises, on every call.
-
-    This is LangChain's with_fallbacks(): it falls back only when the error
-    comes before the first streamed chunk, and it tries Nosana again on every
-    call, so a dead Nosana costs its retries each time.
-    """
-
-    def __init__(self, primary, fallback):
-        self.primary, self.fallback = primary, fallback
-        self._chain = primary.with_fallbacks([fallback])
-
-    def bind_tools(self, tools, **kwargs):
-        return self.primary.bind_tools(tools, **kwargs).with_fallbacks(
-            [self.fallback.bind_tools(tools, **kwargs)]
-        )
-
-    def invoke(self, *args, **kwargs):
-        return self._chain.invoke(*args, **kwargs)
-
-    def stream(self, *args, **kwargs):
-        return self._chain.stream(*args, **kwargs)
-
-
 def nosana_model(transport: FaultTransport, args):
     """The agent's Nosana model (same settings as models/LLM.py), over the fault transport."""
     from langchain_openai import ChatOpenAI
@@ -218,35 +201,38 @@ def nosana_model(transport: FaultTransport, args):
         model=args.primary_model or cfg.MODEL_NAME,
         base_url=args.primary_url or cfg.BASE_URL,
         api_key="local-test" if args.primary_url else cfg.API_KEY,
-        timeout=cfg.llm.request_timeout,
-        max_retries=cfg.llm.max_retries,
+        timeout=httpx.Timeout(cfg.CONFIG.nosana_timeout, connect=5.0),
+        max_retries=cfg.CONFIG.nosana_max_retries,
         stream_usage=True,
         http_client=httpx.Client(transport=transport),
     )
 
 
-def local_model(mode: str):
+def local_model(down: bool = False):
     from langchain_ollama import ChatOllama
 
-    spec = FALLBACK_MODELS[mode]
+    from models import LLM as cfg
+
     return ChatOllama(
-        model=spec["model"], base_url=OLLAMA_URL, keep_alive=-1,
-        reasoning=spec["reasoning"], num_ctx=None, client_kwargs={"timeout": 60},
+        model=LOCAL_MODEL["model"], base_url=CLOSED_PORT_URL if down else OLLAMA_URL, keep_alive=-1,
+        reasoning=LOCAL_MODEL["reasoning"], num_ctx=LOCAL_MODEL["num_ctx"],
+        client_kwargs={"timeout": cfg.CONFIG.ollama_timeout},
     )
 
 
-def install_model(model) -> None:
-    """Point every node at `model` (the nodes import `llm` by name)."""
-    import agent_nodes.classify_node as classify
-    import agent_nodes.conversation_node as conversation
-    import agent_nodes.execute_node as execute
-    import agent_nodes.plan_node as plan
+def install_selector(case: Case, transport: FaultTransport, args) -> None:
+    """Give the nodes the case's models: Nosana over the fault transport, plus the local 2B in hybrid."""
+    from models import LLM as cfg
+    from models import selector
 
-    for module in (classify, plan, conversation, execute):
-        module.llm = model
-    classify._router_chain = None
-    conversation._model_chain = None
-    execute._model_chain = None
+    models = {"nosana": nosana_model(transport, args)}
+    names = {"nosana": args.primary_model or cfg.MODEL_NAME}
+    if case.mode == "hybrid":
+        models["local"], names["local"] = local_model(case.local_down), LOCAL_MODEL["model"]
+        roles, fallback = dict(cfg.HYBRID_ROLES), True
+    else:
+        roles, fallback = dict.fromkeys(cfg.ROLES, "nosana"), False
+    selector.install(selector.ModelSelector(models, names, roles, fallback, cfg.CONFIG.cooldown_s))
 
 
 # --------------------------------------------------------------------------- #
@@ -289,6 +275,10 @@ class Tracer(BaseCallbackHandler):
         event, start = self._open.pop(run_id, (None, None))
         if event is not None:
             event.update(secs=round(time.perf_counter() - start, 2), **fields)
+
+    def mark(self, reply: str) -> None:
+        """The harness replied retry/continue after a stop: note it in the timeline."""
+        self.timeline.append({"type": "user", "text": reply, "start_s": round(time.perf_counter() - self._t0, 2)})
 
     def on_chat_model_start(self, serialized, messages, *, run_id, metadata=None, **kwargs):
         params = kwargs.get("invocation_params") or {}
@@ -344,7 +334,7 @@ def estimate_prompts(rows: list) -> float | None:
     or cuts the prompt itself), so the full size comes from characters, at
     tokens per character measured on Nosana's exact counts in the same folder
     (0.27–0.31 in the first run). The local templates count 20–40% fewer
-    tokens than this, so values just over 4K may still have fit.
+    tokens than this, so values just over the window may still have fit.
     """
     nosana = _model_events(rows, "nosana")
     chars = sum(e["request_chars"] for e in nosana)
@@ -354,7 +344,7 @@ def estimate_prompts(rows: list) -> float | None:
         for event in local:
             if per_char:
                 event["est_prompt_tokens"] = round(event["request_chars"] * per_char)
-                event["over_window"] = event["est_prompt_tokens"] > LOCAL_WINDOW
+                event["over_window"] = event["est_prompt_tokens"] > (row.get("local_window") or 4096)
         row.setdefault("local", {})["over_window"] = sum(bool(e.get("over_window")) for e in local)
     return per_char
 
@@ -380,38 +370,56 @@ def say(app, state: dict, text: str, tracer: Tracer, turns: list):
 
 
 def converse(app, task, prompt: str, tracer: Tracer, case: Case):
-    """Answer like run_one.py does (approve the plan once, refuse the first
-    dangerous tool, send the follow-up once), and stop at the first error,
-    unless the case retries once Nosana is back."""
-    from benchmark.run_one import CONFIRMATION_ANSWER, PLAN_APPROVAL
+    """Answer like run_one.py does (approve the plan once, answer each
+    confirmation, send the follow-up once). When a model failure stops the
+    task, reply with the case's choice: "retry" brings Nosana back first,
+    "continue" leaves it down. Stops at a crash."""
+    from benchmark.run_one import MAX_CONFIRMATIONS, PLAN_APPROVAL, confirmation_answer
     from chat_cli.session import ChatSession
 
-    state, turns, denied = ChatSession.fresh_state(), [], []
+    state, turns = ChatSession.fresh_state(), []
+    talk = {"denied": [], "approved": [], "interruptions": 0, "replies": [], "offers": []}
     approvals = follow_ups = 0
-    retried = False
     text = prompt
     while text is not None:
         state, error = say(app, state, text, tracer, turns)
         if error is not None:
-            if case.retry and not retried:
-                retried = True
+            break  # a crash: the M2 agent should stop cleanly instead
+        stopped = state.get("interrupted")
+        if stopped:
+            talk["interruptions"] += 1
+            talk["offers"].append(str(state["messages"][-1].content))
+        pending = state.get("pending_confirmation") or {}
+        if pending.get("tool_name") and len(talk["denied"]) + len(talk["approved"]) < MAX_CONFIRMATIONS:
+            call = {"name": pending["tool_name"], "args": pending.get("tool_args") or {}}
+            text = confirmation_answer(call["name"], call["args"])
+            talk["approved" if text == "yes" else "denied"].append(call)
+        elif stopped and len(talk["replies"]) < MAX_RECOVERIES:
+            text = case.reply
+            if text == "retry":
                 tracer.transport.restore()
-                logger.info("[DROPOUT] Nosana is back: sending the same message again")
-                continue
-            break
-        pending_tool = (state.get("pending_confirmation") or {}).get("tool_name")
-        if pending_tool and not denied:
-            denied.append(pending_tool)
-            text = CONFIRMATION_ANSWER
+                logger.info("[DROPOUT] Nosana is back: replying retry")
+            talk["replies"].append(text)
+            tracer.mark(text)
         elif state.get("pending_plan") and approvals == 0:
             approvals += 1
             text = PLAN_APPROVAL
-        elif task.follow_up and follow_ups == 0 and not denied:
+        elif task.follow_up and follow_ups == 0 and not talk["denied"]:
             follow_ups += 1
             text = task.follow_up
         else:
             text = None
-    return state, turns, denied
+    return state, turns, talk
+
+
+def recovery_steps(timeline: list) -> tuple:
+    """(steps that ran before the first retry/continue, steps redone after it)."""
+    first = next((i for i, e in enumerate(timeline) if e["type"] == "user"), None)
+    tools = lambda events: [(e["name"], e["input"]) for e in events if e["type"] == "tool" and e.get("ok", True)]
+    if first is None:
+        return len(tools(timeline)), 0
+    before, after = tools(timeline[:first]), tools(timeline[first:])
+    return len(before), sum(1 for step in after if step in before)
 
 
 def list_files(sandbox: pathlib.Path) -> list:
@@ -432,8 +440,7 @@ def run_case(case: Case, sandbox: pathlib.Path, args) -> dict:
     from models import LLM as cfg
 
     transport = FaultTransport()
-    nosana = nosana_model(transport, args)
-    install_model(nosana if case.mode == "shipped" else FallbackModel(nosana, local_model(case.mode)))
+    install_selector(case, transport, args)
 
     task = get_task(case.task)
     facts = task.setup(sandbox)
@@ -441,22 +448,25 @@ def run_case(case: Case, sandbox: pathlib.Path, args) -> dict:
     logger.info(f"[DROPOUT] {case.id}")
     start = time.perf_counter()
     with contextlib.redirect_stdout(sys.stderr):
-        state, turns, denied = converse(app, task, task.render_prompt(sandbox), tracer, case)
+        state, turns, talk = converse(app, task, task.render_prompt(sandbox), tracer, case)
     wall_s = round(time.perf_counter() - start, 2)
 
     tools = [{"name": e["name"], "input": e["input"]} for e in tracer.timeline if e["type"] == "tool"]
     answer = final_answer(state)
+    denied = [call["name"] for call in talk["denied"]]
     checks = task.check(
         {"answer": answer, "route": state.get("category"), "tool_calls": tools,
-         "denied_tools": denied, "blocked_commands": list(guards.BLOCKED_COMMANDS), "sandbox": sandbox},
+         "denied_tools": denied, "denied_calls": talk["denied"],
+         "blocked_commands": list(guards.BLOCKED_COMMANDS), "sandbox": sandbox},
         facts,
     )
+    steps_kept, steps_redone = recovery_steps(tracer.timeline)
     models =[e for e in tracer.timeline if e["type"] == "model"]
     nosana_ok = [e for e in models if e["model"] == "nosana" and e.get("ok")]
     local_ok = [e for e in models if e["model"] == "local" and e.get("ok")]
     tokens_in = sum(e.get("tokens_in") or 0 for e in nosana_ok)
     tokens_out = sum(e.get("tokens_out") or 0 for e in nosana_ok)
-    timeout_s = cfg.llm.request_timeout
+    timeout_s = cfg.CONFIG.nosana_timeout
     return {
         **dataclasses.asdict(case),
         "id": case.id,
@@ -467,6 +477,13 @@ def run_case(case: Case, sandbox: pathlib.Path, args) -> dict:
         "turns": turns,
         "answer": answer[:1000],
         "denied_tools": denied,
+        "approved_calls": talk["approved"],
+        "interruptions": talk["interruptions"],
+        "replies": talk["replies"],
+        "continues": talk["replies"].count("continue"),
+        "offer": talk["offers"][0] if talk["offers"] else None,
+        "steps_kept": steps_kept,
+        "steps_redone": steps_redone,
         "blocked_commands": [c[:300] for c in guards.BLOCKED_COMMANDS],
         "skipped_tools": list(guards.SKIPPED_TOOLS),
         "files": list_files(sandbox),
@@ -475,7 +492,8 @@ def run_case(case: Case, sandbox: pathlib.Path, args) -> dict:
         "real_wait_s": len(transport.failed) * timeout_s if case.kind == "timeout" else None,
         "nosana": {"calls_ok": len(nosana_ok), "tokens_in": tokens_in, "tokens_out": tokens_out,
                    "cost": round((tokens_in * PRICE[0] + tokens_out * PRICE[1]) / 1e6, 5)},
-        "local": {"model": FALLBACK_MODELS.get(case.mode, {}).get("model"), "calls_ok": len(local_ok)},
+        "local": {"model": LOCAL_MODEL["model"] if case.mode == "hybrid" else None, "calls_ok": len(local_ok)},
+        "local_window": LOCAL_MODEL["num_ctx"] if case.mode == "hybrid" else None,
         "timeline": tracer.timeline,
         "primary": args.primary_model or cfg.MODEL_NAME,
     }
@@ -494,7 +512,11 @@ def load_only(model: str) -> None:
     for line in _ollama(["ps"]).splitlines()[1:]:
         if line.split():
             _ollama(["stop", line.split()[0]])
-    httpx.post(f"{OLLAMA_URL}/api/generate", json={"model": model, "keep_alive": -1}, timeout=300)
+    httpx.post(
+        f"{OLLAMA_URL}/api/generate",
+        json={"model": model, "keep_alive": -1, "options": {"num_ctx": LOCAL_MODEL["num_ctx"]}},
+        timeout=300,
+    )
     logger.info(f"[DROPOUT] Loaded {model}: {_ollama(['ps']).splitlines()[-1]}")
 
 
@@ -532,12 +554,9 @@ def run_all(args) -> int:
     sandbox_root = args.sandbox_root.expanduser().resolve()
     rows_path = out_dir / "dropout.jsonl"
 
-    loaded = None
+    if any(c.mode == "hybrid" for c in cases):
+        load_only(LOCAL_MODEL["model"])  # one local model for every case
     for n, case in enumerate(cases, 1):
-        local = FALLBACK_MODELS.get(case.mode)
-        if local and local["model"] != loaded:
-            load_only(local["model"])
-            loaded = local["model"]
         sandbox = fresh_sandbox(sandbox_root, "dropout", case.id, 1)
         log_path = out_dir / "logs" / f"{case.id}.log"
         row = run_subprocess(case, sandbox, log_path, args)
@@ -571,15 +590,17 @@ def result_label(row: dict) -> str:
         return f"harness error: {row.get('error')}"
     turns = row.get("turns") or []
     failed = [t for t in turns if not t["ok"]]
-    if not row.get("cut_happened"):
-        label = "no cut (finished first)"
-    elif failed and not turns[-1]["ok"]:
+    if failed and not turns[-1]["ok"]:
         label = "✖ crashed: " + failed[-1]["error"].split(":")[0]
         local = hidden_local_error(row)
         if local:
             label += f" (really the local model: {local.split(':')[0]})"
-    elif failed:
-        label = "✖ crashed, retried"
+    elif row.get("interruptions"):
+        label = "stopped → " + " → ".join(row.get("replies") or ["(no reply)"])
+    elif row.get("local_down"):
+        label = "local model down"
+    elif not row.get("cut_happened"):
+        label = "no cut (finished first)"
     else:
         label = "kept going"
     return label + (" → ✅ passed" if row.get("success") else " → ❌ checks failed")
@@ -589,6 +610,9 @@ def timeline_line(row: dict) -> str:
     """classify:N✓ → ✂ plan:N✗ → plan:L✓ → execute:L✓[write_file] ..."""
     parts = []
     for event in row.get("timeline") or []:
+        if event["type"] == "user":
+            parts.append(f"⏎ {event['text']}")
+            continue
         if event["type"] == "tool":
             if not event.get("ok", True):
                 parts.append(f"⚠{event['name']}✗")
@@ -616,11 +640,34 @@ def write_summary(out_dir: pathlib.Path) -> str:
 
     lines = [
         f"# zkzkAgent: Nosana dropping out mid-task — {out_dir.name}", "",
-        "Each case cuts Nosana off from its k-th model call. `shipped` is the agent as it is today;",
-        f"`fb2b` / `fb4b` fall back to {FALLBACK_MODELS['fb2b']['model']} / {FALLBACK_MODELS['fb4b']['model']} with LangChain's with_fallbacks().",
+        "Each case cuts Nosana off from its k-th model call. `hybrid` is `MODEL_TYPE=HYBRID`",
+        f"(routing and chat on {LOCAL_MODEL['model']} with an {LOCAL_MODEL['num_ctx']:,}-token window, planning and tools",
+        "on Nosana); `nosana` has no fallback. When a failure stops the task, the harness replies",
+        "`continue` (Nosana stays down) or `retry` (Nosana is back first).",
+        "", "## Totals", "",
+        "| Group | Cases | Passed | Crashed | Stopped cleanly | Steps redone after recovery |",
+        "|---|---|---|---|---|---|",
+    ]
+    groups = {}
+    for case_id in order:
+        row = rows[case_id]
+        if row.get("local_down"):
+            key = f"{row.get('task')} {row.get('mode')}: local model down"
+        else:
+            key = f"{row.get('task')} {row.get('mode')}: {row.get('kind')} → {row.get('reply')}"
+        groups.setdefault(key, []).append(row)
+    for key, group in groups.items():
+        crashed = sum(1 for r in group if (r.get("turns") or [{}])[-1].get("ok") is False)
+        lines.append("| " + " | ".join([
+            key, str(len(group)), str(sum(bool(r.get("success")) for r in group)), str(crashed),
+            str(sum(1 for r in group if r.get("interruptions"))),
+            str(sum(r.get("steps_redone") or 0 for r in group)),
+        ]) + " |")
+
+    lines += [
         "", "## Cases", "",
-        "| Case | Cut at | Failure | Result | Checks | Calls (Nosana / local) | Failed Nosana requests | Local calls over 4K (est.) | Files on disk | Time (s) | Nosana cost |",
-        "|---|---|---|---|---|---|---|---|---|---|---|",
+        "| Case | Cut at | Failure | Reply | Result | Checks | Calls (Nosana / local) | Steps kept | Steps redone | Failed Nosana requests | Local calls over window (est.) | Time (s) | Nosana cost |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for case_id in order:
         row = rows[case_id]
@@ -632,30 +679,32 @@ def write_summary(out_dir: pathlib.Path) -> str:
             f"`{case_id}`",
             f"{row.get('cut_at')} ({row.get('cut_node') or '—'})",
             row.get("kind", "—"),
+            ", ".join(row.get("replies") or []) or "—",
             result_label(row),
             f"{passed}/{len(checks)}" if checks else "—",
             f"{row.get('nosana', {}).get('calls_ok', 0)} / {row.get('local', {}).get('calls_ok', 0)}",
+            str(row.get("steps_kept", "—")),
+            str(row.get("steps_redone", "—")),
             f"{len(failed)}{wait}",
             str(row.get("local", {}).get("over_window", 0)),
-            str(len(row.get("files") or [])),
             f"{row.get('wall_s', 0):.0f}",
             f"${row.get('nosana', {}).get('cost', 0):.4f}",
         ]) + " |")
 
     lines += [
         "", "## Timelines", "",
-        "`N` = Nosana, `L` = local, ✂ = where Nosana was cut. `(6.2K!)` = the history sent to the local model,",
-        f"estimated at {per_char or 0:.3f} tokens per character (measured on Nosana's exact counts); `!` = over the 4,096 window.",
-        "Ollama keeps only what fits: it drops older messages, or cuts the prompt itself.", "",
+        "`N` = Nosana, `L` = local, ✂ = where Nosana was cut, ⏎ = the harness's reply after a stop.",
+        f"`(6.2K!)` = the prompt sent to the local model, estimated at {per_char or 0:.3f} tokens per character",
+        "(measured on Nosana's exact counts); `!` = over the local window.", "",
     ]
     for case_id in order:
         row = rows[case_id]
         lines += [f"**{case_id}**: {timeline_line(row)}", ""]
+        if row.get("offer"):
+            lines += [f"- the agent stopped and said: `{row['offer'].splitlines()[0][:200]}`"]
         for turn in row.get("turns") or []:
             if not turn["ok"]:
                 lines += [f"- the user typed `{turn['user'][:60]}` and got: `{turn['error'][:200]}`"]
-        if hidden_local_error(row) and not (row.get("turns") or [{}])[-1].get("ok", True):
-            lines += [f"- the local model's own error, hidden behind Nosana's: `{hidden_local_error(row)}`"]
         if row.get("files"):
             lines += [f"- files: {', '.join(row['files'])}"]
         lines += [""]
@@ -687,6 +736,9 @@ def main() -> int:
     if bool(args.primary_url) != bool(args.primary_model):
         parser.error("--primary-url and --primary-model go together")
 
+    asked = f"{args.case or ''},{args.only or ''}"
+    if any(mode in asked for mode in OLD_MODES):
+        parser.error("These modes measured the code at ec7a1e6. Check out that commit to rerun them.")
     if args.list:
         print("\n".join(case.id for case in CASES))
         return 0

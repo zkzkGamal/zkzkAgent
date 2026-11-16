@@ -13,14 +13,17 @@ import contextlib
 import json
 import logging
 import pathlib
+import re
 import sys
 import time
 
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import AIMessage, HumanMessage
 
+from agent_nodes.handover import CONTINUE_WORDS
 from benchmark import guards
 from benchmark.tasks import get_task
+from tools_module.runCommand import needs_confirmation
 from chat_cli.session import ChatSession
 from preprocessing.strip_think_tags import strip_think_tags
 
@@ -31,14 +34,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 PLAN_APPROVAL = "ok"
-CONFIRMATION_ANSWER = "no"  # the benchmark never lets a dangerous tool run
+MAX_CONFIRMATIONS = 10  # confirmations answered per run
+RECOVERY_REPLY = "continue"  # after a model failure stops the task: finish on the other model
+assert RECOVERY_REPLY in CONTINUE_WORDS
 WARMUP_MESSAGE = "this is a warm up message, generate a short response"
+PING = "Reply with OK."
+COMMAND_PARTS = re.compile(r"&&|\|\||[;|\n]")
 MAX_TOOL_INPUT = 300  # characters of each tool input kept in the result
 MAX_ANSWER = 1000  # characters of the final answer kept in the result
 
 
 class Meter(BaseCallbackHandler):
-    """Counts model calls, tokens and tool calls across every node of the graph."""
+    """Counts model calls, tokens and tool calls across every node of the graph,
+    in total and per backend (Nosana or local), so HYBRID runs show the split."""
 
     def __init__(self):
         self.llm_calls = 0
@@ -46,11 +54,24 @@ class Meter(BaseCallbackHandler):
         self.tokens_out = 0
         self.max_tokens_in = 0  # largest single prompt: how much of the context window was used
         self.tool_calls = []
+        self.by_backend = {}
+        self._backend_of = {}  # run_id -> backend of a call in flight
 
-    def on_chat_model_start(self, serialized, messages, **kwargs):
+    def _bucket(self, backend: str) -> dict:
+        return self.by_backend.setdefault(
+            backend, {"calls": 0, "tokens_in": 0, "tokens_out": 0, "errors": 0}
+        )
+
+    def on_chat_model_start(self, serialized, messages, *, run_id=None, **kwargs):
         self.llm_calls += 1
+        params = kwargs.get("invocation_params") or {}
+        # ChatOpenAI reports "openai-chat" (Nosana); ChatOllama "chat-ollama"
+        backend = "nosana" if "openai" in str(params.get("_type", "")) else "local"
+        self._backend_of[run_id] = backend
+        self._bucket(backend)["calls"] += 1
 
-    def on_llm_end(self, response, **kwargs):
+    def on_llm_end(self, response, *, run_id=None, **kwargs):
+        backend = self._backend_of.pop(run_id, None)
         for generations in response.generations:
             for generation in generations:
                 message = getattr(generation, "message", None)
@@ -58,6 +79,14 @@ class Meter(BaseCallbackHandler):
                 self.tokens_in += usage.get("input_tokens", 0)
                 self.tokens_out += usage.get("output_tokens", 0)
                 self.max_tokens_in = max(self.max_tokens_in, usage.get("input_tokens", 0))
+                if backend:
+                    self._bucket(backend)["tokens_in"] += usage.get("input_tokens", 0)
+                    self._bucket(backend)["tokens_out"] += usage.get("output_tokens", 0)
+
+    def on_llm_error(self, error, *, run_id=None, **kwargs):
+        backend = self._backend_of.pop(run_id, None)
+        if backend:
+            self._bucket(backend)["errors"] += 1
 
     def on_tool_start(self, serialized, input_str, **kwargs):
         name = kwargs.get("name") or (serialized or {}).get("name", "?")
@@ -69,6 +98,7 @@ class Meter(BaseCallbackHandler):
             "tokens_in": self.tokens_in,
             "tokens_out": self.tokens_out,
             "max_tokens_in": self.max_tokens_in,
+            "by_backend": self.by_backend,
             "n_tool_calls": len(self.tool_calls),
             "tool_calls": self.tool_calls,
         }
@@ -83,30 +113,68 @@ def send(app, state: dict, text: str, meter: Meter) -> dict:
     return app.invoke(state, config={"callbacks": [meter]})
 
 
-def run_conversation(app, task, prompt: str, meter: Meter):
+def confirmation_answer(name: str, args: dict) -> str:
+    """Say yes only to a chain of commands that are each safe on their own.
+
+    A gated run_command gets "yes" when every part between &&, ||, ;, | and
+    newlines is an allow-listed command (see tools_module/runCommand.py) or a
+    cd into the sandbox, and guards.py would let it through. Installs,
+    deletions, deploys, heredoc writes, interpreters and remote scripts get
+    "no", so the benchmark never lets a dangerous tool run.
+    """
+    if name != "run_command":
+        return "no"
+    command = str((args or {}).get("command", ""))
+    if guards.BLOCKED_PATTERN.search(command) or guards._write_outside_sandbox(command):
+        return "no"
+    for part in COMMAND_PARTS.split(command):
+        part = part.strip()
+        if not part:
+            continue
+        if part.startswith("cd ") and guards._inside_sandbox(part[3:].strip().strip("'\"")):
+            continue
+        if needs_confirmation(part):
+            return "no"
+    return "yes"
+
+
+def run_conversation(app, task, prompt: str, meter: Meter) -> dict:
     """Send the prompt, then answer like a careful user would: approve the
-    plan once, say no to the first dangerous tool, and send the task's
+    plan once, answer each confirmation (see confirmation_answer), reply
+    "continue" once if a model failure stopped the task, and send the task's
     follow-up once if the agent stopped to ask in plain text."""
     state = send(app, ChatSession.fresh_state(), prompt, meter)
     route = state.get("category")
-    approvals, follow_ups, denied_tools = 0, 0, []
+    approvals, follow_ups, continues, interruptions, denied, approved = 0, 0, 0, 0, [], []
 
     while True:
-        pending_tool = (state.get("pending_confirmation") or {}).get("tool_name")
-        if pending_tool and not denied_tools:
-            logger.info(f"[BENCH] Refusing dangerous tool: {pending_tool}")
-            denied_tools.append(pending_tool)
-            state = send(app, state, CONFIRMATION_ANSWER, meter)
+        if state.get("interrupted"):
+            interruptions += 1
+        pending = state.get("pending_confirmation") or {}
+        if pending.get("tool_name") and len(denied) + len(approved) < MAX_CONFIRMATIONS:
+            call = {"name": pending["tool_name"], "args": pending.get("tool_args") or {}}
+            answer = confirmation_answer(call["name"], call["args"])
+            logger.info(f"[BENCH] Confirmation for {call['name']}: answering {answer}")
+            (approved if answer == "yes" else denied).append(call)
+            state = send(app, state, answer, meter)
+        elif state.get("interrupted") and continues == 0 and state["interrupted"].get("can_continue"):
+            logger.info(f"[BENCH] The task stopped ({state['interrupted']['error']}); replying {RECOVERY_REPLY}")
+            continues += 1
+            state = send(app, state, RECOVERY_REPLY, meter)
         elif state.get("pending_plan") and approvals == 0:
             logger.info("[BENCH] Approving plan")
             approvals += 1
             state = send(app, state, PLAN_APPROVAL, meter)
-        elif task.follow_up and follow_ups == 0 and not denied_tools:
+        elif task.follow_up and follow_ups == 0 and not denied:
             logger.info(f"[BENCH] Sending follow-up: {task.follow_up}")
             follow_ups += 1
             state = send(app, state, task.follow_up, meter)
         else:
-            return state, route, approvals, follow_ups, denied_tools
+            return {
+                "state": state, "route": route, "approvals": approvals, "follow_ups": follow_ups,
+                "continues": continues, "interruptions": interruptions,
+                "denied": denied, "approved": approved,
+            }
 
 
 def final_answer(state: dict) -> str:
@@ -114,6 +182,18 @@ def final_answer(state: dict) -> str:
         if isinstance(message, AIMessage) and message.content:
             return strip_think_tags(str(message.content))
     return ""
+
+
+def model_record() -> dict:
+    """Which model served each role, and how often a fallback model answered."""
+    from models import selector
+
+    events = selector.current().events
+    return {
+        "model_events": events,
+        "fallback_calls": sum(1 for e in events if e["fallback"] and e["ok"]),
+        "model_failures": sum(1 for e in events if not e["ok"]),
+    }
 
 
 def guard_record() -> dict:
@@ -131,14 +211,31 @@ def emit(row: dict) -> None:
 # Modes
 # --------------------------------------------------------------------------- #
 def warm_up(app, row: dict) -> int:
+    """Load the models and check that every backend answers.
+
+    The agent no longer raises when a model fails (it falls back or stops),
+    so each backend is also pinged directly: a dead Nosana must stop the
+    benchmark, not quietly turn a HYBRID run into a local one.
+    """
+    from models import selector
+
     state = ChatSession.fresh_state()
     state["messages"] = [HumanMessage(content=WARMUP_MESSAGE)]
     start = time.perf_counter()
+    errors = []
     try:
         with contextlib.redirect_stdout(sys.stderr):
             app.invoke(state)
     except Exception as exc:  # noqa: BLE001 — report it; run_all decides what to do
-        row["error"] = f"{type(exc).__name__}: {exc}"
+        errors.append(f"{type(exc).__name__}: {exc}")
+    sel = selector.current()
+    for backend, model in sel.models.items():
+        try:
+            model.invoke(PING)
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{sel.label(backend)}: {type(exc).__name__}: {exc}")
+    if errors:
+        row["error"] = "; ".join(errors)
         emit(row)
         return 1
     row.update(success=True, wall_s=round(time.perf_counter() - start, 2))
@@ -162,9 +259,7 @@ def run_task(app, args, row: dict) -> int:
     start = time.perf_counter()
     try:
         with contextlib.redirect_stdout(sys.stderr):
-            state, route, approvals, follow_ups, denied_tools = run_conversation(
-                app, task, task.render_prompt(sandbox), meter
-            )
+            talk = run_conversation(app, task, task.render_prompt(sandbox), meter)
     except Exception as exc:  # noqa: BLE001 — a crashing agent is a failed run
         logger.exception("[BENCH] Agent raised an error")
         row.update(
@@ -172,17 +267,21 @@ def run_task(app, args, row: dict) -> int:
             wall_s=round(time.perf_counter() - start, 2),
             **guard_record(),  # a crashed run can still show what it tried
             **meter.as_row(),
+            **model_record(),
         )
         emit(row)
         return 1
     wall_s = round(time.perf_counter() - start, 2)
 
+    state, route, denied = talk["state"], talk["route"], talk["denied"]
     answer = final_answer(state)
+    denied_tools = [call["name"] for call in denied]
     run = {
         "answer": answer,
         "route": route,
         "tool_calls": meter.tool_calls,
         "denied_tools": denied_tools,
+        "denied_calls": denied,
         "blocked_commands": list(guards.BLOCKED_COMMANDS),
         "sandbox": sandbox,
     }
@@ -193,13 +292,18 @@ def run_task(app, args, row: dict) -> int:
         checks=checks,
         route=route,
         route_match=route == task.expected_route,
-        approvals=approvals,
-        follow_ups=follow_ups,
+        approvals=talk["approvals"],
+        follow_ups=talk["follow_ups"],
+        continues=talk["continues"],
+        interruptions=talk["interruptions"],
         denied_tools=denied_tools,
+        denied_calls=denied,
+        approved_calls=talk["approved"],
         wall_s=wall_s,
         **guard_record(),
         answer=answer[:MAX_ANSWER],
         **meter.as_row(),
+        **model_record(),
     )
     logger.info(f"[BENCH] {'PASS' if row['success'] else 'FAIL'} {checks}")
     emit(row)
@@ -245,9 +349,10 @@ def main() -> int:
 
     row.update(
         model=llm_config.MODEL_NAME,
+        local_model=llm_config.LOCAL_MODEL_NAME,  # HYBRID: the local model next to Nosana
         model_type=llm_config.MODEL_TYPE,
-        reasoning=getattr(llm_config, "REASONING", None),  # Ollama only
-        num_ctx=getattr(llm_config, "NUM_CTX", None),  # Ollama only; None = Ollama's default
+        reasoning=llm_config.REASONING,  # Ollama only
+        num_ctx=llm_config.NUM_CTX,  # Ollama only; None = Ollama's default
     )
     if args.warmup:
         return warm_up(app, row)

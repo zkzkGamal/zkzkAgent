@@ -143,6 +143,11 @@ def render_assistant_final(session) -> None:
         print(style("  reply with 'yes' to proceed or 'no' to cancel", C.GREY))
         return
 
+    if session.awaiting_recovery:  # the offer itself was already printed by the node
+        can_continue = (session.state.get("interrupted") or {}).get("can_continue")
+        print(style("  reply 'retry'" + (" or 'continue'" if can_continue else ""), C.GREY))
+        return
+
     if isinstance(last, AIMessage) and not clean.strip():
         print(style("  (the assistant ran tools without a text reply)", C.GREY))
 

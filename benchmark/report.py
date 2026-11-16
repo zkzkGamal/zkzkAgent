@@ -79,9 +79,11 @@ def parse_prices(items: list) -> dict:
 
 
 def run_cost(row: dict, price) -> float | None:
+    """Tokens × price. A row that splits its calls by backend pays for Nosana's only."""
     if price is None:
         return None
-    return (row.get("tokens_in", 0) * price[0] + row.get("tokens_out", 0) * price[1]) / 1e6
+    paid = (row.get("by_backend") or {}).get("nosana", {}) if row.get("by_backend") else row
+    return (paid.get("tokens_in", 0) * price[0] + paid.get("tokens_out", 0) * price[1]) / 1e6
 
 
 def context_window(info: dict, override=None):
@@ -267,6 +269,46 @@ def failures_section(rows: list) -> list:
 # --------------------------------------------------------------------------- #
 # Main
 # --------------------------------------------------------------------------- #
+def split_section(rows: list, backends: list, prices: dict) -> list:
+    """Where the model calls ran: the share kept local, fallbacks, and cost per success."""
+    body = []
+    for backend in backends:
+        runs = [r for r in rows if r.get("backend") == backend and r.get("by_backend")]
+        if not runs:
+            continue
+        def total(side, key):
+            return sum(r["by_backend"].get(side, {}).get(key, 0) for r in runs)
+        local_calls, nosana_calls = total("local", "calls"), total("nosana", "calls")
+        local_tokens = total("local", "tokens_in") + total("local", "tokens_out")
+        nosana_tokens = total("nosana", "tokens_in") + total("nosana", "tokens_out")
+        calls, tokens = local_calls + nosana_calls, local_tokens + nosana_tokens
+        passed = sum(bool(r.get("success")) for r in runs)
+        price = prices.get(backend)
+        cost = sum(run_cost(r, price) for r in runs) if price else None
+        body.append([
+            backend,
+            str(calls),
+            str(local_calls),
+            str(nosana_calls),
+            f"{100 * local_calls / calls:.0f}%" if calls else NONE,
+            f"{100 * local_tokens / tokens:.0f}%" if tokens else NONE,
+            str(sum(r.get("fallback_calls", 0) for r in runs)),
+            str(sum(1 for r in runs if r.get("interruptions"))),
+            (_usd(cost / passed) if passed else NONE) if price else "local hardware",
+        ])
+    if not body:
+        return []
+    header = [
+        "Backend", "Model calls", "Local", "Nosana", "Local share of calls",
+        "Local share of tokens", "Fallback calls", "Interrupted runs", "Cost per successful task",
+    ]
+    return ["## Where the Model Calls Ran", ""] + _table(header, body) + [
+        "",
+        "Fallback calls = calls a node's second model answered because its first failed. "
+        "Interrupted runs = runs where a model failure stopped the task and the harness replied `continue`.",
+    ]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="benchmark.report", description="Summarise zkzkAgent benchmark results."
@@ -297,6 +339,7 @@ def main() -> int:
         setup_section(meta, backends),
         results_section(rows, backends, prices),
         totals_section(rows, backends, prices),
+        split_section(rows, backends, prices),
         context_section(rows, backends, meta, windows),
         speed_section(load_rows(results_dir, "speed")),
         failures_section(rows),
