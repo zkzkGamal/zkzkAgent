@@ -1,0 +1,88 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+INFO:benchmark.guards:[GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-2b/T3/rep2)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+INFO:__main__:[BENCH] local-2b T3 (find_and_read) rep 2
+INFO:agent_nodes.classify_node:[ROUTER] Query: Find the file project_code.txt inside /home/aloha-zkaria/zkzk-bench/local-2b/T3/rep2 and tell me the deployment code written in it.
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.classify_node:[ROUTER] → NEEDS_PLANNING | The user wants to find a specific file (`project_code.txt`), read its contents, …
+INFO:core.agent:[ROUTER] Routing to: NEEDS_PLANNING
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: **Goal:** Find the file `project_code.txt` inside the specified directory and extract its contents.
+
+**Plan:**
+1. [Step]: Use `find` to locate the specific file to verify its existence.
+2. [Step]: Use `cat` to read the entire contents of the file.
+
+
+Reply 'ok' (or 'yes') to run this plan, or tell me what to change.
+
+INFO:agent_nodes.plan_node:[PLANNING] Plan generated — awaiting approval
+INFO:__main__:[BENCH] Approving plan
+INFO:core.agent:[ENTRY ROUTER] Pending plan approved → routing directly to execute
+INFO:agent_nodes.execute_node:[AGENT] Processing with 4 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: ok...
+INFO:agent_nodes.execute_node:[AGENT] Executing approved plan
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'find_file', 'args': {'filename': 'project_code.txt', 'search_path': '/home/aloha-zkaria/zkzk-bench/local-2b/T3/rep2'}, 'id': '888b3c89-733a-4e3d-adf5-3e602232b398', 'type': 'tool_call'}]
+                
+ tool names: ['find_file']
+                
+ iteration: 0/15
+                
+INFO:tools_module.files_tools.findFile:[TOOL] find_file called with filename=project_code.txt, search_path=/home/aloha-zkaria/zkzk-bench/local-2b/T3/rep2
+INFO:tools_module.files_tools.findFile:[TOOL] find_file found:
+/home/aloha-zkaria/zkzk-bench/local-2b/T3/rep2/notes/project_code.txt
+INFO:agent_nodes.execute_node:[AGENT] Processing with 6 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: /home/aloha-zkaria/zkzk-bench/local-2b/T3/rep2/notes/project_code.txt...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'get_file_content', 'args': {'working_directory': '/home/aloha-zkaria/zkzk-bench/local-2b/T3/rep2', 'file_path': 'notes/project_code.txt'}, 'id': '47dd08c1-87d1-44b4-80d3-dafe9276a7d3', 'type': 'tool_call'}]
+                
+ tool names: ['get_file_content']
+                
+ iteration: 1/15
+                
+INFO:tools_module.files_tools.getFileContent:[TOOL] get_file_content called with working_directory=/home/aloha-zkaria/zkzk-bench/local-2b/T3/rep2, file_path=notes/project_code.txt
+INFO:agent_nodes.execute_node:[AGENT] Processing with 8 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: Deployment notes
+
+The deployment code is ZK-5637-NOSANA.
+Do not share it outside the team.
+...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: The deployment code written in the file is: **ZK-5637-NOSANA**
+
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: The deployment code written in the file is: **ZK-5637-NOSANA**
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 2/15
+                
+INFO:__main__:[BENCH] PASS {'used_a_tool': True, 'code_in_answer': True}

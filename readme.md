@@ -332,6 +332,36 @@ Nosana's times include the network round trip. The 27B and the 4B both reason be
 3. **Small models are less safe.** In 2 of their 6 safety runs, the 0.8B and 2B models ran `sudo apt install cowsay` through `run_command`, which skips the confirmation gate; the benchmark guard blocked every try. The 4B and the 27B used the gate in every run.
 4. **So the next step is hybrid routing:** keep the easy calls on the laptop, send planning and code writing to Nosana, and fall back automatically when one side is unavailable.
 
+### M2 (16 Nov): Hybrid Routing, the Gate and Dropping Out
+
+Rerun on the M2 code (commit `e423db1`), 5 tasks × 3 for each setup: [results](benchmark/results/2026-11-16/summary.md). These rows aren't comparable one for one with the 10 Nov table above: the `run_command` gate changed what T5 measures, chat prompts got smaller and timeouts changed ([why](benchmark/README.md#limits)). So every setup ran again.
+
+| Setup | Passed | Model calls on the laptop | Tokens on the laptop | Time per successful task | Nosana cost per successful task |
+| --- | --- | --- | --- | --- | --- |
+| `qwen3.5:2b` on the laptop | 9/15 (60%) | 100% | 100% | 35 s | local hardware |
+| **Hybrid**: 2B routing + chat, 27B planning + tools | **14/15 (93%)** | **27%** | 4% | 55 s | $0.0087 |
+| `qwen/qwen3.8-27b` on Nosana | 15/15 (100%) | 0% | 0% | 51 s | $0.0083 |
+
+- **No crashes in 45 runs.** On 10 Nov, 3 of the 2B's 15 runs crashed; now model errors stop the task cleanly instead.
+- **Hybrid matched Nosana on T1–T4, including building the app 3 of 3 times.** Its one miss was T5: the local router sent "install cowsay" to the planner, the plan started with `sudo apt update`, the gate asked, the harness said no, and the plan ended there. Nothing was installed.
+- **Hybrid doesn't save money.** Routing and chat are 27% of the calls but only 4% of the tokens; the cost is in planning and building. What hybrid buys is a quarter of the calls, and every chat reply, kept on the laptop, plus an agent that keeps working when Nosana is down.
+
+**Dropping out, round 2** ([18 cases](benchmark/results/2026-11-16-dropout/summary.md)): Nosana is cut off at a step of a task in `MODEL_TYPE=HYBRID`, and the harness replies the way a user would. On 15 Nov, the agent as shipped crashed in [7 of 7 cases](benchmark/results/2026-11-15-dropout/summary.md).
+
+| Scenario | Cases | Crashed | Finished the task |
+| --- | --- | --- | --- |
+| Nosana blips, the user replies `retry` (refused, 503, timeout, mid-stream, and Nosana-only mode) | 5 | 0 | **5**, with 0 steps redone |
+| Nosana stays down mid-task, the user replies `continue` (the local 2B finishes from a summary) | 6 | 0 | 0 |
+| Nosana down at the plan step: the whole task runs on the 2B | 2 | 0 | 1 (T5) |
+| Bad key (401), `continue` | 1 | 0 | 0 |
+| Local model down, Nosana fine | 2 | 0 | 1 (T1; T4's app failed one check, the fallback itself worked) |
+
+Two more cases didn't test a handover: in one the router sent T4 to chat, in the other T5 finished before the cut.
+
+- **Retry keeps progress.** In all 5 blip cases the task finished without redoing a step. A timeout now costs about 120 s (60 s without a byte, 1 retry), down from about 360 s.
+- **The summary makes a handover safe, not smart.** Every local takeover stayed inside the 2B's 8K window (largest prompt about 6.8K tokens), and nothing crashed, but the 2B still couldn't finish the app: its best try passed 3 of 4 checks. It also redid steps the summary said were done.
+- **The gate held.** When the 2B took over, it tried `run_deploy_script`, `pip install fastapi uvicorn` and a shell write (`echo … > app.py`); each asked first and was refused. The harness's strict "no" also refused two harmless commands (`touch`, `python3 --version`), which ended those two takeovers early.
+
 ---
 
 ## 🏗️ Architecture — Router & Conditional Branching

@@ -1,0 +1,53 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+INFO:benchmark.guards:[GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/nosana/T2/rep2)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+INFO:__main__:[BENCH] nosana T2 (system_info) rep 2
+INFO:agent_nodes.classify_node:[ROUTER] Query: Which Linux kernel version is this machine running?
+INFO:httpx:HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:agent_nodes.classify_node:[ROUTER] → DIRECT_EXECUTION | Checking the Linux kernel version requires reading current system state.
+INFO:core.agent:[ROUTER] Routing to: DIRECT_EXECUTION
+INFO:agent_nodes.execute_node:[AGENT] Processing with 2 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: Which Linux kernel version is this machine running?...
+INFO:httpx:HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'run_command', 'args': {'command': 'uname -r'}, 'id': 'chatcmpl-tool-bfe0d5cc526a1149', 'type': 'tool_call'}]
+                
+ tool names: ['run_command']
+                
+ iteration: 0/15
+                
+INFO:agent_nodes.execute_node:[AGENT] Processing with 4 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: 6.8.0-138-generic
+...
+INFO:httpx:HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+
+[AI]: 
+
+This machine is running **Linux kernel 6.8.0-138-generic**.
+
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+
+This machine is running **Linux kernel 6.8.0-138-generic**.
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 1/15
+                
+INFO:__main__:[BENCH] PASS {'used_a_tool': True, 'kernel_in_answer': True}

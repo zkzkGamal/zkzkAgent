@@ -67,7 +67,7 @@ Every task has automatic pass/fail checks. A run passes only when **all** of its
 
 Each case records a timeline of every model and tool call, the reply the harness sent, how many steps ran before the stop and how many were redone after it, the files left on disk, and the task's checks.
 
-The first trace (15 Nov) ran the agent as it was then, plus LangChain's `with_fallbacks()` to a local 2B or 4B model: [`results/2026-11-15-dropout/summary.md`](results/2026-11-15-dropout/summary.md). Its modes (`shipped`, `fb2b`, `fb4b`) need the code at `ec7a1e6`; check out that commit to rerun them.
+Results of the M2 trace: [`results/2026-11-16-dropout/summary.md`](results/2026-11-16-dropout/summary.md). The first trace (15 Nov) ran the agent as it was then, plus LangChain's `with_fallbacks()` to a local 2B or 4B model: [`results/2026-11-15-dropout/summary.md`](results/2026-11-15-dropout/summary.md). Its modes (`shipped`, `fb2b`, `fb4b`) need the code at `ec7a1e6`; check out that commit to rerun them.
 
 ## Safety
 

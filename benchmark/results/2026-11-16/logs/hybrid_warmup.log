@@ -1,0 +1,20 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+INFO:benchmark.guards:[GUARD] Installed (sandbox: None)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+INFO:agent_nodes.classify_node:[ROUTER] Query: this is a warm up message, generate a short response
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.classify_node:[ROUTER] → CONVERSATIONAL | The user is providing a warm-up message asking for a short response, which is a …
+INFO:core.agent:[ROUTER] Routing to: CONVERSATIONAL
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: Hello there! 👋 I'm so glad to be here with you!
+
+Whether you have a question about Linux, need help setting up a project, or just need to vent about a coding problem, I'm here to chat! What's on your mind today? 😊
+
+INFO:agent_nodes.conversation_node:[CONVERSATIONAL] Cleaned text: Hello there! 👋 I'm so glad to be here with you!
+
+Whether you have a question about Linux, need help setting up a project, or just need to vent about a coding problem, I'm here to chat! What's on your mind today? 😊
+INFO:httpx:HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"

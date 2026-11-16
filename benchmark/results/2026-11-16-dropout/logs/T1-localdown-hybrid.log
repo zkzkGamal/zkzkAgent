@@ -1,0 +1,29 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+2026-11-16 16:27:42,760 [INFO] benchmark.guards: [GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/dropout/T1-localdown-hybrid/rep1)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+2026-11-16 16:27:42,927 [INFO] __main__: [DROPOUT] T1-localdown-hybrid
+2026-11-16 16:27:42,929 [INFO] agent_nodes.classify_node: [ROUTER] Query: What does `chmod 755` do to a file? Answer briefly.
+2026-11-16 16:27:42,932 [WARNING] models.selector: [MODEL] classify on local (qwen3.5:2b-q4_K_M) failed: ConnectError: [Errno 111] Connection refused
+
+[local (qwen3.5:2b-q4_K_M) failed (ConnectError) — using Nosana (qwen/qwen3.8-27b)]
+
+2026-11-16 16:27:49,906 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-11-16 16:27:49,915 [INFO] agent_nodes.classify_node: [ROUTER] → CONVERSATIONAL | The user is asking for general knowledge about chmod permissions, not requesting…
+2026-11-16 16:27:49,916 [INFO] core.agent: [ROUTER] Routing to: CONVERSATIONAL
+2026-11-16 16:27:50,068 [INFO] httpx: HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+
+[AI]: 
+
+`chmod 755` sets permissions to:
+
+- Owner: read, write, execute
+- Group: read, execute
+- Others: read, execute
+
+2026-11-16 16:27:51,465 [INFO] agent_nodes.conversation_node: [CONVERSATIONAL] Cleaned text: `chmod 755` sets permissions to:
+
+- Owner: read, write, execute
+- Group: read, execute
+- Others: read, execute

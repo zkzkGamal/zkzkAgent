@@ -1,0 +1,103 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+INFO:benchmark.guards:[GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/nosana/T3/rep3)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+INFO:__main__:[BENCH] nosana T3 (find_and_read) rep 3
+INFO:agent_nodes.classify_node:[ROUTER] Query: Find the file project_code.txt inside /home/aloha-zkaria/zkzk-bench/nosana/T3/rep3 and tell me the deployment code written in it.
+INFO:httpx:HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:agent_nodes.classify_node:[ROUTER] → DIRECT_EXECUTION | User asks to locate and read a specific file, which is a simple system action.
+INFO:core.agent:[ROUTER] Routing to: DIRECT_EXECUTION
+INFO:agent_nodes.execute_node:[AGENT] Processing with 2 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: Find the file project_code.txt inside /home/aloha-zkaria/zkzk-bench/nosana/T3/rep3 and tell me the d...
+INFO:httpx:HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'read_file', 'args': {'path': '/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/project_code.txt'}, 'id': 'chatcmpl-tool-922aff35c0c1cdd9', 'type': 'tool_call'}]
+                
+ tool names: ['read_file']
+                
+ iteration: 0/15
+                
+INFO:tools_module.files_tools.readFile:[TOOL] read_file called with path=/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/project_code.txt
+ERROR:tools_module.files_tools.readFile:[TOOL] read_file error: [Errno 2] No such file or directory: '/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/project_code.txt'
+INFO:agent_nodes.execute_node:[AGENT] Processing with 4 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: Error reading file /home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/project_code.txt: [Errno 2] No such ...
+INFO:httpx:HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'find_file', 'args': {'filename': 'project_code.txt', 'search_path': '/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3'}, 'id': 'chatcmpl-tool-bc0f62ebd9ebe65b', 'type': 'tool_call'}]
+                
+ tool names: ['find_file']
+                
+ iteration: 1/15
+                
+INFO:tools_module.files_tools.findFile:[TOOL] find_file called with filename=project_code.txt, search_path=/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3
+INFO:tools_module.files_tools.findFile:[TOOL] find_file found:
+/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/notes/project_code.txt
+INFO:agent_nodes.execute_node:[AGENT] Processing with 6 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: /home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/notes/project_code.txt...
+INFO:httpx:HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'read_file', 'args': {'path': '/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/notes/project_code.txt'}, 'id': 'chatcmpl-tool-8601668cb2b65385', 'type': 'tool_call'}]
+                
+ tool names: ['read_file']
+                
+ iteration: 2/15
+                
+INFO:tools_module.files_tools.readFile:[TOOL] read_file called with path=/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/notes/project_code.txt
+INFO:tools_module.files_tools.readFile:[TOOL] read_file success, 91 chars
+INFO:agent_nodes.execute_node:[AGENT] Processing with 8 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: Deployment notes
+
+The deployment code is ZK-3887-NOSANA.
+Do not share it outside the team.
+...
+INFO:httpx:HTTP Request: POST https://inference.nosana.com/v1/chat/completions "HTTP/1.1 200 OK"
+
+[AI]: 
+
+Found it — the file was actually located at `/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/notes/project_code.txt` (inside a `notes` subfolder, not the rep3 root).
+
+The deployment code written in it is:
+
+**ZK-3887-NOSANA**
+
+Note: The file also states this is a deployment note and should not be shared outside the team, so keep it internal.
+
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+
+Found it — the file was actually located at `/home/aloha-zkaria/zkzk-bench/nosana/T3/rep3/notes/pr
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 3/15
+                
+INFO:__main__:[BENCH] PASS {'used_a_tool': True, 'code_in_answer': True}

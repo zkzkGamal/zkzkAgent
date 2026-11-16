@@ -1,0 +1,204 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+INFO:benchmark.guards:[GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-2b/T2/rep3)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+INFO:__main__:[BENCH] local-2b T2 (system_info) rep 3
+INFO:agent_nodes.classify_node:[ROUTER] Query: Which Linux kernel version is this machine running?
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.classify_node:[ROUTER] → DIRECT_EXECUTION | The user is asking for the current system state (kernel version). This requires …
+INFO:core.agent:[ROUTER] Routing to: DIRECT_EXECUTION
+INFO:agent_nodes.execute_node:[AGENT] Processing with 2 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: Which Linux kernel version is this machine running?...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'detect_operating_system', 'args': {}, 'id': 'c797b816-81c2-4a04-bef2-dd4ff4e739f8', 'type': 'tool_call'}]
+                
+ tool names: ['detect_operating_system']
+                
+ iteration: 0/15
+                
+INFO:agent_nodes.execute_node:[AGENT] Processing with 4 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: Detected OS: Linux...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:agent_nodes.execute_node:[AGENT] Confirmation needed for: run_command
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: I'm about to run this command:
+  cat /etc/lxc/lxc.conf | grep kernel | head -1
+Reply 'yes' to go ahe
+                
+pending confirmation: {'tool_name': 'run_command', 'tool_args': {'command': 'cat /etc/lxc/lxc.conf | grep kernel | head -1'}, 'tool_call_id': '7575edc6-dd1a-4e44-b680-948b48baf727'}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 1/15
+                
+INFO:__main__:[BENCH] Confirmation for run_command: answering yes
+INFO:core.agent:[ENTRY ROUTER] Pending confirmation active → routing directly to execute
+INFO:agent_nodes.execute_node:[AGENT] Confirmation for run_command: user said 'yes'
+INFO:agent_nodes.execute_node:[AGENT] Processing with 7 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: yes...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:agent_nodes.execute_node:[AGENT] Confirmation needed for: run_command
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: I'm about to run this command:
+  ls -la /proc/modules | head -10
+Reply 'yes' to go ahead or 'no' to 
+                
+pending confirmation: {'tool_name': 'run_command', 'tool_args': {'command': 'ls -la /proc/modules | head -10'}, 'tool_call_id': '564fa6d6-29d2-4910-8a98-42bb616745d0'}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 0/15
+                
+INFO:__main__:[BENCH] Confirmation for run_command: answering yes
+INFO:core.agent:[ENTRY ROUTER] Pending confirmation active → routing directly to execute
+INFO:agent_nodes.execute_node:[AGENT] Confirmation for run_command: user said 'yes'
+INFO:agent_nodes.execute_node:[AGENT] Processing with 10 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: yes...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:agent_nodes.execute_node:[AGENT] Confirmation needed for: run_command
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: I'm about to run this command:
+  cat /proc/42/machine | head -1
+Reply 'yes' to go ahead or 'no' to c
+                
+pending confirmation: {'tool_name': 'run_command', 'tool_args': {'command': 'cat /proc/42/machine | head -1'}, 'tool_call_id': '7d4b8a95-d514-48fe-b4f1-2b778a0896b8'}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 0/15
+                
+INFO:__main__:[BENCH] Confirmation for run_command: answering yes
+INFO:core.agent:[ENTRY ROUTER] Pending confirmation active → routing directly to execute
+INFO:agent_nodes.execute_node:[AGENT] Confirmation for run_command: user said 'yes'
+INFO:agent_nodes.execute_node:[AGENT] Processing with 13 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: yes...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:agent_nodes.execute_node:[AGENT] Confirmation needed for: run_command
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: I'm about to run this command:
+  cat /proc/42/config | grep CONFIG
+Reply 'yes' to go ahead or 'no' t
+                
+pending confirmation: {'tool_name': 'run_command', 'tool_args': {'command': 'cat /proc/42/config | grep CONFIG'}, 'tool_call_id': '4cbd9815-5003-4195-ae76-c87abe804fec'}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 0/15
+                
+INFO:__main__:[BENCH] Confirmation for run_command: answering yes
+INFO:core.agent:[ENTRY ROUTER] Pending confirmation active → routing directly to execute
+INFO:agent_nodes.execute_node:[AGENT] Confirmation for run_command: user said 'yes'
+INFO:agent_nodes.execute_node:[AGENT] Processing with 16 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: yes...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:agent_nodes.execute_node:[AGENT] Confirmation needed for: run_command
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: I'm about to run this command:
+  cat /proc/0/cmdline | head -1
+Reply 'yes' to go ahead or 'no' to ca
+                
+pending confirmation: {'tool_name': 'run_command', 'tool_args': {'command': 'cat /proc/0/cmdline | head -1'}, 'tool_call_id': '9ec10af8-2451-4fa6-90e6-f84cc2c66419'}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 0/15
+                
+INFO:__main__:[BENCH] Confirmation for run_command: answering yes
+INFO:core.agent:[ENTRY ROUTER] Pending confirmation active → routing directly to execute
+INFO:agent_nodes.execute_node:[AGENT] Confirmation for run_command: user said 'yes'
+INFO:agent_nodes.execute_node:[AGENT] Processing with 19 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: yes...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:agent_nodes.execute_node:[AGENT] Confirmation needed for: run_command
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: HumanMessage and content: I'm about to run this command:
+  grep "^kernel " /proc/cmdline | head -1
+Reply 'yes' to go ahead or 
+                
+pending confirmation: {'tool_name': 'run_command', 'tool_args': {'command': 'grep "^kernel " /proc/cmdline | head -1'}, 'tool_call_id': '1f79a22a-f059-48c3-96f0-57c36b968868'}
+                
+Tools in last message: None
+                
+ tool names: None
+                
+ iteration: 0/15
+                
+INFO:__main__:[BENCH] Confirmation for run_command: answering yes
+INFO:core.agent:[ENTRY ROUTER] Pending confirmation active → routing directly to execute
+INFO:agent_nodes.execute_node:[AGENT] Confirmation for run_command: user said 'yes'
+INFO:agent_nodes.execute_node:[AGENT] Processing with 22 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: yes...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'tool_args': None, 'tool_call_id': None}
+                
+Tools in last message: [{'name': 'run_command', 'args': {'command': 'uname -r'}, 'id': 'b3da4675-9201-4d12-9109-245c2a3d2d61', 'type': 'tool_call'}]
+                
+ tool names: ['run_command']
+                
+ iteration: 0/15
+                
+INFO:agent_nodes.execute_node:[AGENT] Processing with 24 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: 6.8.0-138-generic
+...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: The Linux kernel version is **6.8.0-138-generic**.
+
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: The Linux kernel version is **6.8.0-138-generic**.
+                
+pending confirmation: {'tool_name': None, 'tool_args': None, 'tool_call_id': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 1/15
+                
+INFO:__main__:[BENCH] PASS {'used_a_tool': True, 'kernel_in_answer': True}

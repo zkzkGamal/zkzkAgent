@@ -1,0 +1,30 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+INFO:benchmark.guards:[GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/hybrid/T1/rep3)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+INFO:__main__:[BENCH] hybrid T1 (chat) rep 3
+INFO:agent_nodes.classify_node:[ROUTER] Query: What does `chmod 755` do to a file? Answer briefly.
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.classify_node:[ROUTER] → CONVERSATIONAL | The user is asking a general knowledge question about a command line tool withou…
+INFO:core.agent:[ROUTER] Routing to: CONVERSATIONAL
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: `chmod 755` gives read, write, and execute permissions to a user and others, while restricting only the owner to write permissions.
+
+Breakdown:
+- Owner (o): rwx (read, write, execute)
+- Group (g): r-x (read, execute, no write)
+- Others (o): r-x (read, execute, no write)
+
+This is commonly used to create executable scripts or directories like folders in the Linux file system.
+
+INFO:agent_nodes.conversation_node:[CONVERSATIONAL] Cleaned text: `chmod 755` gives read, write, and execute permissions to a user and others, while restricting only the owner to write permissions.
+
+Breakdown:
+- Owner (o): rwx (read, write, execute)
+- Group (g): r-x (read, execute, no write)
+- Others (o): r-x (read, execute, no write)
+
+This is commonly used to create executable scripts or directories like folders in the Linux file system.
+INFO:__main__:[BENCH] PASS {'routed_conversational': True, 'no_tool_calls': True, 'mentions_owner': True, 'mentions_execute': True}

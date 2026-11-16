@@ -1,0 +1,97 @@
+{
+  "local-2b": {
+    "cpu": "Intel(R) Core(TM) i7-10850H CPU @ 2.70GHz",
+    "ram": "31 GB",
+    "gpu": "Quadro T2000 with Max-Q Design, 4096 MiB",
+    "os": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "packages": {
+      "langchain-core": "1.5.3",
+      "langgraph": "1.0.9",
+      "langchain-openai": "1.1.11",
+      "langchain-ollama": "1.0.1"
+    },
+    "git_commit": "e423db1b26f22b44c9c884e05e35074d3c9a3172",
+    "git_dirty": false,
+    "model": "qwen3.5:2b-q4_K_M",
+    "local_model": "qwen3.5:2b-q4_K_M",
+    "model_type": "OLLAMA",
+    "reasoning": false,
+    "num_ctx": null,
+    "reps": 3,
+    "tasks": [
+      "T1",
+      "T2",
+      "T3",
+      "T4",
+      "T5"
+    ],
+    "run_timeout_s": 900,
+    "started_at": "2026-11-16T15:10:37",
+    "ollama_ps": "NAME                 ID              SIZE      PROCESSOR    CONTEXT    UNTIL   \nqwen3.5:2b-q4_K_M    124a03c34777    3.5 GB    100% GPU     4096       Forever",
+    "finished_at": "2026-11-16T15:16:49"
+  },
+  "hybrid": {
+    "cpu": "Intel(R) Core(TM) i7-10850H CPU @ 2.70GHz",
+    "ram": "31 GB",
+    "gpu": "Quadro T2000 with Max-Q Design, 4096 MiB",
+    "os": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "packages": {
+      "langchain-core": "1.5.3",
+      "langgraph": "1.0.9",
+      "langchain-openai": "1.1.11",
+      "langchain-ollama": "1.0.1"
+    },
+    "git_commit": "e423db1b26f22b44c9c884e05e35074d3c9a3172",
+    "git_dirty": false,
+    "model": "qwen/qwen3.8-27b",
+    "local_model": "qwen3.5:2b-q4_K_M",
+    "model_type": "HYBRID",
+    "reasoning": false,
+    "num_ctx": 8192,
+    "reps": 3,
+    "tasks": [
+      "T1",
+      "T2",
+      "T3",
+      "T4",
+      "T5"
+    ],
+    "run_timeout_s": 900,
+    "started_at": "2026-11-16T15:17:06",
+    "ollama_ps": "NAME                 ID              SIZE      PROCESSOR    CONTEXT    UNTIL   \nqwen3.5:2b-q4_K_M    124a03c34777    3.6 GB    100% GPU     8192       Forever",
+    "finished_at": "2026-11-16T15:31:03"
+  },
+  "nosana": {
+    "cpu": "Intel(R) Core(TM) i7-10850H CPU @ 2.70GHz",
+    "ram": "31 GB",
+    "gpu": "Quadro T2000 with Max-Q Design, 4096 MiB",
+    "os": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "packages": {
+      "langchain-core": "1.5.3",
+      "langgraph": "1.0.9",
+      "langchain-openai": "1.1.11",
+      "langchain-ollama": "1.0.1"
+    },
+    "git_commit": "e423db1b26f22b44c9c884e05e35074d3c9a3172",
+    "git_dirty": false,
+    "model": "qwen/qwen3.8-27b",
+    "local_model": null,
+    "model_type": "NOSANA",
+    "reasoning": false,
+    "num_ctx": null,
+    "reps": 3,
+    "tasks": [
+      "T1",
+      "T2",
+      "T3",
+      "T4",
+      "T5"
+    ],
+    "run_timeout_s": 900,
+    "started_at": "2026-11-16T15:31:11",
+    "finished_at": "2026-11-16T15:44:50"
+  }
+}

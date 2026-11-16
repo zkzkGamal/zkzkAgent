@@ -1,0 +1,66 @@
+/home/aloha-zkaria/.local/lib/python3.10/site-packages/langgraph/cache/base/__init__.py:8: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+INFO:benchmark.guards:[GUARD] Installed (sandbox: /home/aloha-zkaria/zkzk-bench/local-2b/T2/rep1)
+/home/aloha-zkaria/zkzkAgent/core/loadPrompts.py:13: LangChainDeprecationWarning: The function `load_prompt` was deprecated in LangChain 1.2.21 and will be removed in 2.0.0. Use `Use `dumpd`/`dumps` from `langchain_core.load` to serialize prompts and `load`/`loads` to deserialize them.` instead.
+  prompt = load_prompt(prompt_path)
+INFO:__main__:[BENCH] local-2b T2 (system_info) rep 1
+INFO:agent_nodes.classify_node:[ROUTER] Query: Which Linux kernel version is this machine running?
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.classify_node:[ROUTER] → DIRECT_EXECUTION | The user is asking for the current system state (specifically the kernel version…
+INFO:core.agent:[ROUTER] Routing to: DIRECT_EXECUTION
+INFO:agent_nodes.execute_node:[AGENT] Processing with 2 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: Which Linux kernel version is this machine running?...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'detect_operating_system', 'args': {}, 'id': '157f1f79-7211-4cbd-a53e-35043fa060be', 'type': 'tool_call'}]
+                
+ tool names: ['detect_operating_system']
+                
+ iteration: 0/15
+                
+INFO:agent_nodes.execute_node:[AGENT] Processing with 4 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: Detected OS: Linux...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: 
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: [{'name': 'run_command', 'args': {'command': 'uname -r'}, 'id': '17cd7fe8-cf0a-44af-93e8-1ac23a5ee4bb', 'type': 'tool_call'}]
+                
+ tool names: ['run_command']
+                
+ iteration: 1/15
+                
+INFO:agent_nodes.execute_node:[AGENT] Processing with 6 messages in context
+INFO:agent_nodes.execute_node:[AGENT] Last message: 6.8.0-138-generic
+...
+INFO:httpx:HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+
+[AI]: The Linux kernel version is 6.8.0-138-generic
+
+INFO:agent_nodes.execute_node:[AGENT] Response finished
+INFO:core.agent:
+                [AGENT] Evaluating next step with
+                
+last message type: AIMessage and content: The Linux kernel version is 6.8.0-138-generic
+                
+pending confirmation: {'tool_name': None, 'user_message': None}
+                
+Tools in last message: []
+                
+ tool names: None
+                
+ iteration: 2/15
+                
+INFO:__main__:[BENCH] PASS {'used_a_tool': True, 'kernel_in_answer': True}
