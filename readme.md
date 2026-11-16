@@ -22,6 +22,8 @@ This repository implements a multi-node LangGraph/StateGraph runtime that mirror
 
 > 🆕 **Now on Nosana**: set `MODEL_TYPE=NOSANA` and the agent's LLM runs on [Nosana](https://nosana.com)'s decentralized GPU network, so even a small laptop can drive a 27B model. Tools still run on your machine. See [Nosana Decentralized GPU Inference](#-nosana-decentralized-gpu-inference-new) and a [real run](#-real-run-on-nosana-zkzkagent-builds-a-calculator-app), whose code is on GitHub at [zkzkGamal/calculator](https://github.com/zkzkGamal/calculator).
 
+> 🆕 **Hybrid mode**: set `MODEL_TYPE=HYBRID` to keep routing and chat on your laptop and send only planning and tool use to Nosana. If Nosana drops out mid-task, the agent stops cleanly, keeps every step it finished, and lets you `retry` or `continue` on the local model. See [Hybrid Mode](#hybrid-mode-local--nosana) and [When Nosana Drops Out](#when-nosana-drops-out).
+
 ---
 
 ## 🎬 Demos
@@ -92,8 +94,9 @@ zkzkAgent doesn't just blindly execute your commands — it **classifies your in
 
 ### 🛡️ Human-in-the-Loop Safety
 
-- **Confirmation Gates**: Destructive operations require explicit `yes/no` before execution
-- **Dangerous Tool Protection**: Safeguards for `empty_trash`, `remove_file`, `install_package`, and more
+- **Confirmation Gates**: Destructive operations require explicit `yes/no` before execution; after `yes` the task carries on
+- **Dangerous Tool Protection**: Safeguards for `empty_trash`, `remove_file`, `install_package`, `run_deploy_script`, and more
+- **Shell Commands Gated**: `run_command` runs a short list of read-only commands (`ls`, `cat`, `grep`, `uname`, `mkdir`, …) without asking, and without a shell, so no expansion can change what was checked; anything else, including `&&`, `|`, `>`, `$` or `sudo`, asks first and runs only after your `yes`
 - **Local Execution**: Tools always run on your machine; with Ollama, inference does too and nothing leaves it
 
 ### 🎤 Voice Interaction (Optional)
@@ -107,7 +110,7 @@ zkzkAgent doesn't just blindly execute your commands — it **classifies your in
 | Category                              | Tools                                                                                                                             |
 | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **File Operations**                   | `find_file`, `find_folder`, `read_file`, `open_file`, `get_file_content`, `write_file`, `get_files_info`, `create_project_folder` |
-| **Dangerous (Confirmation Required)** | `empty_trash`, `clear_tmp`, `remove_file`, `install_package`, `remove_package`                                                    |
+| **Dangerous (Confirmation Required)** | `empty_trash`, `clear_tmp`, `remove_file`, `install_package`, `remove_package`, `run_deploy_script`, and `run_command` (except read-only commands) |
 | **Applications**                      | `open_vscode`, `open_browser`                                                                                                     |
 | **Network**                           | `check_internet`, `enable_wifi`, `duckduckgo_search`, `duckduckgo_search_images`                                                  |
 | **Process Management**                | `find_process`, `kill_process`                                                                                                    |
@@ -122,13 +125,13 @@ Small local models struggle with long, multi-step plans. zkzkAgent can send its 
 
 Pick the backend with one variable in `.env`. No code changes.
 
-|                         | `MODEL_TYPE=OLLAMA` (default)               | `MODEL_TYPE=NOSANA`                                         |
-| ----------------------- | ------------------------------------------- | ----------------------------------------------------------- |
-| Where the model runs    | Your machine, via Ollama                    | GPU nodes on the Nosana network                             |
-| Model                   | Any Ollama model (default `qwen3:1.7b-q4_K_M`) | Any model Nosana serves (we use `qwen/qwen3.8-27b`)      |
-| Hardware needed         | 8–16 GB RAM                                 | Any machine with internet                                   |
-| What leaves the machine | Nothing                                     | Prompts, chat history and tool output sent to the model     |
-| LangChain client        | `ChatOllama`                                | `ChatOpenAI` (OpenAI-compatible API)                        |
+|                         | `MODEL_TYPE=OLLAMA` (default)               | `MODEL_TYPE=NOSANA`                                         | `MODEL_TYPE=HYBRID`                                         |
+| ----------------------- | ------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+| Where the model runs    | Your machine, via Ollama                    | GPU nodes on the Nosana network                             | Routing and chat on your machine; planning and tool use on Nosana |
+| Model                   | Any Ollama model (default `qwen3:1.7b-q4_K_M`) | Any model Nosana serves (we use `qwen/qwen3.8-27b`)      | One of each (we use `qwen3.5:2b-q4_K_M` + `qwen/qwen3.8-27b`) |
+| Hardware needed         | 8–16 GB RAM                                 | Any machine with internet                                   | Enough to run a small model, plus internet                  |
+| What leaves the machine | Nothing                                     | Prompts, chat history and tool output sent to the model     | A task's request, the conversation history and tool output; chat replies are made locally |
+| LangChain client        | `ChatOllama`                                | `ChatOpenAI` (OpenAI-compatible API)                        | Both                                                        |
 
 ### Option A — Nosana Inference API (what we use)
 
@@ -146,12 +149,62 @@ Pick the backend with one variable in `.env`. No code changes.
 
    ```bash
    python3 models/LLM.py
-   # [NOSANA] qwen/qwen3.8-27b @ https://inference.nosana.com/v1
+   # [NOSANA] qwen/qwen3.8-27b (Nosana)
    ```
 
 4. Start the agent as usual (`./cli.sh` or `python3 main.py`).
 
-If `NOSANA_MODEL` is empty, zkzkAgent calls `GET /models` and uses the first model being served. Models only appear in that list while a GPU is serving them, so this always picks a live one. Requests time out after 120 s and retry twice.
+If `NOSANA_MODEL` is empty, zkzkAgent calls `GET /models` and uses the first model being served. Models only appear in that list while a GPU is serving them, so this always picks a live one. A request fails if Nosana can't be reached within 5 s or sends nothing for 60 s (`NOSANA_TIMEOUT`), and is retried once (`NOSANA_MAX_RETRIES`).
+
+### Hybrid Mode: Local + Nosana
+
+Small models are good at short jobs and bad at long ones. Hybrid mode gives each step the model it needs:
+
+| Step | Runs on | Why |
+| --- | --- | --- |
+| Routing (what kind of request is this?) | Local model | A short prompt with no history; fast |
+| Chat answers | Local model | Fast, and the reply is made on your machine |
+| Planning | Nosana | In our [benchmark](#-benchmark-local-models-vs-nosana), the local 2B built 0 of 3 apps; the 27B built 3 of 3 |
+| Tool use | Nosana | Same |
+
+```bash
+MODEL_TYPE="HYBRID"
+NOSANA_API_KEY="nos_..."
+NOSANA_MODEL="qwen/qwen3.8-27b"
+OLLAMA_MODEL="qwen3.5:2b-q4_K_M"
+```
+
+Optional settings, with their defaults:
+
+```bash
+NOSANA_FALLBACK="true"    # use the local model when Nosana fails ("false" by default in NOSANA mode)
+NOSANA_TIMEOUT="60"       # seconds without a byte before a Nosana request fails (connecting: 5 s)
+NOSANA_MAX_RETRIES="1"
+NOSANA_COOLDOWN="60"      # seconds a failed Nosana is skipped
+OLLAMA_NUM_CTX="8192"     # HYBRID default; in OLLAMA mode it stays at Ollama's 4,096 unless set
+OLLAMA_TIMEOUT="60"
+```
+
+`NOSANA_FALLBACK="true"` also works in NOSANA mode, if Ollama is installed. The CLI header shows which model does what.
+
+### When Nosana Drops Out
+
+We [cut Nosana off at every step of a task](benchmark/results/2026-11-15-dropout/summary.md) and watched what happened. Handing a half-done task, with the 27B's long history, to a 2B model failed every time. So zkzkAgent follows three rules:
+
+1. **Routing, planning and chat switch at once.** They don't depend on history, so the other model just answers. You see a line like `[Nosana (qwen/qwen3.8-27b) failed (ConnectError) — using local (qwen3.5:2b-q4_K_M)]`.
+2. **A task never switches model halfway.** If the model fails mid-task, the agent stops, keeps every step it finished, and asks:
+
+   ```
+   Nosana (qwen/qwen3.8-27b) stopped: APIConnectionError: Connection error.
+   Nothing is lost: 3 steps of this task are done (create_project_folder, write_file, write_file).
+   Reply 'continue' to finish with local (qwen3.5:2b-q4_K_M), or 'retry' to try Nosana (qwen/qwen3.8-27b) again. The local model is smaller, so it gets a short summary of what is done instead of the full history.
+   ```
+
+   - `retry` carries on where it stopped, on the same model, and tells it which steps already ran.
+   - `continue` gives the other model a short summary (the request, the plan, the steps done) instead of the full history.
+3. **New requests skip a failed Nosana.** After an outage, Nosana is skipped for `NOSANA_COOLDOWN` seconds, so a dead endpoint costs one timeout, not one per call. A rejected key or empty credits (401) skips it until you reply `retry` or restart, and the message tells you to check `NOSANA_API_KEY` and your credits.
+
+The same rules work the other way round: if the local model is down, routing and chat use Nosana.
 
 ### Option B — Run Your Own Ollama on a Nosana GPU
 
@@ -175,7 +228,7 @@ OLLAMA_MODEL="qwen3:14b"
 
 ### 🔒 Privacy in Nosana Mode
 
-Nosana mode sends everything the model sees to a remote GPU node: your messages, the conversation history and tool results (for example, file contents returned by `read_file`). Use `MODEL_TYPE=OLLAMA` for sensitive work. Dangerous tools still need your `yes` in both modes, because the confirmation gate runs locally.
+Nosana mode sends everything the model sees to a remote GPU node: your messages, the conversation history and tool results (for example, file contents returned by `read_file`). Hybrid mode answers chat locally, but when you ask for a task, the request, the conversation history (earlier chat included) and tool results go to Nosana. Use `MODEL_TYPE=OLLAMA` for sensitive work. Dangerous tools still need your `yes` in every mode, because the confirmation gate runs locally.
 
 ---
 
@@ -533,7 +586,7 @@ Each node has its own `.yaml` prompt file — customize behavior per path:
 `models/LLM.py` reads the backend from `.env`, so switching models needs no code changes. Copy `.env.example` to `.env` to start:
 
 ```bash
-MODEL_TYPE="OLLAMA"                        # OLLAMA (local) or NOSANA
+MODEL_TYPE="OLLAMA"                        # OLLAMA (local), NOSANA or HYBRID
 OLLAMA_MODEL="qwen3:1.7b-q4_K_M"           # any model you have pulled
 OLLAMA_BASE_URL="http://127.0.0.1:11434"
 ```
@@ -675,16 +728,20 @@ AI:   [PLAN] First I'll list files, filter by date, then confirm before removing
 
 ```
 User: Empty the trash
-AI:   ⚠️ I'm about to perform 'empty_trash'. This will delete data permanently.
-      Please confirm with 'yes' or 'no'.
+AI:   ⚠️ I'm about to permanently delete everything in your trash
+      Reply 'yes' to go ahead or 'no' to cancel.
 User: yes
 AI:   ✓ Trash emptied. ~/.local/share/Trash cleared.
 
 User: Install nginx
-AI:   ⚠️ I'm about to run 'install_package' (nginx). Confirm with 'yes' or 'no'.
+AI:   ⚠️ I'm about to install software with this command:
+        sudo apt install -y nginx
+      Reply 'yes' to go ahead or 'no' to cancel.
 User: no
-AI:   ✓ Installation cancelled.
+AI:   Canceled: I did not run `sudo apt install -y nginx`.
 ```
+
+After `yes`, the agent carries on with the rest of the task.
 
 ### 🔍 Web Search & Images
 
@@ -732,10 +789,12 @@ zkzkAgent/
 │   ├── classify_node.py        # Router: classifies intent, sets state["category"]
 │   ├── conversation_node.py    # Handles CONVERSATIONAL requests
 │   ├── plan_node.py            # Handles NEEDS_PLANNING — decomposes tasks
+│   ├── handover.py             # retry/continue words and the handover summary
 │   └── execute_node.py         # Handles DIRECT_EXECUTION — tool-calling agent
 │
 ├── models/                     # AI model configs
-│   ├── LLM.py                  # LLM backend: Ollama (local) or Nosana, set by MODEL_TYPE
+│   ├── LLM.py                  # LLM backends: Ollama (local), Nosana or both, set by MODEL_TYPE
+│   ├── selector.py             # Picks the model for each node; fallback and circuit breaker
 │   ├── voice.py                # Whisper speech recognition
 │   └── tts.py                  # Coqui / Kokoro TTS
 │
@@ -819,8 +878,11 @@ __all__ = [..., my_custom_tool]
 In `agent_nodes/execute_node.py`:
 
 ```python
-DANGEROUS_TOOLS = ["empty_trash", "clear_tmp", "remove_file", "my_dangerous_tool"]
+DANGEROUS_TOOLS = ["empty_trash", "clear_tmp", "remove_file", "install_package",
+                   "remove_package", "run_deploy_script", "my_dangerous_tool"]
 ```
+
+`run_command` asks only when the command is not on the read-only list. To let another read-only command run without asking, add it to `SAFE_COMMANDS` in `tools_module/runCommand.py`.
 
 ---
 
@@ -841,7 +903,8 @@ systemctl restart ollama       # restart service
 | ------------------------------------------------------------ | ------------------------------------------------------------------------- |
 | `NOSANA_API_KEY missing or invalid (must start with 'nos_')` | Set `NOSANA_API_KEY` in `.env`                                            |
 | `No Nosana models are being served right now.`               | No GPU is serving a model at the moment. Try again later, or switch to `MODEL_TYPE=OLLAMA` |
-| `Unknown MODEL_TYPE '...'`                                   | Use `OLLAMA` or `NOSANA`                                                  |
+| `Unknown MODEL_TYPE '...'`                                   | Use `OLLAMA`, `NOSANA` or `HYBRID`                                        |
+| `No model could answer. …`                                   | Every model failed; the message names each error. Check that Ollama is running (`ollama ps`), and your Nosana key and credits |
 
 #### NetworkManager Not Found
 
@@ -876,6 +939,7 @@ If you see `KeyError: missing variables` in a LangChain prompt — you likely ha
 
 - **Local by default**: With `MODEL_TYPE=OLLAMA`, all LLM inference is on-device — zero cloud calls
 - **Opt-in remote inference**: With `MODEL_TYPE=NOSANA`, prompts, chat history and tool output go to a Nosana GPU node; tools still execute locally
+- **Hybrid**: With `MODEL_TYPE=HYBRID`, routing and chat run locally; tasks send their request, the conversation history and tool output to Nosana
 - **No telemetry**: zkzkAgent sends no analytics or usage data
 - **Confirmation-gated**: Destructive operations blocked until user explicitly approves
 - **Role separation**: Router, planner, and executor are separate nodes with different prompts and permissions
